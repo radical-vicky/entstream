@@ -1,0 +1,946 @@
+```django
+{% extends "base.html" %}
+
+{% block title %}Upload Video | StreamSphere{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Upload your video to StreamSphere.">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.upload-page {
+    --bg: #0b0d10;
+    --panel: #12151a;
+    --panel2: #191d23;
+    --border: #2c323a;
+    --text: #f4f6f8;
+    --muted: #939daa;
+    --orange: #ff7900;
+    --orange-soft: #ffad66;
+    --danger: #ff6969;
+
+    max-width: 1120px;
+    margin: auto;
+    padding: 30px 22px 50px;
+    color: var(--text);
+}
+
+.upload-page,
+.upload-page * {
+    box-sizing: border-box;
+}
+
+.upload-page h1,
+.upload-page h2,
+.upload-page h3,
+.upload-page p {
+    margin-top: 0;
+}
+
+.upload-page a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.upload-page button,
+.upload-page input,
+.upload-page textarea,
+.upload-page select {
+    font: inherit;
+}
+
+.upload-page button:focus-visible,
+.upload-page a:focus-visible,
+.upload-page input:focus-visible,
+.upload-page textarea:focus-visible,
+.upload-page select:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+/* Header */
+.upload-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.upload-kicker {
+    margin-bottom: 7px;
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.upload-header h1 {
+    margin-bottom: 6px;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 850;
+    letter-spacing: -.8px;
+}
+
+.upload-header p {
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.upload-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.upload-back:hover {
+    border-color: var(--orange);
+    color: var(--orange-soft);
+}
+
+/* Layout */
+.upload-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: start;
+    gap: 18px;
+}
+
+.upload-card,
+.upload-side-card {
+    min-width: 0;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 0;
+}
+
+.upload-card-header {
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.upload-card-header h2 {
+    margin-bottom: 4px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.upload-card-header p {
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.upload-form {
+    padding: 20px;
+}
+
+.upload-field {
+    margin-bottom: 19px;
+}
+
+.upload-field > label,
+.upload-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e8ebef;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.upload-required {
+    color: var(--orange);
+}
+
+/* Inputs */
+.upload-input,
+.upload-textarea,
+.upload-select {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #343b44;
+    border-radius: 0;
+    background: #0c0f13;
+    color: var(--text);
+    font-size: 12px !important;
+}
+
+.upload-input::placeholder,
+.upload-textarea::placeholder {
+    color: #737c88;
+}
+
+.upload-input:focus,
+.upload-textarea:focus,
+.upload-select:focus {
+    border-color: var(--orange);
+    outline: none;
+}
+
+.upload-textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.upload-help {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* Video drop zone */
+.upload-dropzone {
+    position: relative;
+    display: flex;
+    min-height: 185px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 1px dashed #454d57;
+    background: #0d1014;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.is-dragging {
+    border-color: var(--orange);
+    background: #17120e;
+}
+
+.upload-dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-drop-content {
+    pointer-events: none;
+}
+
+.upload-drop-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 12px;
+    border: 1px solid #553820;
+    background: #24180f;
+    color: var(--orange);
+    font-size: 20px;
+}
+
+.upload-drop-title {
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.upload-drop-subtitle {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.upload-file-name {
+    display: none;
+    margin-top: 9px;
+    color: var(--orange-soft);
+    font-size: 11px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.upload-file-name.is-visible {
+    display: block;
+}
+
+.upload-preview {
+    display: none;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    background: #000;
+}
+
+.upload-preview.is-visible {
+    display: block;
+}
+
+.upload-preview video {
+    display: block;
+    width: 100%;
+    max-height: 280px;
+    background: #000;
+    object-fit: contain;
+}
+
+/* Compact options */
+.upload-options {
+    display: grid;
+    gap: 10px;
+}
+
+.upload-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    background: #0d1014;
+    cursor: pointer;
+}
+
+.upload-check input {
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    accent-color: var(--orange);
+}
+
+.upload-check strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11px;
+}
+
+.upload-check small {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.upload-price {
+    display: none;
+    margin-top: 12px;
+}
+
+.upload-price.is-visible {
+    display: block;
+}
+
+.upload-errors {
+    margin-bottom: 17px;
+    padding: 12px;
+    border: 1px solid #713434;
+    background: #241111;
+    color: #ffb6b6;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.upload-field-error {
+    margin-top: 6px;
+    color: var(--danger);
+    font-size: 10px;
+}
+
+.upload-divider {
+    height: 1px;
+    margin: 22px 0;
+    background: var(--border);
+}
+
+/* Buttons */
+.upload-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding-top: 17px;
+    border-top: 1px solid var(--border);
+}
+
+.upload-button,
+.upload-cancel {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.upload-button {
+    border-color: var(--orange);
+    background: var(--orange);
+    color: #111;
+}
+
+.upload-button:hover {
+    background: var(--orange-soft);
+    border-color: var(--orange-soft);
+}
+
+.upload-button:disabled {
+    opacity: .65;
+    cursor: wait;
+}
+
+.upload-cancel {
+    background: transparent;
+    color: var(--text);
+}
+
+.upload-cancel:hover {
+    border-color: #737d89;
+}
+
+/* Sidebar */
+.upload-sidebar {
+    display: grid;
+    gap: 13px;
+}
+
+.upload-side-card {
+    padding: 17px;
+}
+
+.upload-side-card h3 {
+    margin-bottom: 13px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.upload-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.upload-tip:first-of-type {
+    padding-top: 0;
+}
+
+.upload-tip:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.upload-tip-icon {
+    display: flex;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #49321f;
+    background: #21170f;
+    color: var(--orange);
+    font-size: 12px;
+}
+
+.upload-tip strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11px;
+}
+
+.upload-tip p {
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.upload-notice {
+    padding: 12px;
+    border-left: 2px solid var(--orange);
+    background: #1b1510;
+    color: #c7c0b9;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.upload-notice strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--orange-soft);
+}
+
+.upload-profile-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.upload-profile-link i {
+    color: var(--orange);
+}
+
+.upload-profile-link:hover {
+    border-color: var(--orange);
+}
+
+/* Responsive */
+@media (max-width: 820px) {
+    .upload-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .upload-sidebar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .upload-page {
+        padding: 22px 12px 35px;
+    }
+
+    .upload-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .upload-header h1 {
+        font-size: 28px;
+    }
+
+    .upload-form,
+    .upload-card-header {
+        padding: 15px;
+    }
+
+    .upload-sidebar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .upload-dropzone {
+        min-height: 160px;
+        padding: 15px;
+    }
+
+    .upload-actions {
+        flex-direction: column;
+    }
+
+    .upload-button,
+    .upload-cancel {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="upload-page">
+
+    <header class="upload-header">
+        <div>
+            <div class="upload-kicker">Creator studio</div>
+            <h1>Upload video<span style="color:#ff7900">.</span></h1>
+            <p>Add your video and publish it to StreamSphere.</p>
+        </div>
+
+        <a class="upload-back" href="{% url 'accounts:profile' %}">
+            <i class="fas fa-arrow-left"></i> My profile
+        </a>
+    </header>
+
+    <div class="upload-layout">
+
+        <section class="upload-card">
+            <div class="upload-card-header">
+                <h2>Video information</h2>
+                <p>Choose your file and add a title.</p>
+            </div>
+
+            <form class="upload-form"
+                  method="post"
+                  enctype="multipart/form-data"
+                  id="videoUploadForm">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="upload-errors">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="upload-field">
+                    <label for="{{ form.video_file.id_for_label }}">
+                        Video file <span class="upload-required">*</span>
+                    </label>
+
+                    <label class="upload-dropzone" id="uploadDropZone">
+                        <input
+                            type="file"
+                            name="{{ form.video_file.html_name }}"
+                            id="{{ form.video_file.id_for_label }}"
+                            accept="video/*"
+                            required
+                        >
+
+                        <div class="upload-drop-content">
+                            <div class="upload-drop-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-drop-title">Select your video</div>
+                            <div class="upload-drop-subtitle">
+                                Click here to browse your files
+                            </div>
+                            <div class="upload-file-name" id="uploadFileName"></div>
+                        </div>
+                    </label>
+
+                    {% for error in form.video_file.errors %}
+                    <div class="upload-field-error">{{ error }}</div>
+                    {% endfor %}
+
+                    {% if form.video_file.help_text %}
+                    <small class="upload-help">{{ form.video_file.help_text }}</small>
+                    {% endif %}
+
+                    <div class="upload-preview" id="uploadPreview">
+                        <video id="uploadPreviewVideo"
+                               controls
+                               preload="metadata"></video>
+                    </div>
+                </div>
+
+                <div class="upload-field">
+                    <label for="{{ form.title.id_for_label }}">
+                        Title <span class="upload-required">*</span>
+                    </label>
+
+                    <input
+                        class="upload-input"
+                        type="text"
+                        name="{{ form.title.html_name }}"
+                        id="{{ form.title.id_for_label }}"
+                        value="{{ form.title.value|default_if_none:'' }}"
+                        maxlength="200"
+                        placeholder="Enter video title"
+                        required
+                    >
+
+                    {% for error in form.title.errors %}
+                    <div class="upload-field-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="upload-field">
+                    <label for="{{ form.description.id_for_label }}">
+                        Description <span style="color:#737c88">(optional)</span>
+                    </label>
+
+                    <textarea
+                        class="upload-textarea"
+                        name="{{ form.description.html_name }}"
+                        id="{{ form.description.id_for_label }}"
+                        placeholder="Write a short description..."
+                    >{{ form.description.value|default_if_none:'' }}</textarea>
+
+                    {% for error in form.description.errors %}
+                    <div class="upload-field-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                {% if form.status %}
+                <div class="upload-field">
+                    <label for="{{ form.status.id_for_label }}">Visibility</label>
+
+                    <select class="upload-select"
+                            name="{{ form.status.html_name }}"
+                            id="{{ form.status.id_for_label }}">
+                        {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}"{% if form.status.value == value %} selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    {% for error in form.status.errors %}
+                    <div class="upload-field-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if form.is_premium %}
+                <div class="upload-divider"></div>
+
+                <div class="upload-field">
+                    <div class="upload-label">Monetization</div>
+
+                    <div class="upload-options">
+                        <label class="upload-check"
+                               for="{{ form.is_premium.id_for_label }}">
+                            <input
+                                type="checkbox"
+                                name="{{ form.is_premium.html_name }}"
+                                id="{{ form.is_premium.id_for_label }}"
+                                {% if form.is_premium.value %}checked{% endif %}
+                            >
+                            <span>
+                                <strong>Premium video</strong>
+                                <small>Mark this video as paid content.</small>
+                            </span>
+                        </label>
+                    </div>
+
+                    {% for error in form.is_premium.errors %}
+                    <div class="upload-field-error">{{ error }}</div>
+                    {% endfor %}
+
+                    {% if form.price %}
+                    <div class="upload-price" id="uploadPriceField">
+                        <label for="{{ form.price.id_for_label }}">Price</label>
+
+                        <input
+                            class="upload-input"
+                            type="number"
+                            name="{{ form.price.html_name }}"
+                            id="{{ form.price.id_for_label }}"
+                            value="{{ form.price.value|default_if_none:'0.00' }}"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter price"
+                        >
+
+                        {% for error in form.price.errors %}
+                        <div class="upload-field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if form.duration %}
+                <div class="upload-field">
+                    <label for="{{ form.duration.id_for_label }}">Duration</label>
+
+                    <input
+                        class="upload-input"
+                        type="text"
+                        name="{{ form.duration.html_name }}"
+                        id="{{ form.duration.id_for_label }}"
+                        value="{{ form.duration.value|default_if_none:'' }}"
+                        placeholder="Optional"
+                    >
+                </div>
+                {% endif %}
+
+                <div class="upload-actions">
+                    <button class="upload-button"
+                            type="submit"
+                            id="uploadSubmitButton">
+                        <i class="fas fa-upload"></i> Upload video
+                    </button>
+
+                    <a class="upload-cancel"
+                       href="{% url 'accounts:profile' %}">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="upload-sidebar">
+
+            <section class="upload-side-card">
+                <h3>Quick tips</h3>
+
+                <div class="upload-tip">
+                    <div class="upload-tip-icon">
+                        <i class="fas fa-heading"></i>
+                    </div>
+                    <div>
+                        <strong>Good title</strong>
+                        <p>Keep it short and clear.</p>
+                    </div>
+                </div>
+
+                <div class="upload-tip">
+                    <div class="upload-tip-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div>
+                        <strong>Check preview</strong>
+                        <p>Make sure the correct video is selected.</p>
+                    </div>
+                </div>
+
+                <div class="upload-tip">
+                    <div class="upload-tip-icon">
+                        <i class="fas fa-align-left"></i>
+                    </div>
+                    <div>
+                        <strong>Add context</strong>
+                        <p>A short description is enough.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="upload-side-card">
+                <h3>Publishing</h3>
+                <div class="upload-notice">
+                    <strong>Before uploading</strong>
+                    Make sure you have permission to share the video.
+                </div>
+            </section>
+
+            <a class="upload-profile-link"
+               href="{% url 'accounts:profile' %}">
+                <span><i class="fas fa-user-circle"></i> View my profile</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+        </aside>
+    </div>
+</main>
+
+<script>
+(function () {
+    const fileInput = document.getElementById(
+        "{{ form.video_file.id_for_label|escapejs }}"
+    );
+    const fileName = document.getElementById("uploadFileName");
+    const dropZone = document.getElementById("uploadDropZone");
+    const preview = document.getElementById("uploadPreview");
+    const previewVideo = document.getElementById("uploadPreviewVideo");
+    const premiumCheckbox = document.getElementById(
+        "{% if form.is_premium %}{{ form.is_premium.id_for_label|escapejs }}{% endif %}"
+    );
+    const priceField = document.getElementById("uploadPriceField");
+    const uploadForm = document.getElementById("videoUploadForm");
+    const submitButton = document.getElementById("uploadSubmitButton");
+
+    let previewUrl = null;
+
+    function clearPreview() {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        previewVideo.removeAttribute("src");
+        previewVideo.load();
+        preview.classList.remove("is-visible");
+    }
+
+    function showFile(file) {
+        if (!file) return;
+
+        clearPreview();
+
+        fileName.textContent = file.name;
+        fileName.classList.add("is-visible");
+
+        if (file.type.startsWith("video/")) {
+            previewUrl = URL.createObjectURL(file);
+            previewVideo.src = previewUrl;
+            preview.classList.add("is-visible");
+        }
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            showFile(this.files && this.files[0]);
+        });
+    }
+
+    if (dropZone && fileInput) {
+        ["dragenter", "dragover"].forEach(function (name) {
+            dropZone.addEventListener(name, function (event) {
+                event.preventDefault();
+                dropZone.classList.add("is-dragging");
+            });
+        });
+
+        ["dragleave", "drop"].forEach(function (name) {
+            dropZone.addEventListener(name, function (event) {
+                event.preventDefault();
+                dropZone.classList.remove("is-dragging");
+            });
+        });
+
+        dropZone.addEventListener("drop", function (event) {
+            const files = event.dataTransfer && event.dataTransfer.files;
+
+            if (files && files.length) {
+                try {
+                    const transfer = new DataTransfer();
+                    Array.from(files).forEach(function (file) {
+                        transfer.items.add(file);
+                    });
+                    fileInput.files = transfer.files;
+                    showFile(fileInput.files[0]);
+                } catch (error) {
+                    // Browsers may prevent assigning dropped files.
+                }
+            }
+        });
+    }
+
+    function updatePriceVisibility() {
+        if (premiumCheckbox && priceField) {
+            priceField.classList.toggle(
+                "is-visible",
+                premiumCheckbox.checked
+            );
+        }
+    }
+
+    if (premiumCheckbox) {
+        premiumCheckbox.addEventListener("change", updatePriceVisibility);
+        updatePriceVisibility();
+    }
+
+    if (uploadForm && submitButton) {
+        uploadForm.addEventListener("submit", function (event) {
+            if (!uploadForm.checkValidity()) {
+                return;
+            }
+
+            if (submitButton.disabled) {
+                event.preventDefault();
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        });
+    }
+
+    window.addEventListener("beforeunload", function () {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+    });
+})();
+</script>
+{% endblock %}
+```

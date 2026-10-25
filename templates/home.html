@@ -1,0 +1,833 @@
+```django
+{% extends "base.html" %}
+
+{% block title %}StreamSphere - Discover Videos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sh-home {
+        min-height: calc(100vh - 130px);
+        background: #0b0d0e;
+        color: #e7e9ea;
+    }
+
+    .sh-container {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 30px 28px 64px;
+    }
+
+    .sh-hero {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+        overflow: hidden;
+        margin-bottom: 36px;
+        padding: 30px 32px;
+        border: 1px solid #34271c;
+        background: linear-gradient(110deg, #17120e 0%, #111313 58%, #0d0f10 100%);
+    }
+
+    .sh-hero::after {
+        position: absolute;
+        top: -90px;
+        right: 12%;
+        width: 240px;
+        height: 240px;
+        border: 1px solid rgba(255, 146, 46, .13);
+        content: "";
+        transform: rotate(35deg);
+        pointer-events: none;
+    }
+
+    .sh-hero-copy {
+        position: relative;
+        z-index: 1;
+        max-width: 650px;
+    }
+
+    .sh-eyebrow {
+        margin: 0 0 10px;
+        color: #ff922e;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .sh-hero h1 {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(27px, 4vw, 43px);
+        font-weight: 850;
+        letter-spacing: -1.5px;
+        line-height: 1.12;
+    }
+
+    .sh-hero h1 span {
+        color: #ff922e;
+    }
+
+    .sh-hero-description {
+        max-width: 510px;
+        margin: 14px 0 0;
+        color: #a1a6a9;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .sh-hero-actions {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .sh-button {
+        display: inline-flex;
+        min-height: 43px;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 0 17px;
+        border: 1px solid #ff7900;
+        background: #ff7900;
+        color: #090b0c;
+        font-size: 11px;
+        font-weight: 850;
+        text-decoration: none;
+        transition: background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .sh-button:hover {
+        border-color: #ff922e;
+        background: #ff922e;
+    }
+
+    .sh-button-secondary {
+        border-color: #383b3c;
+        background: #171a1b;
+        color: #e7e9ea;
+    }
+
+    .sh-button-secondary:hover {
+        border-color: #ff7900;
+        background: #21160d;
+        color: #ff922e;
+    }
+
+    .sh-button svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .sh-section {
+        margin-top: 38px;
+    }
+
+    .sh-section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .sh-section-label {
+        margin: 0 0 5px;
+        color: #ff922e;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .sh-section-title {
+        margin: 0;
+        color: #f6f7f7;
+        font-size: 19px;
+        font-weight: 850;
+        letter-spacing: -.4px;
+    }
+
+    .sh-section-description {
+        margin: 6px 0 0;
+        color: #858b8f;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .sh-view-all {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 0 8px 10px;
+        color: #ff922e;
+        font-size: 11px;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+    .sh-view-all:hover {
+        color: #fff;
+    }
+
+    .sh-view-all svg {
+        width: 14px;
+        height: 14px;
+        transition: transform .18s ease;
+    }
+
+    .sh-view-all:hover svg {
+        transform: translateX(3px);
+    }
+
+    .sh-video-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 28px 18px;
+    }
+
+    .sh-video-card {
+        min-width: 0;
+    }
+
+    .sh-thumbnail {
+        position: relative;
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 1px solid #222627;
+        background: #151819;
+        color: #777e82;
+        text-decoration: none;
+    }
+
+    .sh-thumbnail img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .sh-video-card:hover .sh-thumbnail img {
+        transform: scale(1.035);
+        opacity: .9;
+    }
+
+    .sh-thumbnail-fallback {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        min-height: 100px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        color: #737a7e;
+        font-size: 10px;
+    }
+
+    .sh-thumbnail-fallback svg {
+        width: 28px;
+        height: 28px;
+        color: #a1a6a9;
+    }
+
+    .sh-thumbnail-shade {
+        position: absolute;
+        inset: auto 0 0;
+        height: 38%;
+        background: linear-gradient(transparent, rgba(0,0,0,.5));
+        pointer-events: none;
+    }
+
+    .sh-duration {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        padding: 4px 6px;
+        background: rgba(0,0,0,.9);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .sh-premium {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 5px 7px;
+        border-left: 2px solid #ff7900;
+        background: rgba(18,14,10,.95);
+        color: #ff922e;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .7px;
+        text-transform: uppercase;
+    }
+
+    .sh-card-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding-top: 12px;
+    }
+
+    .sh-creator-mark {
+        display: flex;
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #34383a;
+        background: #1b1e20;
+        color: #ff922e;
+        font-size: 12px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    .sh-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sh-video-title {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0;
+        color: #e7e9ea;
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .sh-video-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color .18s ease;
+    }
+
+    .sh-video-card:hover .sh-video-title a {
+        color: #ff922e;
+    }
+
+    .sh-creator-link {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        margin-top: 6px;
+        color: #92989c;
+        font-size: 11px;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sh-creator-link:hover {
+        color: #fff;
+    }
+
+    .sh-video-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 4px;
+        color: #777e82;
+        font-size: 10px;
+        line-height: 1.6;
+    }
+
+    .sh-meta-dot {
+        color: #45494b;
+    }
+
+    .sh-price {
+        display: inline-block;
+        margin-top: 7px;
+        color: #ff922e;
+        font-size: 11px;
+        font-weight: 850;
+    }
+
+    .sh-empty {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 25px;
+        border: 1px solid #25292b;
+        background: #101213;
+    }
+
+    .sh-empty-icon {
+        display: flex;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #303436;
+        background: #171a1b;
+        color: #ff922e;
+    }
+
+    .sh-empty-icon svg {
+        width: 23px;
+        height: 23px;
+    }
+
+    .sh-empty h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .sh-empty p {
+        margin: 6px 0 0;
+        color: #858b8f;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .sh-empty-link {
+        display: inline-block;
+        margin-top: 10px;
+        color: #ff922e;
+        font-size: 11px;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+    .sh-empty-link:hover {
+        color: #fff;
+    }
+
+    .sh-divider {
+        height: 1px;
+        margin-top: 38px;
+        border: 0;
+        background: #222627;
+    }
+
+    @media (max-width: 1350px) {
+        .sh-video-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 1050px) {
+        .sh-video-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .sh-container {
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+
+        .sh-hero {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 27px;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .sh-container {
+            padding: 20px 14px 42px;
+        }
+
+        .sh-hero {
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 23px 19px;
+        }
+
+        .sh-hero h1 {
+            font-size: clamp(27px, 7vw, 35px);
+        }
+
+        .sh-hero-description {
+            font-size: 12px;
+        }
+
+        .sh-hero-actions {
+            width: 100%;
+        }
+
+        .sh-button {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .sh-section {
+            margin-top: 30px;
+        }
+
+        .sh-section-header {
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .sh-section-title {
+            font-size: 17px;
+        }
+
+        .sh-video-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px 12px;
+        }
+
+        .sh-card-content {
+            gap: 8px;
+            padding-top: 9px;
+        }
+
+        .sh-creator-mark {
+            width: 29px;
+            height: 29px;
+            font-size: 10px;
+        }
+
+        .sh-video-title {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .sh-creator-link {
+            margin-top: 5px;
+            font-size: 10px;
+        }
+
+        .sh-video-meta {
+            gap: 4px;
+            font-size: 9px;
+        }
+
+        .sh-premium {
+            top: 5px;
+            left: 5px;
+            padding: 4px 5px;
+            font-size: 8px;
+        }
+
+        .sh-duration {
+            right: 5px;
+            bottom: 5px;
+            font-size: 9px;
+        }
+
+        .sh-empty {
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 14px;
+        }
+
+        .sh-empty-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sh-divider {
+            margin-top: 30px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .sh-video-grid {
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .sh-video-title {
+            font-size: 13px;
+        }
+
+        .sh-creator-mark {
+            width: 34px;
+            height: 34px;
+        }
+
+        .sh-section-header {
+            gap: 8px;
+        }
+
+        .sh-view-all {
+            gap: 4px;
+            font-size: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="sh-home">
+    <div class="sh-container">
+
+        <section class="sh-hero">
+            <div class="sh-hero-copy">
+                <p class="sh-eyebrow">Your next watch starts here</p>
+                <h1>Discover videos.<br><span>Find your next favourite.</span></h1>
+                <p class="sh-hero-description">
+                    Explore fresh uploads, discover creators and watch the videos
+                    everyone is talking about on StreamSphere.
+                </p>
+            </div>
+
+            <div class="sh-hero-actions">
+                <a href="{% url 'videos:list' %}" class="sh-button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" aria-hidden="true">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 4.2 4.2"></path>
+                    </svg>
+                    Explore videos
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}" class="sh-button sh-button-secondary">
+                        Your profile
+                    </a>
+                {% else %}
+                    <a href="{% url 'account_signup' %}" class="sh-button sh-button-secondary">
+                        Join StreamSphere
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Latest videos -->
+        <section class="sh-section">
+            <div class="sh-section-header">
+                <div>
+                    <p class="sh-section-label">Just published</p>
+                    <h2 class="sh-section-title">Latest videos</h2>
+                    <p class="sh-section-description">
+                        The newest videos shared by our creators.
+                    </p>
+                </div>
+
+                <a href="{% url 'videos:list' %}?sort=newest" class="sh-view-all">
+                    View all
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" aria-hidden="true">
+                        <path d="M5 12h14M13 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            {% if latest_videos %}
+                <div class="sh-video-grid">
+                    {% for video in latest_videos %}
+                        <article class="sh-video-card">
+                            <a href="{{ video.get_absolute_url }}"
+                               class="sh-thumbnail"
+                               aria-label="Watch {{ video.title }}">
+
+                                {% if video.thumbnail_url %}
+                                    <img src="{{ video.thumbnail_url }}"
+                                         alt="{{ video.title }}"
+                                         loading="lazy">
+                                {% else %}
+                                    <span class="sh-thumbnail-fallback">
+                                        <svg viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="1.5"
+                                             aria-hidden="true">
+                                            <rect x="3" y="5" width="18" height="14"></rect>
+                                            <path d="m10 9 5 3-5 3z"></path>
+                                        </svg>
+                                        Thumbnail unavailable
+                                    </span>
+                                {% endif %}
+
+                                <span class="sh-thumbnail-shade" aria-hidden="true"></span>
+
+                                {% if video.is_premium %}
+                                    <span class="sh-premium">Premium</span>
+                                {% endif %}
+
+                                {% if video.duration %}
+                                    <span class="sh-duration">{{ video.duration }}</span>
+                                {% endif %}
+                            </a>
+
+                            <div class="sh-card-content">
+                                <span class="sh-creator-mark" aria-hidden="true">
+                                    {{ video.creator.username|first|default:"S" }}
+                                </span>
+
+                                <div class="sh-card-info">
+                                    <h3 class="sh-video-title">
+                                        <a href="{{ video.get_absolute_url }}">{{ video.title }}</a>
+                                    </h3>
+
+                                    <a href="/creators/{{ video.creator.username }}/"
+                                       class="sh-creator-link">
+                                        {{ video.creator.username }}
+                                    </a>
+
+                                    <p class="sh-video-meta">
+                                        <span>{{ video.views }} views</span>
+                                        <span class="sh-meta-dot" aria-hidden="true">·</span>
+                                        <span>{{ video.created_at|timesince }} ago</span>
+                                    </p>
+
+                                    {% if video.is_premium %}
+                                        <span class="sh-price">KSh {{ video.price }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="sh-empty">
+                    <div class="sh-empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5">
+                            <rect x="3" y="5" width="18" height="14"></rect>
+                            <path d="m10 9 5 3-5 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>No videos published yet</h3>
+                        <p>
+                            New uploads will appear here once creators publish their videos.
+                        </p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'accounts:profile' %}" class="sh-empty-link">
+                                Visit your profile →
+                            </a>
+                        {% else %}
+                            <a href="{% url 'account_signup' %}" class="sh-empty-link">
+                                Join and become a creator →
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+        <hr class="sh-divider">
+
+        <!-- Popular videos -->
+        <section class="sh-section">
+            <div class="sh-section-header">
+                <div>
+                    <p class="sh-section-label">Worth watching</p>
+                    <h2 class="sh-section-title">Popular videos</h2>
+                    <p class="sh-section-description">
+                        Videos attracting views across StreamSphere.
+                    </p>
+                </div>
+
+                <a href="{% url 'videos:list' %}?sort=popular" class="sh-view-all">
+                    View all
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" aria-hidden="true">
+                        <path d="M5 12h14M13 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            {% if popular_videos %}
+                <div class="sh-video-grid">
+                    {% for video in popular_videos %}
+                        <article class="sh-video-card">
+                            <a href="{{ video.get_absolute_url }}"
+                               class="sh-thumbnail"
+                               aria-label="Watch {{ video.title }}">
+
+                                {% if video.thumbnail_url %}
+                                    <img src="{{ video.thumbnail_url }}"
+                                         alt="{{ video.title }}"
+                                         loading="lazy">
+                                {% else %}
+                                    <span class="sh-thumbnail-fallback">
+                                        <svg viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="1.5"
+                                             aria-hidden="true">
+                                            <rect x="3" y="5" width="18" height="14"></rect>
+                                            <path d="m10 9 5 3-5 3z"></path>
+                                        </svg>
+                                        Thumbnail unavailable
+                                    </span>
+                                {% endif %}
+
+                                <span class="sh-thumbnail-shade" aria-hidden="true"></span>
+
+                                {% if video.is_premium %}
+                                    <span class="sh-premium">Premium</span>
+                                {% endif %}
+
+                                {% if video.duration %}
+                                    <span class="sh-duration">{{ video.duration }}</span>
+                                {% endif %}
+                            </a>
+
+                            <div class="sh-card-content">
+                                <span class="sh-creator-mark" aria-hidden="true">
+                                    {{ video.creator.username|first|default:"S" }}
+                                </span>
+
+                                <div class="sh-card-info">
+                                    <h3 class="sh-video-title">
+                                        <a href="{{ video.get_absolute_url }}">{{ video.title }}</a>
+                                    </h3>
+
+                                    <a href="/creators/{{ video.creator.username }}/"
+                                       class="sh-creator-link">
+                                        {{ video.creator.username }}
+                                    </a>
+
+                                    <p class="sh-video-meta">
+                                        <span>{{ video.views }} views</span>
+                                        <span class="sh-meta-dot" aria-hidden="true">·</span>
+                                        <span>{{ video.created_at|timesince }} ago</span>
+                                    </p>
+
+                                    {% if video.is_premium %}
+                                        <span class="sh-price">KSh {{ video.price }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="sh-empty">
+                    <div class="sh-empty-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5">
+                            <path d="M12 3v18M3 12h18"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Popular videos will appear here</h3>
+                        <p>
+                            As published videos receive views, the most watched content
+                            will be featured in this section.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+    </div>
+</main>
+{% endblock %}
+```

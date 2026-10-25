@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Confirm Email | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.account-page{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:30px 16px;background:#090b0c;color:#f5f5f5}
+.account-card{width:100%;max-width:480px;padding:40px;border:1px solid #292d2f;background:#0e1011}
+.account-eyebrow{color:#ff7900;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.account-card h1{margin:12px 0;color:#fff;font-size:29px;font-weight:800}
+.account-card p{color:#a0a5a7;font-size:14px;line-height:1.8}
+.account-button{width:100%;margin-top:20px;padding:14px;border:0;border-radius:0;background:#ff7900;color:#17100a;font-size:13px;font-weight:800;cursor:pointer}
+.account-link{display:block;margin-top:20px;color:#ff7900;text-align:center;text-decoration:none;font-size:13px}
+</style>
+
+<div class="account-page">
+    <section class="account-card">
+        <div class="account-eyebrow">Email verification</div>
+        <h1>Confirm your email</h1>
+
+        {% if confirmation %}
+            <p>Please confirm that you want to use this email address for your StreamSphere account.</p>
+
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                {% csrf_token %}
+                <button class="account-button" type="submit">Confirm Email Address</button>
+            </form>
+        {% else %}
+            <p>This confirmation link is invalid or has expired. You may need to request a new verification email.</p>
+        {% endif %}
+
+        <a class="account-link" href="{% url 'account_login' %}">Back to sign in</a>
+    </section>
+</div>
+{% endblock %}

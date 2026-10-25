@@ -1,0 +1,568 @@
+```django
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}Create Account | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: calc(100vh - 64px);
+        padding: 40px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #090b0c;
+        color: #f5f5f5;
+        box-sizing: border-box;
+    }
+
+    .auth-page *,
+    .auth-page *::before,
+    .auth-page *::after {
+        box-sizing: border-box;
+    }
+
+    .auth-shell {
+        width: 100%;
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 1fr 0.85fr;
+        overflow: hidden;
+        border: 1px solid #292d2f;
+        border-radius: 0;
+        background: #0e1011;
+        box-shadow: 0 25px 80px rgb(0 0 0 / 40%);
+    }
+
+    /* Left visual panel */
+    .auth-visual {
+        position: relative;
+        min-height: 680px;
+        display: flex;
+        align-items: flex-end;
+        padding: 48px;
+        overflow: hidden;
+        background-color: #151718;
+        background-image:
+            linear-gradient(
+                180deg,
+                rgb(9 11 12 / 12%) 0%,
+                rgb(9 11 12 / 48%) 48%,
+                rgb(9 11 12 / 96%) 100%
+            ),
+            url("{% static 'images/auth-background.jpg' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    .auth-visual::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(
+                circle at 20% 20%,
+                rgb(255 121 0 / 14%),
+                transparent 45%
+            );
+        pointer-events: none;
+    }
+
+    .auth-visual-content {
+        position: relative;
+        z-index: 1;
+        max-width: 440px;
+    }
+
+    .auth-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 26px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+    }
+
+    .auth-brand-mark {
+        width: 11px;
+        height: 11px;
+        flex-shrink: 0;
+        background: #ff7900;
+        box-shadow: 0 0 18px rgb(255 121 0 / 55%);
+        transform: rotate(45deg);
+    }
+
+    .auth-visual h1 {
+        margin: 0 0 18px;
+        color: #fff;
+        font-size: clamp(34px, 4vw, 49px);
+        line-height: 1.12;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+    }
+
+    .auth-visual h1 span {
+        color: #ff7900;
+    }
+
+    .auth-visual-description {
+        max-width: 390px;
+        margin: 0;
+        color: #d0d4d5;
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+    .auth-benefits {
+        display: grid;
+        gap: 14px;
+        margin-top: 30px;
+    }
+
+    .auth-benefit {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #e0e2e3;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .auth-benefit-icon {
+        width: 27px;
+        height: 27px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border: 1px solid rgb(255 121 0 / 40%);
+        color: #ff7900;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    /* Right form panel */
+    .auth-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 42px;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgb(255 121 0 / 6%),
+                transparent 36%
+            ),
+            #0e1011;
+    }
+
+    .auth-form-wrap {
+        width: 100%;
+        max-width: 370px;
+    }
+
+    .auth-eyebrow {
+        margin-bottom: 12px;
+        color: #ff7900;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .auth-heading {
+        margin: 0 0 10px;
+        color: #fff;
+        font-size: 32px;
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+    }
+
+    .auth-subheading {
+        margin: 0 0 28px;
+        color: #969b9e;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .auth-messages {
+        margin-bottom: 20px;
+    }
+
+    .auth-message,
+    .auth-error-box {
+        margin-bottom: 10px;
+        padding: 12px 14px;
+        border: 1px solid #61351f;
+        border-radius: 0;
+        background: rgb(255 121 0 / 7%);
+        color: #ffb17a;
+        font-size: 12px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .auth-error-box ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+    }
+
+    .auth-field {
+        margin-bottom: 18px;
+    }
+
+    .auth-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #e1e3e4;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .auth-label .required-mark {
+        margin-left: 3px;
+        color: #ff7900;
+    }
+
+    .auth-panel input[type="text"],
+    .auth-panel input[type="email"],
+    .auth-panel input[type="password"],
+    .auth-panel input[type="tel"],
+    .auth-panel input[type="url"] {
+        width: 100%;
+        min-height: 46px;
+        padding: 12px 13px;
+        border: 1px solid #303638;
+        border-radius: 0;
+        outline: none;
+        background: #151819;
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .auth-panel input:focus {
+        border-color: #ff7900;
+        box-shadow: 0 0 0 3px rgb(255 121 0 / 10%);
+    }
+
+    .auth-panel input::placeholder {
+        color: #6d7477;
+    }
+
+    .auth-field-help {
+        margin-top: 8px;
+        color: #858c8f;
+        font-size: 11px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .auth-field-help ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+    }
+
+    .auth-field-help li {
+        margin-bottom: 3px;
+    }
+
+    .auth-field-help a {
+        color: #ff9a45;
+    }
+
+    .auth-field-error {
+        margin: 7px 0 0;
+        color: #ff8a80;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .auth-field-error ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .auth-non-field-errors {
+        margin-bottom: 18px;
+    }
+
+    .auth-submit {
+        width: 100%;
+        min-height: 48px;
+        margin-top: 6px;
+        padding: 12px 18px;
+        border: 1px solid #ff7900;
+        border-radius: 0;
+        background: #ff7900;
+        color: #17100a;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .auth-submit:hover {
+        transform: translateY(-2px);
+        background: #ff8b20;
+        box-shadow: 0 8px 24px rgb(255 121 0 / 18%);
+    }
+
+    .auth-submit:focus-visible,
+    .auth-footer a:focus-visible {
+        outline: 2px solid #ffb16b;
+        outline-offset: 4px;
+    }
+
+    .auth-footer {
+        margin-top: 24px;
+        color: #969b9e;
+        font-size: 12px;
+        text-align: center;
+        line-height: 1.8;
+    }
+
+    .auth-footer a {
+        color: #ff7900;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+        color: #ffad66;
+        text-decoration: underline;
+    }
+
+    .auth-terms {
+        margin: 20px 0 0;
+        color: #747b7e;
+        font-size: 10px;
+        line-height: 1.8;
+        text-align: center;
+    }
+
+    @media (max-width: 900px) {
+        .auth-page {
+            padding: 24px 16px;
+        }
+
+        .auth-shell {
+            max-width: 560px;
+            grid-template-columns: 1fr;
+        }
+
+        .auth-visual {
+            min-height: 300px;
+            padding: 32px;
+            background-position: center 45%;
+        }
+
+        .auth-visual h1 {
+            max-width: 430px;
+            font-size: 36px;
+        }
+
+        .auth-visual-description {
+            font-size: 13px;
+        }
+
+        .auth-benefits {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .auth-panel {
+            padding: 38px 32px 42px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-page {
+            padding: 12px 9px;
+        }
+
+        .auth-visual {
+            min-height: 260px;
+            padding: 25px 21px;
+        }
+
+        .auth-brand {
+            margin-bottom: 18px;
+            font-size: 12px;
+        }
+
+        .auth-visual h1 {
+            font-size: 30px;
+        }
+
+        .auth-visual-description {
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .auth-benefits {
+            grid-template-columns: 1fr;
+            gap: 9px;
+            margin-top: 18px;
+        }
+
+        .auth-panel {
+            padding: 32px 21px;
+        }
+
+        .auth-heading {
+            font-size: 28px;
+        }
+
+        .auth-subheading {
+            margin-bottom: 24px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .auth-panel input,
+        .auth-submit {
+            transition: none;
+        }
+
+        .auth-submit:hover {
+            transform: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-shell">
+
+        <section class="auth-visual">
+            <div class="auth-visual-content">
+                <div class="auth-brand">
+                    <span class="auth-brand-mark" aria-hidden="true"></span>
+                    <span>StreamSphere</span>
+                </div>
+
+                <h1>
+                    Your world of
+                    <span>entertainment.</span>
+                </h1>
+
+                <p class="auth-visual-description">
+                    Create your account and step into a world of stories,
+                    discovery, and entertainment made for you.
+                </p>
+
+                <div class="auth-benefits">
+                    <div class="auth-benefit">
+                        <span class="auth-benefit-icon" aria-hidden="true">+</span>
+                        <span>Discover videos and new creators</span>
+                    </div>
+                    <div class="auth-benefit">
+                        <span class="auth-benefit-icon" aria-hidden="true">▶</span>
+                        <span>Build your own viewing experience</span>
+                    </div>
+                    <div class="auth-benefit">
+                        <span class="auth-benefit-icon" aria-hidden="true">↗</span>
+                        <span>Share your creativity with the world</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <div class="auth-form-wrap">
+
+                <div class="auth-eyebrow">Join StreamSphere</div>
+
+                <h2 class="auth-heading">Create account</h2>
+
+                <p class="auth-subheading">
+                    Fill in your details below to get started.
+                </p>
+
+                {% if messages %}
+                    <div class="auth-messages">
+                        {% for message in messages %}
+                            <div class="auth-message" role="status">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="auth-error-box auth-non-field-errors" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'account_signup' %}">
+                    {% csrf_token %}
+
+                    {% if redirect_field_value %}
+                        <input
+                            type="hidden"
+                            name="{{ redirect_field_name }}"
+                            value="{{ redirect_field_value }}"
+                        >
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="auth-field">
+                            <label
+                                for="{{ field.id_for_label }}"
+                                class="auth-label"
+                            >
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="required-mark">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="auth-field-help">
+                                    {{ field.help_text|safe }}
+                                </div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <p class="auth-field-error" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="auth-submit">
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account?
+                    <a href="{% url 'account_login' %}">Sign in</a>
+                </div>
+
+                <p class="auth-terms">
+                    By creating an account, you agree to use StreamSphere
+                    responsibly and follow the platform's terms.
+                </p>
+
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}
+```

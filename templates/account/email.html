@@ -1,0 +1,464 @@
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Email Addresses | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    .email-page {
+        min-height: 70vh;
+        padding: 48px 20px 72px;
+        background: radial-gradient(ellipse at top, rgba(255,121,0,.07), transparent 50%), #090b0c;
+        color: #eeeeee;
+    }
+
+    .email-container {
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .email-header {
+        margin-bottom: 28px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid #292d2f;
+    }
+
+    .email-eyebrow {
+        margin-bottom: 10px;
+        color: #ff7900;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+    }
+
+    .email-header h1 {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(28px, 5vw, 40px);
+        font-weight: 800;
+        letter-spacing: -.04em;
+    }
+
+    .email-header p {
+        margin: 12px 0 0;
+        color: #929799;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .email-panel {
+        padding: clamp(20px, 4vw, 34px);
+        border: 1px solid #292d2f;
+        background: #101213;
+    }
+
+    .email-intro {
+        margin: 0 0 22px;
+        color: #a6abad;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .email-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .email-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 17px;
+        border: 1px solid #303436;
+        background: #090b0c;
+    }
+
+    .email-radio {
+        flex: 0 0 auto;
+        width: 17px;
+        height: 17px;
+        margin-top: 4px;
+        accent-color: #ff7900;
+    }
+
+    .email-details {
+        min-width: 0;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .email-address {
+        overflow-wrap: anywhere;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .email-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+    }
+
+    .email-badge {
+        display: inline-flex;
+        padding: 5px 8px;
+        border: 1px solid #353a3c;
+        color: #c1c5c7;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    .email-badge.verified {
+        border-color: #245b3c;
+        background: #10251a;
+        color: #7ee2a8;
+    }
+
+    .email-badge.unverified {
+        border-color: #6b461e;
+        background: #25190d;
+        color: #ffbd75;
+    }
+
+    .email-badge.primary {
+        border-color: #78400e;
+        background: #2a190c;
+        color: #ff9b3d;
+    }
+
+    .email-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .email-action {
+        min-height: 42px;
+        padding: 11px 15px;
+        border: 1px solid #3a3f41;
+        border-radius: 0;
+        background: #151819;
+        color: #eee;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background .2s, border-color .2s, color .2s;
+    }
+
+    .email-action:hover {
+        border-color: #ff7900;
+        color: #ff7900;
+    }
+
+    .email-action.primary-action {
+        border-color: #ff7900;
+        background: #ff7900;
+        color: #090b0c;
+    }
+
+    .email-action.primary-action:hover {
+        background: #ffa347;
+    }
+
+    .email-action.danger-action {
+        border-color: #6b3030;
+        color: #ff8585;
+    }
+
+    .email-action.danger-action:hover {
+        border-color: #ff5555;
+        background: #291313;
+    }
+
+    .email-divider {
+        height: 1px;
+        margin: 30px 0;
+        border: 0;
+        background: #292d2f;
+    }
+
+    .email-section-title {
+        margin: 0 0 8px;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .email-section-description {
+        margin: 0 0 20px;
+        color: #929799;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .email-add-form {
+        display: grid;
+        gap: 15px;
+    }
+
+    .email-add-form p {
+        margin: 0;
+    }
+
+    .email-add-form label {
+        display: block;
+        margin-bottom: 8px;
+        color: #d9dcdd;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .email-add-form input[type="email"],
+    .email-add-form input[type="text"] {
+        display: block;
+        width: 100%;
+        min-height: 45px;
+        padding: 11px 13px;
+        border: 1px solid #353a3c;
+        border-radius: 0;
+        background: #090b0c;
+        color: #fff;
+    }
+
+    .email-add-form input:focus {
+        border-color: #ff7900;
+        outline: 2px solid rgba(255,121,0,.15);
+    }
+
+    .email-help {
+        margin-top: 6px;
+        color: #929799;
+        font-size: 12px;
+    }
+
+    .email-errors {
+        margin-top: 7px;
+        color: #ff8585;
+        font-size: 12px;
+    }
+
+    .email-notice {
+        margin-bottom: 18px;
+        padding: 13px 15px;
+        border: 1px solid #303436;
+        background: #0b0d0e;
+        color: #d9dcdd;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .email-empty {
+        padding: 20px;
+        border: 1px solid #6b461e;
+        background: #21170f;
+        color: #ffbd75;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .email-panel a {
+        color: #ff7900;
+    }
+
+    .email-panel a:hover {
+        color: #ffa347;
+    }
+
+    .email-back {
+        display: inline-block;
+        margin-top: 24px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 520px) {
+        .email-page {
+            padding: 30px 14px 48px;
+        }
+
+        .email-panel {
+            padding: 20px 16px;
+        }
+
+        .email-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .email-action {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="email-page">
+    <div class="email-container">
+
+        <header class="email-header">
+            <div class="email-eyebrow">StreamSphere account</div>
+            <h1>Email addresses</h1>
+            <p>
+                Manage your email addresses, verification status, and primary
+                contact address.
+            </p>
+        </header>
+
+        <div class="email-panel">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="email-notice">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if emailaddresses %}
+                <p class="email-intro">
+                    These email addresses are associated with your account.
+                    Select an address to manage it.
+                </p>
+
+                {% url 'account_email' as email_url %}
+
+                <form method="post" action="{{ email_url }}" id="manageEmailForm">
+                    {% csrf_token %}
+
+                    <ul class="email-list">
+                        {% for radio in emailaddress_radios %}
+                            {% with emailaddress=radio.emailaddress %}
+                                <li class="email-item">
+                                    <input
+                                        class="email-radio"
+                                        type="radio"
+                                        name="email"
+                                        value="{{ emailaddress.email }}"
+                                        id="{{ radio.id }}"
+                                        {% if radio.checked %}checked{% endif %}>
+
+                                    <label class="email-details" for="{{ radio.id }}">
+                                        <span class="email-address">
+                                            {{ emailaddress.email }}
+                                        </span>
+
+                                        <span class="email-badges">
+                                            {% if emailaddress.verified %}
+                                                <span class="email-badge verified">
+                                                    ✓ Verified
+                                                </span>
+                                            {% else %}
+                                                <span class="email-badge unverified">
+                                                    ! Unverified
+                                                </span>
+                                            {% endif %}
+
+                                            {% if emailaddress.primary %}
+                                                <span class="email-badge primary">
+                                                    ★ Primary
+                                                </span>
+                                            {% endif %}
+                                        </span>
+                                    </label>
+                                </li>
+                            {% endwith %}
+                        {% endfor %}
+                    </ul>
+
+                    <div class="email-actions">
+                        <button type="submit" name="action_primary"
+                                class="email-action primary-action">
+                            Make Primary
+                        </button>
+
+                        <button type="submit" name="action_send"
+                                class="email-action">
+                            Resend Verification
+                        </button>
+
+                        <button type="submit" name="action_remove"
+                                class="email-action danger-action"
+                                onclick="return confirm('Remove the selected email address?');">
+                            Remove Address
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="email-empty">
+                    No email addresses are currently associated with your account.
+                    Add an email address below to get started.
+                </div>
+            {% endif %}
+
+            {% if can_add_email %}
+                <hr class="email-divider">
+
+                <h2 class="email-section-title">Add an email address</h2>
+
+                <p class="email-section-description">
+                    Add another email address to your account. You may need to
+                    verify it before using it as your primary address.
+                </p>
+
+                {% url 'account_email' as action_url %}
+
+                <form method="post" action="{{ action_url }}"
+                      class="email-add-form" id="addEmailForm">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                                {% if field.field.required %}*{% endif %}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="email-help">{{ field.help_text|safe }}</div>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div class="email-errors">
+                                    {% for error in field.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    {% if form.non_field_errors %}
+                        <div class="email-errors">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="email-actions">
+                        <button type="submit" name="action_add"
+                                class="email-action primary-action">
+                            + Add Email Address
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+
+            <a class="email-back" href="{% url 'accounts:profile' %}">
+                ← Return to your StreamSphere profile
+            </a>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

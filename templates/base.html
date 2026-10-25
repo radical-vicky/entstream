@@ -1,0 +1,815 @@
+
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090b0c">
+    <meta name="description" content="StreamSphere — discover videos, watch live creators, and unlock premium content.">
+
+    <title>{% block title %}StreamSphere{% endblock %}</title>
+
+    {% tailwind_css %}
+    {% block extra_head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --ss-bg: #090b0c;
+            --ss-panel: #101213;
+            --ss-panel-hover: #191c1e;
+            --ss-border: #292d2f;
+            --ss-text: #eeeeee;
+            --ss-muted: #929799;
+            --ss-orange: #ff7900;
+            --ss-orange-hover: #ffa347;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+            background: var(--ss-bg);
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--ss-bg);
+            color: var(--ss-text);
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-wrap: break-word;
+        }
+
+        img, video {
+            max-width: 100%;
+        }
+
+        button, input, textarea, select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--ss-orange);
+            outline-offset: 3px;
+        }
+
+        ::selection {
+            background: var(--ss-orange);
+            color: #090b0c;
+        }
+
+        /* Main site header */
+        .ss-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            border-bottom: 1px solid var(--ss-border);
+            background: rgba(9, 11, 12, .97);
+            backdrop-filter: blur(14px);
+        }
+
+        .ss-header-inner {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        .ss-topbar {
+            display: flex;
+            min-height: 72px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+        }
+
+        .ss-brand {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            color: #fff;
+            font-size: 23px;
+            font-weight: 900;
+            letter-spacing: -1.1px;
+            white-space: nowrap;
+        }
+
+        .ss-brand span {
+            color: var(--ss-orange);
+        }
+
+        .ss-desktop-search {
+            display: flex;
+            flex: 1 1 340px;
+            width: 100%;
+            max-width: 520px;
+            min-width: 0;
+            border: 1px solid #303436;
+            background: #151819;
+        }
+
+        .ss-desktop-search:focus-within {
+            border-color: var(--ss-orange);
+        }
+
+        .ss-desktop-search input {
+            width: 100%;
+            min-width: 0;
+            height: 42px;
+            padding: 0 14px;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .ss-desktop-search input::placeholder {
+            color: #858b8e;
+        }
+
+        .ss-search-button {
+            flex: 0 0 auto;
+            padding: 0 16px;
+            border: 0;
+            border-left: 1px solid #303436;
+            background: transparent;
+            color: var(--ss-orange);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .ss-search-button:hover {
+            background: #25292b;
+        }
+
+        .ss-desktop-nav {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 22px;
+        }
+
+        .ss-nav-link {
+            display: inline-flex;
+            min-height: 40px;
+            align-items: center;
+            color: #c0c4c6;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: color .2s ease;
+        }
+
+        .ss-nav-link:hover,
+        .ss-nav-link[aria-current="page"] {
+            color: var(--ss-orange);
+        }
+
+        .ss-join-button {
+            display: inline-flex;
+            min-height: 40px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 17px;
+            border: 1px solid var(--ss-orange);
+            background: var(--ss-orange);
+            color: #090b0c;
+            font-size: 12px;
+            font-weight: 900;
+            white-space: nowrap;
+            transition: background .2s ease;
+        }
+
+        .ss-join-button:hover {
+            background: var(--ss-orange-hover);
+        }
+
+        .ss-profile-link {
+            color: #fff;
+        }
+
+        /* Mobile controls */
+        .ss-mobile-actions {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ss-mobile-search-row {
+            display: none;
+            padding: 0 0 13px;
+        }
+
+        .ss-icon-button {
+            display: inline-flex;
+            width: 42px;
+            height: 42px;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #303436;
+            background: #111415;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .ss-icon-button:hover,
+        .ss-icon-button[aria-expanded="true"] {
+            border-color: var(--ss-orange);
+            color: var(--ss-orange);
+        }
+
+        .ss-mobile-search {
+            display: flex;
+            width: 100%;
+            border: 1px solid #303436;
+            background: #151819;
+        }
+
+        .ss-mobile-search:focus-within {
+            border-color: var(--ss-orange);
+        }
+
+        .ss-mobile-search input {
+            width: 100%;
+            min-width: 0;
+            height: 43px;
+            padding: 0 12px;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        /* Expandable mobile navigation */
+        .ss-mobile-menu {
+            display: none;
+            border-top: 1px solid var(--ss-border);
+            background: #0d0f10;
+        }
+
+        .ss-mobile-menu.is-open {
+            display: block;
+        }
+
+        .ss-mobile-menu-inner {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 8px 20px 18px;
+        }
+
+        .ss-mobile-menu a {
+            display: flex;
+            min-height: 47px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid #202426;
+            color: #d6d9da;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ss-mobile-menu a:hover {
+            color: var(--ss-orange);
+        }
+
+        .ss-mobile-menu .ss-mobile-profile {
+            margin-top: 10px;
+            padding: 0 12px;
+            border: 1px solid #3c2b1d;
+            background: #17120e;
+            color: var(--ss-orange);
+        }
+
+        .ss-mobile-menu .ss-mobile-join {
+            justify-content: center;
+            margin-top: 12px;
+            border: 1px solid var(--ss-orange);
+            background: var(--ss-orange);
+            color: #090b0c;
+        }
+
+        .ss-mobile-menu .ss-mobile-logout {
+            display: block;
+            width: 100%;
+            min-height: 47px;
+            margin-top: 8px;
+            border: 0;
+            background: transparent;
+            color: #ff8989;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Page content */
+        .ss-main {
+            min-height: 70vh;
+            width: 100%;
+        }
+
+        /* Footer */
+        .ss-footer {
+            margin-top: 48px;
+            border-top: 1px solid var(--ss-border);
+            background: #090b0c;
+        }
+
+        .ss-footer-inner {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .ss-footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .ss-footer-brand {
+            display: inline-block;
+            color: #fff;
+            font-size: 19px;
+            font-weight: 900;
+            letter-spacing: -.7px;
+            white-space: nowrap;
+        }
+
+        .ss-footer-brand span {
+            color: var(--ss-orange);
+        }
+
+        .ss-footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 23px;
+        }
+
+        .ss-footer-links a {
+            color: var(--ss-muted);
+            font-size: 12px;
+            transition: color .2s ease;
+        }
+
+        .ss-footer-links a:hover {
+            color: var(--ss-orange);
+        }
+
+        .ss-footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid #202325;
+            color: #777d80;
+            font-size: 11px;
+        }
+
+        .ss-footer-bottom p {
+            margin: 0;
+        }
+
+        /* Tablet */
+        @media (max-width: 1100px) {
+            .ss-header-inner {
+                padding-right: 20px;
+                padding-left: 20px;
+            }
+
+            .ss-topbar {
+                gap: 18px;
+            }
+
+            .ss-desktop-nav {
+                gap: 14px;
+            }
+
+            .ss-nav-link {
+                font-size: 12px;
+            }
+        }
+
+        /* Mobile and small tablets */
+        @media (max-width: 800px) {
+            .ss-header {
+                position: sticky;
+            }
+
+            .ss-header-inner {
+                padding: 0 16px;
+            }
+
+            .ss-topbar {
+                min-height: 62px;
+                gap: 12px;
+            }
+
+            .ss-brand {
+                font-size: 21px;
+            }
+
+            .ss-desktop-search,
+            .ss-desktop-nav {
+                display: none;
+            }
+
+            .ss-mobile-actions {
+                display: flex;
+            }
+
+            .ss-mobile-search-row {
+                display: block;
+            }
+
+            .ss-footer-inner {
+                padding: 24px 18px;
+            }
+
+            .ss-footer-top {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .ss-footer-links {
+                gap: 15px 20px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .ss-header-inner {
+                padding: 0 12px;
+            }
+
+            .ss-topbar {
+                min-height: 58px;
+            }
+
+            .ss-brand {
+                font-size: 19px;
+                letter-spacing: -.8px;
+            }
+
+            .ss-icon-button {
+                width: 38px;
+                height: 38px;
+            }
+
+            .ss-footer-bottom {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-[#090b0c] text-[#eeeeee] antialiased">
+
+    <!-- Site header -->
+    <header class="ss-header">
+        <div class="ss-header-inner">
+
+            <div class="ss-topbar">
+
+                <!-- Brand -->
+                <a href="{% url 'home' %}" class="ss-brand" aria-label="StreamSphere home">
+                    Stream<span>Sphere</span>
+                </a>
+
+                <!-- Desktop search -->
+                <form action="{% url 'videos:list' %}"
+                      method="get"
+                      role="search"
+                      class="ss-desktop-search">
+
+                    <label for="desktop-video-search" class="sr-only">
+                        Search videos and creators
+                    </label>
+
+                    <input
+                        id="desktop-video-search"
+                        name="q"
+                        type="search"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search videos and creators...">
+
+                    <button type="submit" class="ss-search-button">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Desktop navigation -->
+                <nav class="ss-desktop-nav" aria-label="Main navigation">
+
+                    <a href="{% url 'home' %}" class="ss-nav-link">
+                        Discover
+                    </a>
+
+                    <a href="{% url 'videos:list' %}" class="ss-nav-link">
+                        Trending
+                    </a>
+
+                    <a href="/streaming/" class="ss-nav-link">
+                        Live
+                    </a>
+
+                    {% if user.is_authenticated %}
+
+                        <a href="{% url 'accounts:profile' %}"
+                           class="ss-nav-link ss-profile-link">
+                            My profile
+                        </a>
+
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="ss-nav-link"
+                                    style="border:0;background:transparent;">
+                                Log out
+                            </button>
+                        </form>
+
+                    {% else %}
+
+                        <a href="{% url 'account_login' %}" class="ss-nav-link">
+                            Login
+                        </a>
+
+                        <a href="{% url 'account_signup' %}" class="ss-join-button">
+                            Join StreamSphere
+                        </a>
+
+                    {% endif %}
+                </nav>
+
+                <!-- Mobile controls -->
+                <div class="ss-mobile-actions">
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:profile' %}"
+                           class="ss-icon-button"
+                           aria-label="My profile"
+                           title="My profile">
+                            <svg width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M5 21v-2a7 7 0 0 1 14 0v2"></path>
+                            </svg>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'account_login' %}"
+                           class="ss-icon-button"
+                           aria-label="Log in"
+                           title="Log in">
+                            <svg width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                <path d="M10 17l5-5-5-5"></path>
+                                <path d="M15 12H3"></path>
+                            </svg>
+                        </a>
+                    {% endif %}
+
+                    <button
+                        type="button"
+                        id="ssMenuButton"
+                        class="ss-icon-button"
+                        aria-label="Open navigation menu"
+                        aria-controls="ssMobileMenu"
+                        aria-expanded="false">
+                        <svg id="ssMenuIcon" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" aria-hidden="true">
+                            <path d="M4 6h16"></path>
+                            <path d="M4 12h16"></path>
+                            <path d="M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile search -->
+            <div class="ss-mobile-search-row">
+                <form action="{% url 'videos:list' %}"
+                      method="get"
+                      role="search"
+                      class="ss-mobile-search">
+
+                    <label for="mobile-video-search" class="sr-only">
+                        Search videos and creators
+                    </label>
+
+                    <input
+                        id="mobile-video-search"
+                        name="q"
+                        type="search"
+                        value="{{ request.GET.q|default:'' }}"
+                        placeholder="Search videos and creators...">
+
+                    <button type="submit" class="ss-search-button">
+                        Search
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mobile dropdown -->
+        <div id="ssMobileMenu" class="ss-mobile-menu">
+            <nav class="ss-mobile-menu-inner" aria-label="Mobile navigation">
+
+                <a href="{% url 'home' %}">
+                    <span>Discover</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+
+                <a href="{% url 'videos:list' %}">
+                    <span>Trending videos</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+
+                <a href="/streaming/">
+                    <span>Live streams</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+
+                <a href="/creators/">
+                    <span>Creators</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+
+                <a href="/subscriptions/">
+                    <span>Subscriptions</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+
+                {% if user.is_authenticated %}
+
+                    <a href="{% url 'accounts:profile' %}" class="ss-mobile-profile">
+                        <span>My profile and videos</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+
+                    <a href="{% url 'account_email' %}">
+                        <span>Email settings</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+
+                    <a href="{% url 'account_change_password' %}">
+                        <span>Change password</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="ss-mobile-logout">
+                            Log out
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a href="{% url 'account_login' %}">
+                        <span>Log in</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+
+                    <a href="{% url 'account_signup' %}" class="ss-mobile-join">
+                        Create your account
+                    </a>
+
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page-specific content -->
+    <main class="ss-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="ss-footer">
+        <div class="ss-footer-inner">
+
+            <div class="ss-footer-top">
+
+                <a href="{% url 'home' %}" class="ss-footer-brand">
+                    Stream<span>Sphere</span>
+                </a>
+
+                <nav class="ss-footer-links" aria-label="Footer navigation">
+                    <a href="{% url 'home' %}">Discover</a>
+                    <a href="{% url 'videos:list' %}">Videos</a>
+                    <a href="/streaming/">Live streams</a>
+                    <a href="/creators/">Creators</a>
+                    <a href="/subscriptions/">Subscriptions</a>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:profile' %}">My profile</a>
+                        <a href="{% url 'account_email' %}">Email settings</a>
+                    {% else %}
+                        <a href="{% url 'account_login' %}">Sign in</a>
+                        <a href="{% url 'account_signup' %}">Join StreamSphere</a>
+                    {% endif %}
+                </nav>
+            </div>
+
+            <div class="ss-footer-bottom">
+                <p>&copy; {% now "Y" %} StreamSphere. All rights reserved.</p>
+                <p>Discover videos. Connect with creators.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Responsive menu behavior -->
+    <script>
+        (function () {
+            const button = document.getElementById("ssMenuButton");
+            const menu = document.getElementById("ssMobileMenu");
+
+            if (!button || !menu) return;
+
+            function closeMenu() {
+                menu.classList.remove("is-open");
+                button.setAttribute("aria-expanded", "false");
+                button.setAttribute("aria-label", "Open navigation menu");
+            }
+
+            button.addEventListener("click", function () {
+                const isOpen = menu.classList.toggle("is-open");
+
+                button.setAttribute("aria-expanded", String(isOpen));
+                button.setAttribute(
+                    "aria-label",
+                    isOpen ? "Close navigation menu" : "Open navigation menu"
+                );
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeMenu();
+                    button.focus();
+                }
+            });
+
+            menu.addEventListener("click", function (event) {
+                if (event.target.closest("a")) {
+                    closeMenu();
+                }
+            });
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 800) {
+                    closeMenu();
+                }
+            });
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

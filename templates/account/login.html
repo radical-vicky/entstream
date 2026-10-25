@@ -1,0 +1,712 @@
+
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}Sign In | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================
+   STREAMSPHERE AUTHENTICATION
+   ========================================= */
+
+.ss-auth,
+.ss-auth * {
+    box-sizing: border-box;
+}
+
+.ss-auth {
+    --auth-bg: #090b0c;
+    --auth-panel: #101315;
+    --auth-input: #0b0e10;
+    --auth-border: #2b3034;
+    --auth-text: #f4f5f6;
+    --auth-muted: #9ba3aa;
+    --auth-orange: #ff7900;
+    --auth-orange-hover: #ff9638;
+
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 44px 24px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgb(255 121 0 / 5%), transparent 48%),
+        var(--auth-bg);
+    color: var(--auth-text);
+}
+
+.ss-auth-shell {
+    width: 100%;
+    max-width: 1120px;
+    min-height: 650px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    border: 1px solid var(--auth-border);
+    background: var(--auth-panel);
+    box-shadow: 0 30px 90px rgb(0 0 0 / 38%);
+}
+
+/* LEFT VISUAL PANEL */
+
+.ss-auth-visual {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    min-height: 650px;
+    display: flex;
+    align-items: flex-end;
+    padding: 48px;
+    overflow: hidden;
+    background-color: #17120e;
+    background-image:
+        linear-gradient(
+            180deg,
+            rgb(7 9 10 / 8%) 0%,
+            rgb(7 9 10 / 20%) 36%,
+            rgb(7 9 10 / 88%) 76%,
+            #090b0c 100%
+        ),
+        linear-gradient(
+            90deg,
+            rgb(7 9 10 / 12%),
+            transparent 80%
+        ),
+        url("{% static 'images/auth-background.jpg' %}");
+    background-position: center;
+    background-size: cover;
+}
+
+.ss-auth-visual::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background:
+        radial-gradient(
+            ellipse at 15% 15%,
+            rgb(255 121 0 / 13%),
+            transparent 50%
+        );
+    pointer-events: none;
+}
+
+.ss-auth-visual::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--auth-orange);
+    pointer-events: none;
+}
+
+.ss-auth-visual-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 450px;
+}
+
+.ss-auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+.ss-auth-brand-mark {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(255 121 0 / 65%);
+    background: rgb(255 121 0 / 12%);
+}
+
+.ss-auth-brand-mark::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--auth-orange);
+    transform: rotate(45deg);
+    box-shadow: 0 0 20px rgb(255 121 0 / 35%);
+}
+
+.ss-auth-visual h1 {
+    max-width: 470px;
+    margin: 0 0 19px;
+    color: #fff;
+    font-size: clamp(36px, 4.2vw, 53px);
+    font-weight: 850;
+    line-height: 1.08;
+    letter-spacing: -2px;
+}
+
+.ss-auth-visual h1 span {
+    display: block;
+    margin-top: 5px;
+    color: var(--auth-orange);
+}
+
+.ss-auth-description {
+    max-width: 390px;
+    margin: 0;
+    color: #d2d5d7;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.ss-auth-visual-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 35px;
+    color: #aeb4b8;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.ss-auth-visual-footer::before {
+    content: "";
+    width: 25px;
+    height: 2px;
+    background: var(--auth-orange);
+}
+
+/* RIGHT FORM PANEL */
+
+.ss-auth-panel {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 54px 46px;
+    background:
+        radial-gradient(
+            ellipse at top right,
+            rgb(255 121 0 / 5%),
+            transparent 42%
+        ),
+        var(--auth-panel);
+}
+
+.ss-auth-form-wrap {
+    width: 100%;
+    max-width: 370px;
+}
+
+.ss-auth-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    color: var(--auth-orange);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.ss-auth-eyebrow::before {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: var(--auth-orange);
+}
+
+.ss-auth-heading {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 35px;
+    font-weight: 850;
+    line-height: 1.15;
+    letter-spacing: -1.3px;
+}
+
+.ss-auth-heading span {
+    color: var(--auth-orange);
+}
+
+.ss-auth-subheading {
+    margin: 0 0 31px;
+    color: var(--auth-muted);
+    font-size: 13px;
+    line-height: 1.85;
+}
+
+/* MESSAGES AND ERRORS */
+
+.ss-auth-messages {
+    margin-bottom: 21px;
+}
+
+.ss-auth-message,
+.ss-auth-error-box {
+    margin-bottom: 10px;
+    padding: 13px 15px;
+    border: 1px solid #694126;
+    background: #20170f;
+    color: #ffbd8a;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.ss-auth-error-box {
+    border-color: #713434;
+    background: #241111;
+    color: #ffb6b6;
+}
+
+.ss-auth-error-box ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.ss-auth-field {
+    min-width: 0;
+    margin-bottom: 22px;
+}
+
+.ss-auth-label {
+    display: block;
+    margin-bottom: 9px;
+    color: #e8eaec;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.35px;
+}
+
+.ss-auth-required {
+    color: var(--auth-orange);
+}
+
+.ss-auth-field input:not([type="checkbox"]):not([type="hidden"]),
+.ss-auth-field input[type="email"],
+.ss-auth-field input[type="password"],
+.ss-auth-field input[type="text"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 49px;
+    padding: 0 14px;
+    border: 1px solid #343a40;
+    border-radius: 0;
+    outline: none;
+    background: var(--auth-input);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.ss-auth-field input:focus {
+    border-color: var(--auth-orange);
+    box-shadow: inset 3px 0 0 var(--auth-orange);
+}
+
+.ss-auth-field input::placeholder {
+    color: #707981;
+}
+
+.ss-auth-field input:-webkit-autofill,
+.ss-auth-field input:-webkit-autofill:hover,
+.ss-auth-field input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff;
+    box-shadow: 0 0 0 1000px var(--auth-input) inset;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+.ss-auth-field-error {
+    margin: 8px 0 0;
+    color: #ff8e86;
+    font-size: 11px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.ss-auth-help {
+    margin-top: 8px;
+    color: var(--auth-muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.ss-auth-help ul {
+    margin: 6px 0;
+    padding-left: 17px;
+}
+
+/* OPTIONS */
+
+.ss-auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 2px 0 25px;
+}
+
+.ss-auth-remember {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #aeb4b8;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.ss-auth-remember input {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: var(--auth-orange);
+    cursor: pointer;
+}
+
+.ss-auth-link {
+    color: var(--auth-orange);
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none;
+    transition: color 180ms ease;
+}
+
+.ss-auth-link:hover {
+    color: var(--auth-orange-hover);
+    text-decoration: underline;
+}
+
+/* SUBMIT */
+
+.ss-auth-submit {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 18px;
+    border: 1px solid var(--auth-orange);
+    border-radius: 0;
+    background: var(--auth-orange);
+    color: #15100b;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+    transition: background 180ms ease, border-color 180ms ease;
+}
+
+.ss-auth-submit:hover {
+    border-color: var(--auth-orange-hover);
+    background: var(--auth-orange-hover);
+}
+
+.ss-auth-submit:focus-visible,
+.ss-auth-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+}
+
+.ss-auth-submit span {
+    font-size: 17px;
+    transition: transform 180ms ease;
+}
+
+.ss-auth-submit:hover span {
+    transform: translateX(3px);
+}
+
+.ss-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin: 27px 0 22px;
+    color: #717981;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.ss-auth-divider::before,
+.ss-auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--auth-border);
+}
+
+.ss-auth-footer {
+    color: #a1a8ad;
+    font-size: 12px;
+    line-height: 1.9;
+    text-align: center;
+}
+
+.ss-auth-footer a {
+    color: var(--auth-orange);
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.ss-auth-footer a:hover {
+    color: var(--auth-orange-hover);
+    text-decoration: underline;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 950px) {
+    .ss-auth {
+        padding: 28px 18px;
+    }
+
+    .ss-auth-shell {
+        max-width: 620px;
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+
+    .ss-auth-visual {
+        min-height: 300px;
+        padding: 32px;
+        background-position: center 45%;
+    }
+
+    .ss-auth-visual h1 {
+        max-width: 500px;
+        font-size: 38px;
+    }
+
+    .ss-auth-visual-content {
+        max-width: 520px;
+    }
+
+    .ss-auth-visual-footer {
+        margin-top: 22px;
+    }
+
+    .ss-auth-panel {
+        padding: 42px 32px;
+    }
+
+    .ss-auth-form-wrap {
+        max-width: 460px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ss-auth {
+        min-height: auto;
+        padding: 16px 10px 30px;
+    }
+
+    .ss-auth-visual {
+        min-height: 240px;
+        padding: 25px 21px;
+    }
+
+    .ss-auth-brand {
+        margin-bottom: 22px;
+        font-size: 11px;
+    }
+
+    .ss-auth-visual h1 {
+        font-size: 31px;
+        letter-spacing: -1px;
+    }
+
+    .ss-auth-description {
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .ss-auth-visual-footer {
+        margin-top: 19px;
+        font-size: 9px;
+    }
+
+    .ss-auth-panel {
+        padding: 32px 21px;
+    }
+
+    .ss-auth-heading {
+        font-size: 31px;
+    }
+
+    .ss-auth-subheading {
+        margin-bottom: 25px;
+    }
+
+    .ss-auth-options {
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-auth *,
+    .ss-auth *::before,
+    .ss-auth *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="ss-auth">
+    <div class="ss-auth-shell">
+
+        <section class="ss-auth-visual" aria-label="About StreamSphere">
+            <div class="ss-auth-visual-content">
+
+                <div class="ss-auth-brand">
+                    <span class="ss-auth-brand-mark" aria-hidden="true"></span>
+                    <span>StreamSphere</span>
+                </div>
+
+                <h1>
+                    Your next favourite
+                    <span>starts here.</span>
+                </h1>
+
+                <p class="ss-auth-description">
+                    Discover entertainment, explore new stories, and find
+                    videos worth coming back to. Your next great watch is
+                    just around the corner.
+                </p>
+
+                <div class="ss-auth-visual-footer">
+                    Discover. Watch. Create.
+                </div>
+            </div>
+        </section>
+
+        <section class="ss-auth-panel" aria-labelledby="ssLoginHeading">
+            <div class="ss-auth-form-wrap">
+
+                <div class="ss-auth-eyebrow">Welcome back</div>
+
+                <h2 class="ss-auth-heading" id="ssLoginHeading">
+                    Sign in<span>.</span>
+                </h2>
+
+                <p class="ss-auth-subheading">
+                    Enter your account details to continue to StreamSphere.
+                </p>
+
+                {% if messages %}
+                    <div class="ss-auth-messages">
+                        {% for message in messages %}
+                            <div class="ss-auth-message" role="status">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="ss-auth-error-box" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+
+                    {% if redirect_field_value %}
+                        <input
+                            type="hidden"
+                            name="{{ redirect_field_name }}"
+                            value="{{ redirect_field_value }}"
+                        >
+                    {% endif %}
+
+                    {% for field in form %}
+                        {% if field.name != "remember" %}
+                            <div class="ss-auth-field">
+                                <label
+                                    class="ss-auth-label"
+                                    for="{{ field.id_for_label }}"
+                                >
+                                    {{ field.label }}
+                                    {% if field.field.required %}
+                                        <span class="ss-auth-required">*</span>
+                                    {% endif %}
+                                </label>
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                    <div class="ss-auth-help">
+                                        {{ field.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in field.errors %}
+                                    <p class="ss-auth-field-error" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="ss-auth-options">
+                        {% if form.remember %}
+                            <label
+                                class="ss-auth-remember"
+                                for="{{ form.remember.id_for_label }}"
+                            >
+                                {{ form.remember }}
+                                <span>Remember me</span>
+                            </label>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+
+                        <a
+                            class="ss-auth-link"
+                            href="{% url 'account_reset_password' %}"
+                        >
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="ss-auth-submit">
+                        Sign in to your account
+                        <span aria-hidden="true">&rarr;</span>
+                    </button>
+                </form>
+
+                <div class="ss-auth-divider">New to StreamSphere?</div>
+
+                <div class="ss-auth-footer">
+                    Don't have an account?
+                    <a href="{% url 'account_signup' %}">
+                        Create your account
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+</main>
+{% endblock %}
