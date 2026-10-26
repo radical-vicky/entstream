@@ -1,483 +1,704 @@
 
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}{{ creator.username }} - StreamSphere{% endblock %}
+{% block title %}{{ creator.username }} | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-creator-page {
-    --orange: #ff7900;
-    --bg: #0b0b0d;
-    --panel: #141417;
-    --border: #303035;
-    --text: #f4f4f5;
-    --muted: #a1a1aa;
-    min-height: 100vh;
-    padding: 28px 18px 60px;
-    background: var(--bg);
-    color: var(--text);
+:root {
+    --cp-bg: #080808;
+    --cp-panel: #111111;
+    --cp-panel-hover: #181818;
+    --cp-border: #292929;
+    --cp-text: #f5f5f5;
+    --cp-muted: #a0a0a0;
+    --cp-orange: #ff7900;
+    --cp-orange-light: #ff9a3d;
 }
 
-.ss-creator-wrap {
-    max-width: 1180px;
+.cp-page {
+    width: min(1440px, 100%);
     margin: 0 auto;
+    padding: 28px 24px 60px;
+    color: var(--cp-text);
 }
 
-.ss-creator-banner {
-    min-height: 155px;
-    border: 1px solid var(--border);
+.cp-cover {
+    height: 210px;
+    position: relative;
+    overflow: hidden;
     background:
-        radial-gradient(ellipse at 80% 20%, #59300f 0%, transparent 42%),
-        linear-gradient(115deg, #18181b, #101012 65%, #251406);
+        radial-gradient(ellipse at 80% 20%, #632900 0%, transparent 42%),
+        linear-gradient(120deg, #17110c, #090909 60%, #241004);
+    border: 1px solid var(--cp-border);
 }
 
-.ss-creator-card {
-    display: flex;
-    align-items: flex-end;
-    gap: 22px;
-    padding: 0 26px 24px;
-    border: 1px solid var(--border);
-    border-top: 0;
-    background: var(--panel);
+.cp-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, #ff790012, transparent);
+    pointer-events: none;
 }
 
-.ss-creator-avatar {
-    width: 112px;
-    height: 112px;
-    flex: 0 0 112px;
-    margin-top: -35px;
-    border: 4px solid var(--panel);
-    border-radius: 50%;
-    background: #27272a;
+.cp-cover-image {
+    width: 100%;
+    height: 100%;
+    display: block;
     object-fit: cover;
 }
 
-.ss-creator-avatar-fallback {
+.cp-profile-panel {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: var(--orange);
-    font-size: 40px;
-    font-weight: 900;
+    gap: 22px;
+    padding: 24px;
+    background: var(--cp-panel);
+    border: 1px solid var(--cp-border);
+    border-top: 0;
 }
 
-.ss-creator-info {
-    flex: 1;
-    min-width: 0;
-    padding-top: 20px;
-}
-
-.ss-creator-info h1 {
-    margin: 0;
-    overflow-wrap: anywhere;
-    font-size: clamp(24px, 4vw, 34px);
-    font-weight: 850;
-    letter-spacing: -1px;
-}
-
-.ss-creator-handle {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 14px;
-}
-
-.ss-creator-bio {
-    margin-top: 15px;
-    color: #d4d4d8;
-    line-height: 1.7;
-    overflow-wrap: anywhere;
-}
-
-.ss-creator-location {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.ss-creator-website {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--orange);
-    overflow-wrap: anywhere;
-}
-
-.ss-creator-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    align-items: center;
-}
-
-.ss-creator-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 42px;
-    padding: 0 17px;
-    border: 1px solid var(--border);
-    border-radius: 0;
-    background: transparent;
-    color: var(--text);
-    font-size: 13px;
+.cp-avatar {
+    flex: 0 0 auto;
+    width: 112px;
+    height: 112px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 3px solid var(--cp-orange);
+    background: #242424;
+    color: var(--cp-orange-light);
+    font-size: 38px;
     font-weight: 800;
-    text-decoration: none;
-    cursor: pointer;
 }
 
-.ss-creator-btn-primary {
-    border-color: var(--orange);
-    background: var(--orange);
-    color: #111;
-}
-
-.ss-creator-btn:hover {
-    border-color: var(--orange);
-}
-
-.ss-creator-btn-primary:hover {
-    background: #ff922e;
-}
-
-.ss-creator-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1px;
-    margin-top: 20px;
-    border: 1px solid var(--border);
-    background: var(--border);
-}
-
-.ss-creator-stat {
-    padding: 20px;
-    background: var(--panel);
-}
-
-.ss-creator-stat strong {
-    display: block;
-    font-size: 23px;
-    font-weight: 850;
-}
-
-.ss-creator-stat span {
-    display: block;
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.ss-creator-section {
-    margin-top: 32px;
-}
-
-.ss-creator-section-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 17px;
-}
-
-.ss-creator-section-heading h2 {
-    margin: 0;
-    font-size: 21px;
-    font-weight: 850;
-}
-
-.ss-creator-video-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-}
-
-.ss-creator-video {
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--panel);
-    color: var(--text);
-    text-decoration: none;
-    transition: border-color .15s ease;
-}
-
-.ss-creator-video:hover {
-    border-color: var(--orange);
-}
-
-.ss-creator-thumbnail {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #202024;
-}
-
-.ss-creator-thumbnail img {
+.cp-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.ss-creator-thumbnail span {
-    color: var(--orange);
-    font-size: 32px;
+.cp-identity {
+    flex: 1;
+    min-width: 0;
 }
 
-.ss-creator-video-details {
-    padding: 15px;
+.cp-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.ss-creator-video-details h3 {
+.cp-name {
     margin: 0;
-    font-size: 15px;
-    line-height: 1.5;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.2;
     overflow-wrap: anywhere;
 }
 
-.ss-creator-video-details p {
-    margin: 8px 0 0;
-    color: var(--muted);
-    font-size: 12px;
+.cp-verified {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 21px;
+    height: 21px;
+    background: var(--cp-orange);
+    color: #111;
+    font-size: 13px;
+    font-weight: 900;
 }
 
-.ss-creator-empty {
-    padding: 38px 20px;
-    border: 1px solid var(--border);
-    background: var(--panel);
+.cp-handle {
+    margin: 7px 0 0;
+    color: var(--cp-muted);
+    font-size: 14px;
+}
+
+.cp-bio {
+    margin: 12px 0 0;
+    max-width: 700px;
+    color: #d0d0d0;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.cp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.cp-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    border: 1px solid var(--cp-border);
+    background: #1b1b1b;
+    color: var(--cp-text);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .18s, border-color .18s;
+}
+
+.cp-button:hover {
+    border-color: var(--cp-orange);
+    background: #242424;
+}
+
+.cp-button-primary {
+    border-color: var(--cp-orange);
+    background: var(--cp-orange);
+    color: #111;
+}
+
+.cp-button-primary:hover {
+    background: var(--cp-orange-light);
+    color: #111;
+}
+
+.cp-button:focus-visible,
+.cp-tab:focus-visible {
+    outline: 2px solid var(--cp-orange-light);
+    outline-offset: 3px;
+}
+
+.cp-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 18px;
+    border: 1px solid var(--cp-border);
+    background: var(--cp-panel);
+}
+
+.cp-stat {
+    padding: 20px;
     text-align: center;
+    border-right: 1px solid var(--cp-border);
 }
 
-.ss-creator-empty h3 {
-    margin: 0 0 8px;
+.cp-stat:last-child {
+    border-right: 0;
 }
 
-.ss-creator-empty p {
+.cp-stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--cp-orange-light);
+}
+
+.cp-stat-label {
+    display: block;
+    margin-top: 5px;
+    color: var(--cp-muted);
+    font-size: 13px;
+}
+
+.cp-content {
+    margin-top: 30px;
+}
+
+.cp-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.cp-section-heading h2 {
     margin: 0;
-    color: var(--muted);
+    font-size: 23px;
+}
+
+.cp-section-heading p {
+    margin: 5px 0 0;
+    color: var(--cp-muted);
+    font-size: 13px;
+}
+
+.cp-video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.cp-video-card {
+    min-width: 0;
+    overflow: hidden;
+    background: var(--cp-panel);
+    border: 1px solid var(--cp-border);
+    transition: border-color .18s, transform .18s;
+}
+
+.cp-video-card:hover {
+    border-color: #7a400f;
+    transform: translateY(-2px);
+}
+
+.cp-thumbnail {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #202020;
+}
+
+.cp-thumbnail img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform .25s;
+}
+
+.cp-video-card:hover .cp-thumbnail img {
+    transform: scale(1.035);
+}
+
+.cp-thumbnail-placeholder {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #24160b, #101010);
+    color: var(--cp-orange);
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.cp-duration {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 4px 6px;
+    background: #000d;
+    color: #fff;
+    font-size: 11px;
+}
+
+.cp-video-info {
+    padding: 13px;
+}
+
+.cp-video-title {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--cp-text);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.cp-video-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.cp-video-title a:hover {
+    color: var(--cp-orange-light);
+}
+
+.cp-video-meta {
+    margin-top: 8px;
+    color: var(--cp-muted);
+    font-size: 12px;
     line-height: 1.7;
 }
 
-.ss-creator-messages {
-    margin-bottom: 16px;
+.cp-video-creator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    color: #d4d4d4;
+    font-size: 12px;
 }
 
-.ss-creator-message {
-    margin-bottom: 8px;
-    padding: 12px 14px;
-    border-left: 3px solid var(--orange);
-    background: var(--panel);
-    color: var(--text);
+.cp-mini-avatar {
+    width: 26px;
+    height: 26px;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #393939;
+    border-radius: 50%;
+    background: #252525;
+    color: var(--cp-orange-light);
+    font-weight: 800;
+}
+
+.cp-mini-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cp-empty {
+    padding: 48px 20px;
+    border: 1px dashed #383838;
+    background: var(--cp-panel);
+    text-align: center;
+}
+
+.cp-empty h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.cp-empty p {
+    margin: 0;
+    color: var(--cp-muted);
+    line-height: 1.6;
+}
+
+.cp-empty-action {
+    margin-top: 18px;
+}
+
+.cp-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+}
+
+.cp-pagination a,
+.cp-pagination span {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid var(--cp-border);
+    background: var(--cp-panel);
+    color: var(--cp-text);
+    text-decoration: none;
+}
+
+.cp-pagination .current {
+    border-color: var(--cp-orange);
+    background: var(--cp-orange);
+    color: #111;
+}
+
+.cp-alert {
+    margin-bottom: 16px;
+    padding: 12px 15px;
+    border: 1px solid var(--cp-border);
+    background: var(--cp-panel);
+    color: var(--cp-text);
+}
+
+@media (max-width: 1100px) {
+    .cp-video-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cp-profile-panel {
+        flex-wrap: wrap;
+    }
+
+    .cp-actions {
+        margin-left: 134px;
+    }
 }
 
 @media (max-width: 760px) {
-    .ss-creator-page {
-        padding: 18px 12px 40px;
+    .cp-page {
+        padding: 16px 12px 40px;
     }
 
-    .ss-creator-card {
+    .cp-cover {
+        height: 145px;
+    }
+
+    .cp-profile-panel {
         align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
-        padding: 0 18px 20px;
+        gap: 14px;
+        padding: 18px 14px;
     }
 
-    .ss-creator-avatar {
-        width: 92px;
-        height: 92px;
-        flex-basis: 92px;
+    .cp-avatar {
+        width: 76px;
+        height: 76px;
+        font-size: 28px;
     }
 
-    .ss-creator-info {
-        padding-top: 0;
+    .cp-name {
+        font-size: 23px;
     }
 
-    .ss-creator-actions {
+    .cp-actions {
         width: 100%;
+        margin-left: 0;
     }
 
-    .ss-creator-btn {
+    .cp-actions form {
         flex: 1;
     }
 
-    .ss-creator-video-grid {
+    .cp-actions .cp-button {
+        width: 100%;
+    }
+
+    .cp-stats {
+        margin-top: 12px;
+    }
+
+    .cp-stat {
+        padding: 15px 6px;
+    }
+
+    .cp-stat-number {
+        font-size: 20px;
+    }
+
+    .cp-stat-label {
+        font-size: 11px;
+    }
+
+    .cp-video-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
     }
 
-    .ss-creator-video-details {
-        padding: 11px;
+    .cp-video-info {
+        padding: 10px;
     }
 
-    .ss-creator-video-details h3 {
+    .cp-video-title {
         font-size: 13px;
+    }
+
+    .cp-section-heading h2 {
+        font-size: 20px;
     }
 }
 
-@media (max-width: 420px) {
-    .ss-creator-video-grid {
-        grid-template-columns: minmax(0, 1fr);
+@media (max-width: 380px) {
+    .cp-profile-panel {
+        display: block;
     }
 
-    .ss-creator-stats .ss-creator-stat {
-        padding: 14px 10px;
+    .cp-avatar {
+        margin-bottom: 14px;
     }
 
-    .ss-creator-stat strong {
-        font-size: 19px;
+    .cp-video-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="ss-creator-page">
-    <div class="ss-creator-wrap">
+<main class="cp-page">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="cp-alert" role="status">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
-        {% if messages %}
-        <div class="ss-creator-messages">
-            {% for message in messages %}
-            <div class="ss-creator-message" role="status">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
+    <div class="cp-cover">
+        {% if creator.profile.cover_image %}
+            <img
+                class="cp-cover-image"
+                src="{{ creator.profile.cover_image.url }}"
+                alt=""
+            >
         {% endif %}
+    </div>
 
-        <div class="ss-creator-banner"></div>
-
-        <section class="ss-creator-card">
-            {% if profile.avatar_image %}
-                <img class="ss-creator-avatar"
-                     src="{{ profile.avatar_image.url }}"
-                     alt="{{ creator.username }} profile photo">
-            {% elif profile.avatar %}
-                <img class="ss-creator-avatar"
-                     src="{{ profile.avatar }}"
-                     alt="{{ creator.username }} profile photo">
+    <section class="cp-profile-panel" aria-label="Creator profile">
+        <div class="cp-avatar">
+            {% if creator.profile.avatar_image %}
+                <img
+                    src="{{ creator.profile.avatar_image.url }}"
+                    alt="{{ creator.username }} profile picture"
+                >
+            {% elif creator.profile.avatar %}
+                <img
+                    src="{{ creator.profile.avatar }}"
+                    alt="{{ creator.username }} profile picture"
+                >
             {% else %}
-                <div class="ss-creator-avatar ss-creator-avatar-fallback">
-                    {{ creator.username|first|upper }}
-                </div>
+                {{ creator.username|first|upper }}
+            {% endif %}
+        </div>
+
+        <div class="cp-identity">
+            <div class="cp-name-row">
+                <h1 class="cp-name">{{ creator.get_full_name|default:creator.username }}</h1>
+                {% if creator.profile.is_verified %}
+                    <span class="cp-verified" title="Verified creator" aria-label="Verified creator">✓</span>
+                {% endif %}
+            </div>
+
+            <p class="cp-handle">@{{ creator.username }}</p>
+
+            {% if creator.profile.bio %}
+                <p class="cp-bio">{{ creator.profile.bio }}</p>
+            {% else %}
+                <p class="cp-bio">Welcome to my StreamSphere channel.</p>
+            {% endif %}
+        </div>
+
+        <div class="cp-actions">
+            {% if request.user.is_authenticated and request.user != creator %}
+                <form method="post" action="{% url 'creators:toggle_follow' creator.username %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button
+                        type="submit"
+                        class="cp-button {% if not following_creator %}cp-button-primary{% endif %}"
+                    >
+                        {% if following_creator %}Following{% else %}Follow creator{% endif %}
+                    </button>
+                </form>
+            {% elif not request.user.is_authenticated %}
+                <a class="cp-button cp-button-primary" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">
+                    Follow creator
+                </a>
             {% endif %}
 
-            <div class="ss-creator-info">
-                <h1>{{ creator.get_full_name|default:creator.username }}</h1>
-                <div class="ss-creator-handle">
-                    @{{ creator.username }}
-                </div>
+            {% if request.user == creator %}
+                <a class="cp-button" href="{% url 'accounts:profile' %}">My account</a>
+            {% endif %}
+        </div>
+    </section>
 
-                {% if profile.bio %}
-                    <p class="ss-creator-bio">{{ profile.bio|linebreaksbr }}</p>
-                {% else %}
-                    <p class="ss-creator-bio">
-                        This creator hasn't added a bio yet.
-                    </p>
-                {% endif %}
+    <section class="cp-stats" aria-label="Creator statistics">
+        <div class="cp-stat">
+            <span class="cp-stat-number">{{ video_count|default:videos.count|default:0 }}</span>
+            <span class="cp-stat-label">Videos</span>
+        </div>
+        <div class="cp-stat">
+            <span class="cp-stat-number">{{ follower_count|default:0 }}</span>
+            <span class="cp-stat-label">Followers</span>
+        </div>
+        <div class="cp-stat">
+            <span class="cp-stat-number">{{ total_views|default:0 }}</span>
+            <span class="cp-stat-label">Total views</span>
+        </div>
+    </section>
 
-                {% if profile.location %}
-                    <div class="ss-creator-location">
-                        Location: {{ profile.location }}
-                    </div>
-                {% endif %}
-
-                {% if profile.website %}
-                    <a class="ss-creator-website"
-                       href="{{ profile.website }}"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        Visit website
-                    </a>
-                {% endif %}
+    <section class="cp-content">
+        <div class="cp-section-heading">
+            <div>
+                <h2>Videos</h2>
+                <p>Explore videos published by @{{ creator.username }}</p>
             </div>
+        </div>
 
-            <div class="ss-creator-actions">
-                {% if request.user.is_authenticated %}
-                    {% if request.user.pk != creator.pk %}
-                    <form method="post"
-                          action="{% url 'creators:toggle_follow' creator.username %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="next"
-                               value="{{ request.get_full_path }}">
-
-                        {% if is_following %}
-                            <button class="ss-creator-btn" type="submit">
-                                Following
-                            </button>
-                        {% else %}
-                            <button class="ss-creator-btn ss-creator-btn-primary"
-                                    type="submit">
-                                Follow creator
-                            </button>
-                        {% endif %}
-                    </form>
-                    {% else %}
-                    <a class="ss-creator-btn ss-creator-btn-primary"
-                       href="{% url 'accounts:profile' %}">
-                        Edit my profile
-                    </a>
-                    {% endif %}
-                {% else %}
-                    <a class="ss-creator-btn ss-creator-btn-primary"
-                       href="{% url 'account_login' %}">
-                        Sign in to follow
-                    </a>
-                {% endif %}
-            </div>
-        </section>
-
-        <section class="ss-creator-stats">
-            <div class="ss-creator-stat">
-                <strong>{{ video_count }}</strong>
-                <span>Published videos</span>
-            </div>
-            <div class="ss-creator-stat">
-                <strong>{{ followers_count }}</strong>
-                <span>Followers</span>
-            </div>
-            <div class="ss-creator-stat">
-                <strong>{{ following_count }}</strong>
-                <span>Following</span>
-            </div>
-        </section>
-
-        <section class="ss-creator-section">
-            <div class="ss-creator-section-heading">
-                <h2>Published videos</h2>
-            </div>
-
-            {% if videos %}
-            <div class="ss-creator-video-grid">
+        {% if videos %}
+            <div class="cp-video-grid">
                 {% for video in videos %}
-                <a class="ss-creator-video"
-                   href="{% url 'videos:detail' video.pk %}">
+                    <article class="cp-video-card">
+                        <a class="cp-thumbnail" href="{% url 'videos:detail' video.pk %}" aria-label="Watch {{ video.title }}">
+                            {% if video.thumbnail %}
+                                <img
+                                    src="{{ video.thumbnail.url }}"
+                                    alt="{{ video.title }}"
+                                    loading="lazy"
+                                >
+                            {% elif video.thumbnail_url %}
+                                <img
+                                    src="{{ video.thumbnail_url }}"
+                                    alt="{{ video.title }}"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <span class="cp-thumbnail-placeholder">{{ video.title|first|upper }}</span>
+                            {% endif %}
 
-                    <div class="ss-creator-thumbnail">
-                        {% if video.thumbnail_url %}
-                            <img src="{{ video.thumbnail_url }}"
-                                 alt="{{ video.title }}"
-                                 loading="lazy">
-                        {% else %}
-                            <span aria-hidden="true">▶</span>
-                        {% endif %}
-                    </div>
+                            {% if video.duration %}
+                                <span class="cp-duration">{{ video.duration }}</span>
+                            {% endif %}
+                        </a>
 
-                    <div class="ss-creator-video-details">
-                        <h3>{{ video.title }}</h3>
-                        <p>{{ video.views|default:0 }} views</p>
-                    </div>
-                </a>
+                        <div class="cp-video-info">
+                            <h3 class="cp-video-title">
+                                <a href="{% url 'videos:detail' video.pk %}">{{ video.title }}</a>
+                            </h3>
+
+                            <div class="cp-video-meta">
+                                {{ video.views|default:0 }} views
+                                {% if video.created_at %}
+                                    · {{ video.created_at|date:"M j, Y" }}
+                                {% endif %}
+                            </div>
+
+                            <div class="cp-video-creator">
+                                <span class="cp-mini-avatar">
+                                    {% if creator.profile.avatar_image %}
+                                        <img src="{{ creator.profile.avatar_image.url }}" alt="" loading="lazy">
+                                    {% elif creator.profile.avatar %}
+                                        <img src="{{ creator.profile.avatar }}" alt="" loading="lazy">
+                                    {% else %}
+                                        {{ creator.username|first|upper }}
+                                    {% endif %}
+                                </span>
+                                <span>@{{ creator.username }}</span>
+                            </div>
+                        </div>
+                    </article>
                 {% endfor %}
             </div>
-            {% else %}
-            <div class="ss-creator-empty">
-                <h3>No published videos yet</h3>
-                <p>
-                    Videos this creator publishes will appear here.
-                </p>
-            </div>
-            {% endif %}
-        </section>
 
-    </div>
+            {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                <nav class="cp-pagination" aria-label="Video pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    {% for number in page_obj.paginator.page_range %}
+                        {% if page_obj.number == number %}
+                            <span class="current" aria-current="page">{{ number }}</span>
+                        {% else %}
+                            <a href="?page={{ number }}">{{ number }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="cp-empty">
+                <h3>No videos yet</h3>
+                <p>
+                    {% if request.user == creator %}
+                        You have not published any videos yet. Upload your first video to get started.
+                    {% else %}
+                        This creator has not published any videos yet. Check back later for new content.
+                    {% endif %}
+                </p>
+
+                {% if request.user == creator %}
+                    <div class="cp-empty-action">
+                        <a class="cp-button cp-button-primary" href="{% url 'videos:upload' %}">
+                            Upload a video
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
 </main>
 {% endblock %}
