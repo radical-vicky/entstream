@@ -1,17 +1,12 @@
 #!/bin/bash
-
-# Exit immediately if a command exits with a non-zero status
 set -e
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Run database migrations
+# This is the key step: run migrations and create tables in Supabase
 python manage.py migrate --noinput
 
-# Build Tailwind
+# If you have Tailwind and static files, keep the original commands
 python manage.py tailwind install
 python manage.py tailwind build
-
-# Collect static files
 python manage.py collectstatic --noinput
