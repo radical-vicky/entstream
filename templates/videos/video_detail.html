@@ -1,587 +1,212 @@
-
+```django
 {% extends "base.html" %}
 
 {% block title %}{{ video.title }} | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-/* =========================================
-   STREAMSPHERE VIDEO DETAIL
-   Sharp corners · Charcoal · Orange
-========================================= */
 .vd-page {
-    --vd-bg: #0b0d0e;
-    --vd-panel: #111416;
-    --vd-panel-hover: #171a1c;
-    --vd-border: #292d30;
-    --vd-muted: #92989c;
-    --vd-orange: #ff7900;
-    --vd-orange-light: #ff922e;
-    --vd-text: #e7e9ea;
+    --orange: #ff7900;
+    --orange-light: #ff922e;
+    --bg: #0b0d0e;
+    --panel: #111416;
+    --border: #292d30;
+    --muted: #92989c;
+    color: #e7e9ea;
     max-width: 1800px;
     min-height: 100vh;
     margin: 0 auto;
-    padding: 22px 28px 64px;
-    color: var(--vd-text);
+    padding: 22px 28px 60px;
 }
-
-.vd-breadcrumb {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 20px;
-    color: #777e82;
-    font-size: 12px;
-}
-.vd-breadcrumb a {
-    color: #a8adb0;
-    text-decoration: none;
-    transition: color .2s;
-}
-.vd-breadcrumb a:hover { color: var(--vd-orange-light); }
-.vd-breadcrumb-current {
-    overflow: hidden;
-    max-width: 360px;
-    color: #e7e9ea;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
+.vd-page * { box-sizing: border-box; }
+.vd-page a { text-decoration: none; }
 .vd-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0,1fr) 350px;
     gap: 30px;
     align-items: start;
 }
-.vd-main { min-width: 0; }
-
-/* Video player */
-.vd-player-shell {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #303437;
-    background: #000;
+.vd-main,.vd-sidebar { min-width: 0; }
+.vd-breadcrumb {
+    display: flex; flex-wrap: wrap; gap: 9px;
+    margin-bottom: 20px; color: #777e82; font-size: 12px;
 }
-.vd-player-topline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 40px;
-    padding: 0 14px;
-    border-bottom: 1px solid #292d30;
-    background: #111314;
+.vd-breadcrumb a { color: #a8adb0; }
+.vd-breadcrumb a:hover { color: var(--orange-light); }
+.vd-breadcrumb-current {
+    overflow: hidden; max-width: 360px;
+    text-overflow: ellipsis; white-space: nowrap;
 }
-.vd-live-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #c3c7c9;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .12em;
-    text-transform: uppercase;
+.vd-player-shell { overflow: hidden; border: 1px solid #303437; background: #000; }
+.vd-player-topline,.vd-player-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; padding: 11px 14px; background: #111314;
+    color: #858b8f; font-size: 10px;
 }
-.vd-status-dot {
-    width: 7px;
-    height: 7px;
-    background: var(--vd-orange);
-}
-.vd-player-quality {
-    color: #737a7e;
-    font-size: 10px;
-    letter-spacing: .06em;
-}
-.vd-player {
-    display: block;
-    width: 100%;
-    max-height: 76vh;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    object-fit: contain;
-}
-.vd-player:focus-visible {
-    outline: 2px solid var(--vd-orange);
-    outline-offset: -3px;
-}
-.vd-player-foot {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
-    border-top: 1px solid #24282a;
-    background: #101213;
-    color: #858b8f;
-    font-size: 10px;
-}
-.vd-player-foot strong {
-    color: #c2c6c8;
-    font-weight: 650;
-}
-
-/* Premium and unavailable states */
+.vd-player-topline { border-bottom: 1px solid var(--border); }
+.vd-live-label { color: #c3c7c9; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.vd-status-dot { display: inline-block; width: 7px; height: 7px; margin-right: 7px; background: var(--orange); }
+.vd-player { display: block; width: 100%; max-height: 76vh; aspect-ratio: 16/9; background: #000; object-fit: contain; }
+.vd-player-foot { border-top: 1px solid #24282a; }
+.vd-player-foot strong { color: #e7e9ea; }
 .vd-gate {
-    display: flex;
-    min-height: 330px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 35px 22px;
-    background:
-        radial-gradient(ellipse at center, #21170e 0%, #0b0d0e 68%);
+    display: flex; min-height: 320px; flex-direction: column;
+    align-items: center; justify-content: center; padding: 30px 20px;
+    background: radial-gradient(ellipse at center,#21170e,#0b0d0e 70%);
     text-align: center;
 }
-.vd-gate-icon {
-    display: grid;
-    width: 64px;
-    height: 64px;
-    place-items: center;
-    border: 1px solid #75401c;
-    background: #1b130d;
-    color: var(--vd-orange-light);
-    font-size: 25px;
-}
+.vd-gate-icon { color: var(--orange-light); font-size: 30px; }
 .vd-gate-eyebrow {
-    margin-top: 22px;
-    color: var(--vd-orange-light);
-    font-size: 10px;
-    font-weight: 850;
-    letter-spacing: .17em;
-    text-transform: uppercase;
+    margin-top: 15px; color: var(--orange-light); font-size: 10px;
+    font-weight: 850; letter-spacing: .15em; text-transform: uppercase;
 }
-.vd-gate h2 {
-    margin: 9px 0 0;
-    color: #fff;
-    font-size: clamp(20px, 3vw, 28px);
-    font-weight: 850;
-    letter-spacing: -.035em;
-}
-.vd-gate p {
-    max-width: 430px;
-    margin: 12px 0 0;
-    color: #9ca2a5;
-    font-size: 13px;
-    line-height: 1.8;
-}
+.vd-gate h2 { margin: 10px 0 0; color: #fff; font-size: 25px; }
+.vd-gate p { max-width: 430px; color: #9ca2a5; font-size: 13px; line-height: 1.8; }
 .vd-button {
-    display: inline-flex;
-    min-height: 43px;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    padding: 0 18px;
-    border: 1px solid #414649;
-    background: #171a1c;
-    color: #e7e9ea;
-    font-size: 12px;
-    font-weight: 800;
-    text-decoration: none;
-    transition: border-color .2s, background .2s, color .2s;
+    display: inline-flex; min-height: 40px; align-items: center;
+    justify-content: center; gap: 7px; padding: 0 15px;
+    border: 1px solid #414649; background: #171a1c; color: #e7e9ea;
+    font-size: 11px; font-weight: 800; cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
 }
-.vd-button:hover {
-    border-color: var(--vd-orange);
-    color: var(--vd-orange-light);
+.vd-button:hover { border-color: var(--orange); color: var(--orange-light); }
+.vd-button-primary { border-color: var(--orange); background: var(--orange); color: #17100a; }
+.vd-button-primary:hover { background: var(--orange-light); color: #17100a; }
+.vd-button-liked,.vd-button-following { border-color: #75401c; color: var(--orange-light); }
+.vd-gate .vd-button { margin-top: 12px; }
+.vd-heading { padding: 22px 0 18px; border-bottom: 1px solid var(--border); }
+.vd-label-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.vd-label {
+    padding: 5px 8px; border: 1px solid #393e41; color: #aeb3b6;
+    font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase;
 }
-.vd-button-primary {
-    border-color: var(--vd-orange);
-    background: var(--vd-orange);
-    color: #17100a;
-}
-.vd-button-primary:hover {
-    border-color: var(--vd-orange-light);
-    background: var(--vd-orange-light);
-    color: #17100a;
-}
-.vd-gate .vd-button { margin-top: 23px; }
-
-/* Video heading and stats */
-.vd-heading {
-    padding: 23px 0 19px;
-    border-bottom: 1px solid var(--vd-border);
-}
-.vd-label-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 11px;
-}
-.vd-category-label,
-.vd-premium-label {
-    display: inline-flex;
-    align-items: center;
-    min-height: 23px;
-    padding: 0 8px;
-    border: 1px solid #393e41;
-    color: #aeb3b6;
-    font-size: 9px;
-    font-weight: 850;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-}
-.vd-premium-label {
-    border-color: #68401e;
-    background: #21150c;
-    color: var(--vd-orange-light);
-}
-.vd-heading h1 {
-    margin: 0;
-    overflow-wrap: anywhere;
-    color: #fff;
-    font-size: clamp(22px, 3.1vw, 34px);
-    font-weight: 850;
-    line-height: 1.25;
-    letter-spacing: -.045em;
-}
-.vd-subtitle {
-    margin-top: 9px;
-    color: #969da0;
-    font-size: 13px;
-    line-height: 1.7;
-}
-.vd-stats {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin-top: 18px;
-}
-.vd-stat {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: #9ca2a5;
-    font-size: 11px;
-}
-.vd-stat-icon {
-    color: var(--vd-orange-light);
-    font-size: 13px;
-}
-.vd-stat-divider {
-    width: 3px;
-    height: 3px;
-    background: #50565a;
-}
-
-/* Creator section */
+.vd-premium-label { border-color: #68401e; background: #21150c; color: var(--orange-light); }
+.vd-heading h1 { margin: 0; color: #fff; font-size: clamp(22px,3vw,34px); line-height: 1.3; overflow-wrap: anywhere; }
+.vd-subtitle { margin-top: 9px; color: #969da0; font-size: 13px; line-height: 1.7; }
+.vd-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; color: #9ca2a5; font-size: 11px; }
+.vd-stat-icon { color: var(--orange-light); }
 .vd-creator-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 19px 0;
-    border-bottom: 1px solid var(--vd-border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border);
 }
-.vd-creator {
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    gap: 13px;
-}
+.vd-creator { display: flex; min-width: 0; align-items: center; gap: 12px; }
 .vd-avatar {
-    display: grid;
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
-    place-items: center;
-    overflow: hidden;
-    border: 1px solid #69401e;
-    background: #20150d;
-    color: var(--vd-orange-light);
-    font-size: 19px;
-    font-weight: 850;
-    text-transform: uppercase;
+    display: grid; width: 48px; height: 48px; flex: 0 0 48px;
+    place-items: center; overflow: hidden; border: 1px solid #69401e;
+    border-radius: 50%; background: #20150d; color: var(--orange-light);
+    font-size: 17px; font-weight: 850; text-transform: uppercase;
 }
-.vd-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+.vd-avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.vd-avatar-small { width: 38px; height: 38px; flex-basis: 38px; font-size: 14px; }
 .vd-creator-info { min-width: 0; }
-.vd-creator-name {
-    overflow: hidden;
-    color: #f4f5f5;
-    font-size: 14px;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.vd-creator-caption {
-    margin-top: 5px;
-    color: #838a8e;
-    font-size: 11px;
-}
-.vd-creator-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* Description */
-.vd-description-panel {
-    margin-top: 21px;
-    border: 1px solid var(--vd-border);
-    background: var(--vd-panel);
-}
+.vd-creator-name { color: #f4f5f5; font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
+.vd-creator-caption { margin-top: 5px; color: #838a8e; font-size: 11px; }
+.vd-creator-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.vd-social-actions { display: flex; flex-wrap: wrap; gap: 9px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.vd-inline-form { display: inline-flex; margin: 0; }
+.vd-count { color: #969da0; font-size: 10px; }
+.vd-notification-link { position: relative; }
+.vd-panel { margin-top: 20px; border: 1px solid var(--border); background: var(--panel); }
 .vd-panel-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 15px 17px;
-    border-bottom: 1px solid var(--vd-border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border);
     background: #151819;
 }
-.vd-panel-heading h2 {
-    margin: 0;
-    color: #f0f1f1;
-    font-size: 12px;
-    font-weight: 850;
-    letter-spacing: .04em;
-    text-transform: uppercase;
+.vd-panel-heading h2 { margin: 0; color: #f0f1f1; font-size: 12px; font-weight: 850; text-transform: uppercase; }
+.vd-panel-heading span { color: #747b7f; font-size: 10px; }
+.vd-description-body { padding: 18px; color: #b7bdc0; font-size: 13px; line-height: 1.9; overflow-wrap: anywhere; white-space: pre-line; }
+.vd-description-footer { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 12px 18px; border-top: 1px solid #25292b; color: #858b8f; font-size: 10px; }
+.vd-description-footer strong { color: #d1d4d5; }
+.vd-comments { padding: 16px; }
+.vd-comment-form { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 20px; }
+.vd-comment-compose { flex: 1; min-width: 0; }
+.vd-input {
+    display: block; width: 100%; min-height: 90px; resize: vertical;
+    padding: 12px; border: 1px solid #303638; border-radius: 0;
+    background: #0c0f10; color: #f3f4f5; font: inherit; font-size: 12px;
+    outline: none;
 }
-.vd-panel-heading span {
-    color: #747b7f;
-    font-size: 10px;
+.vd-input:focus { border-color: var(--orange); }
+.vd-input::placeholder { color: #737a7e; }
+.vd-comment-submit { margin-top: 9px; }
+.vd-comment {
+    display: flex; align-items: flex-start; gap: 11px;
+    padding: 15px 0; border-top: 1px solid #25292b;
 }
-.vd-description-body {
-    padding: 18px;
-    color: #b7bdc0;
-    font-size: 13px;
-    line-height: 1.9;
-    overflow-wrap: anywhere;
-    white-space: pre-line;
+.vd-comment-content { flex: 1; min-width: 0; }
+.vd-comment-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.vd-comment-author { color: #f1f2f2; font-size: 12px; font-weight: 800; }
+.vd-comment-date { color: #777e82; font-size: 10px; }
+.vd-comment-text { margin-top: 7px; color: #b8bdc0; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; white-space: pre-line; }
+.vd-comment-delete { margin-top: 8px; padding: 0; border: 0; background: none; color: #ff8585; font-size: 10px; cursor: pointer; }
+.vd-comment-delete:hover { color: #fff; }
+.vd-signin-note,.vd-empty {
+    padding: 24px 16px; color: #92989c; font-size: 12px;
+    line-height: 1.8; text-align: center;
 }
-.vd-description-empty {
-    color: #858b8f;
-    font-style: italic;
-}
-.vd-description-footer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 18px;
-    padding: 12px 18px;
-    border-top: 1px solid #25292b;
-    color: #858b8f;
-    font-size: 10px;
-}
-.vd-description-footer strong {
-    color: #d1d4d5;
-    font-weight: 700;
-}
-
-/* Sidebar */
-.vd-sidebar { min-width: 0; }
-.vd-sidebar-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0 0 15px;
-    border-bottom: 1px solid var(--vd-border);
-}
-.vd-sidebar-header h2 {
-    margin: 0;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 850;
-    letter-spacing: -.02em;
-}
-.vd-sidebar-header p {
-    margin: 5px 0 0;
-    color: #858b8f;
-    font-size: 11px;
-}
-.vd-sidebar-header a {
-    padding-top: 3px;
-    color: var(--vd-orange-light);
-    font-size: 11px;
-    font-weight: 750;
-    text-decoration: none;
-    white-space: nowrap;
-}
-.vd-sidebar-header a:hover { color: #fff; }
-.vd-related-list {
-    display: grid;
-    gap: 0;
-}
+.vd-signin-note a { color: var(--orange-light); }
+.vd-sidebar-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.vd-sidebar-header h2 { margin: 0; color: #fff; font-size: 16px; }
+.vd-sidebar-header p { margin: 5px 0 0; color: #858b8f; font-size: 11px; }
+.vd-sidebar-header a { color: var(--orange-light); font-size: 11px; white-space: nowrap; }
+.vd-related-list { display: grid; }
 .vd-related {
-    display: grid;
-    grid-template-columns: 145px minmax(0, 1fr);
-    gap: 12px;
-    min-width: 0;
-    padding: 16px 0;
-    border-bottom: 1px solid #25292b;
-    text-decoration: none;
+    display: grid; grid-template-columns: 135px minmax(0,1fr); gap: 11px;
+    padding: 15px 0; border-bottom: 1px solid #25292b; color: inherit;
 }
-.vd-related-media {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    background: #171a1c;
+.vd-related-media { position: relative; overflow: hidden; aspect-ratio: 16/9; background: #171a1c; }
+.vd-related-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .2s; }
+.vd-related:hover img { transform: scale(1.04); }
+.vd-related-placeholder { display: grid; width: 100%; height: 100%; place-items: center; color: var(--orange-light); }
+.vd-related-duration,.vd-related-premium { position: absolute; padding: 3px 5px; background: #050606ef; color: white; font-size: 8px; }
+.vd-related-duration { right: 4px; bottom: 4px; }
+.vd-related-premium { top: 4px; left: 4px; color: var(--orange-light); }
+.vd-related-title { display: -webkit-box; overflow: hidden; color: #e6e8e9; font-size: 12px; font-weight: 750; line-height: 1.5; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.vd-related:hover .vd-related-title { color: var(--orange-light); }
+.vd-related-creator,.vd-related-meta { margin-top: 6px; color: #858b8f; font-size: 10px; overflow-wrap: anywhere; }
+.vd-related-price { margin-top: 5px; color: var(--orange-light); font-size: 10px; font-weight: 800; }
+.vd-discover { margin-top: 20px; padding: 18px; border: 1px solid #49301b; background: #17120e; }
+.vd-discover h2 { margin: 0; color: #fff; font-size: 14px; }
+.vd-discover p { color: #a1a5a7; font-size: 11px; line-height: 1.8; }
+@media(max-width:1200px) {
+    .vd-layout { grid-template-columns: minmax(0,1fr) 300px; gap: 22px; }
+    .vd-related { grid-template-columns: 110px minmax(0,1fr); }
 }
-.vd-related-media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .25s;
-}
-.vd-related:hover .vd-related-media img { transform: scale(1.04); }
-.vd-related-placeholder {
-    display: grid;
-    width: 100%;
-    height: 100%;
-    place-items: center;
-    color: var(--vd-orange-light);
-    font-size: 20px;
-}
-.vd-related-duration {
-    position: absolute;
-    right: 4px;
-    bottom: 4px;
-    padding: 3px 5px;
-    background: rgb(0 0 0 / 90%);
-    color: white;
-    font-size: 9px;
-}
-.vd-related-premium {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    padding: 3px 5px;
-    background: #21150c;
-    color: var(--vd-orange-light);
-    font-size: 8px;
-    font-weight: 850;
-    text-transform: uppercase;
-}
-.vd-related-info { min-width: 0; }
-.vd-related-title {
-    display: -webkit-box;
-    overflow: hidden;
-    color: #e6e8e9;
-    font-size: 12px;
-    font-weight: 750;
-    line-height: 1.55;
-    overflow-wrap: anywhere;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-}
-.vd-related:hover .vd-related-title { color: var(--vd-orange-light); }
-.vd-related-creator {
-    overflow: hidden;
-    margin-top: 7px;
-    color: #949a9d;
-    font-size: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.vd-related-meta {
-    margin-top: 5px;
-    color: #747b7f;
-    font-size: 10px;
-}
-.vd-related-price {
-    margin-top: 6px;
-    color: var(--vd-orange-light);
-    font-size: 10px;
-    font-weight: 800;
-}
-
-/* Empty states and next actions */
-.vd-empty {
-    padding: 35px 18px;
-    border: 1px solid var(--vd-border);
-    background: var(--vd-panel);
-    text-align: center;
-}
-.vd-empty-icon {
-    color: var(--vd-orange-light);
-    font-size: 25px;
-}
-.vd-empty h3 {
-    margin: 12px 0 0;
-    color: #eee;
-    font-size: 13px;
-    font-weight: 800;
-}
-.vd-empty p {
-    margin: 8px 0 0;
-    color: #92989c;
-    font-size: 11px;
-    line-height: 1.8;
-}
-.vd-discover {
-    margin-top: 24px;
-    padding: 20px;
-    border: 1px solid #49301b;
-    background: linear-gradient(105deg, #1b140e, #111314 75%);
-}
-.vd-discover h2 {
-    margin: 0;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 850;
-}
-.vd-discover p {
-    margin: 8px 0 15px;
-    color: #a1a5a7;
-    font-size: 11px;
-    line-height: 1.8;
-}
-
-/* Smaller desktop and tablet */
-@media (max-width: 1250px) {
-    .vd-layout { grid-template-columns: minmax(0, 1fr) 310px; gap: 22px; }
-    .vd-related { grid-template-columns: 120px minmax(0, 1fr); gap: 10px; }
-}
-@media (max-width: 1000px) {
+@media(max-width:950px) {
     .vd-page { padding-inline: 20px; }
-    .vd-layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
-    .vd-sidebar { margin-top: 2px; }
-    .vd-related-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
-    .vd-related { grid-template-columns: minmax(0, 1fr); align-content: start; }
-    .vd-related-media { aspect-ratio: 16 / 9; }
-    .vd-related-title { font-size: 13px; }
+    .vd-layout { grid-template-columns: minmax(0,1fr); }
+    .vd-desktop-sidebar { display: none; }
+    .vd-related-list { grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 20px; }
+    .vd-related { grid-template-columns: minmax(0,1fr); align-content: start; }
 }
-@media (max-width: 600px) {
-    .vd-page { padding: 17px 12px 42px; }
-    .vd-breadcrumb { margin-bottom: 15px; }
-    .vd-player-topline { min-height: 35px; padding-inline: 10px; }
-    .vd-player-foot { padding: 9px 10px; }
+@media(min-width:951px) {
+    .vd-mobile-related { display: none; }
+}
+@media(max-width:600px) {
+    .vd-page { padding: 16px 12px 40px; }
+    .vd-player-topline,.vd-player-foot { padding: 9px; }
     .vd-heading { padding-top: 18px; }
-    .vd-heading h1 { font-size: 22px; }
+    .vd-heading h1 { font-size: 23px; }
     .vd-creator-section { align-items: flex-start; }
-    .vd-creator { gap: 10px; }
     .vd-avatar { width: 42px; height: 42px; flex-basis: 42px; }
     .vd-creator-actions { flex-direction: column; align-items: stretch; }
-    .vd-creator-actions .vd-button { min-height: 36px; padding-inline: 10px; font-size: 10px; }
-    .vd-description-body { padding: 14px; }
-    .vd-related-list { grid-template-columns: minmax(0, 1fr); }
-    .vd-related { grid-template-columns: 140px minmax(0, 1fr); }
-    .vd-related-title { font-size: 12px; }
-    .vd-gate { min-height: 270px; padding-inline: 15px; }
+    .vd-creator-actions .vd-button { padding-inline: 10px; font-size: 10px; }
+    .vd-social-actions { gap: 7px; }
+    .vd-social-actions .vd-button { padding-inline: 11px; }
+    .vd-comments { padding: 12px; }
+    .vd-related-list { grid-template-columns: minmax(0,1fr); }
+    .vd-related { grid-template-columns: 135px minmax(0,1fr); }
 }
-@media (max-width: 360px) {
-    .vd-creator-section { flex-wrap: wrap; }
-    .vd-creator-actions { width: 100%; flex-direction: row; }
-    .vd-related { grid-template-columns: 115px minmax(0, 1fr); }
-    .vd-related-title { font-size: 11px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .vd-page * { scroll-behavior: auto !important; transition: none !important; }
+@media(prefers-reduced-motion:reduce) {
+    .vd-page * { transition: none !important; scroll-behavior: auto !important; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <main class="vd-page">
-
-    <!-- Breadcrumb navigation -->
     <nav class="vd-breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
+        <a href="{% url 'home' %}">Home</a>
         <span>/</span>
         <a href="{% url 'videos:list' %}">Explore videos</a>
         <span>/</span>
@@ -589,29 +214,17 @@
     </nav>
 
     <div class="vd-layout">
-
-        <!-- MAIN COLUMN -->
         <article class="vd-main">
-
-            <!-- Player frame -->
             <section class="vd-player-shell" aria-label="Video player">
                 <div class="vd-player-topline">
-                    <div class="vd-live-label">
-                        <span class="vd-status-dot"></span>
-                        <span>Now playing</span>
-                    </div>
-                    <span class="vd-player-quality">STREAMSPHERE PLAYER</span>
+                    <span class="vd-live-label"><span class="vd-status-dot"></span>Now playing</span>
+                    <span>STREAMSPHERE PLAYER</span>
                 </div>
 
                 {% if can_watch %}
                     {% if video.video_file %}
-                        <video
-                            class="vd-player"
-                            controls
-                            playsinline
-                            preload="metadata"
-                            {% if video.thumbnail_url %}poster="{{ video.thumbnail_url }}"{% endif %}
-                        >
+                        <video class="vd-player" controls playsinline preload="metadata"
+                            {% if video.thumbnail_url %}poster="{{ video.thumbnail_url }}"{% endif %}>
                             <source src="{{ video.video_file.url }}">
                             Your browser does not support HTML video playback.
                         </video>
@@ -620,7 +233,7 @@
                             <div class="vd-gate-icon">!</div>
                             <div class="vd-gate-eyebrow">Playback unavailable</div>
                             <h2>We couldn't load this video</h2>
-                            <p>The video file may be missing or temporarily unavailable. Please try again later.</p>
+                            <p>The video file may be missing or temporarily unavailable.</p>
                         </div>
                     {% endif %}
                 {% else %}
@@ -628,17 +241,11 @@
                         <div class="vd-gate-icon">◆</div>
                         <div class="vd-gate-eyebrow">Exclusive content</div>
                         <h2>Unlock this premium video</h2>
-                        <p>This video is reserved for viewers who have the appropriate access. Sign in or explore available subscription options.</p>
-
+                        <p>This video requires the appropriate access. Sign in or explore subscription options.</p>
                         {% if not user.is_authenticated %}
-                            <a class="vd-button vd-button-primary"
-                               href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
-                                Sign in to continue <span aria-hidden="true">→</span>
-                            </a>
+                            <a class="vd-button vd-button-primary" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Sign in to continue →</a>
                         {% else %}
-                            <a class="vd-button vd-button-primary" href="/subscriptions/">
-                                Explore subscriptions <span aria-hidden="true">→</span>
-                            </a>
+                            <a class="vd-button vd-button-primary" href="/subscriptions/">Explore subscriptions →</a>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -649,223 +256,223 @@
                 </div>
             </section>
 
-            <!-- Title and video information -->
             <header class="vd-heading">
                 <div class="vd-label-row">
-                    <span class="vd-category-label">Video</span>
-                    {% if video.is_premium %}
-                        <span class="vd-premium-label">Premium access</span>
-                    {% endif %}
+                    <span class="vd-label">Video</span>
+                    {% if video.is_premium %}<span class="vd-label vd-premium-label">Premium access</span>{% endif %}
                 </div>
-
                 <h1>{{ video.title }}</h1>
-
                 <div class="vd-subtitle">
-                    {% if video.description %}
-                        {{ video.description|truncatechars:150 }}
-                    {% else %}
-                        Watch this video on StreamSphere.
-                    {% endif %}
+                    {% if video.description %}{{ video.description|truncatechars:150 }}{% else %}Watch this video on StreamSphere.{% endif %}
                 </div>
-
                 <div class="vd-stats">
-                    <span class="vd-stat">
-                        <span class="vd-stat-icon" aria-hidden="true">▶</span>
-                        {{ video.views }} view{{ video.views|pluralize }}
-                    </span>
-                    <span class="vd-stat-divider"></span>
-                    <span class="vd-stat">
-                        {{ video.created_at|date:"M j, Y" }}
-                    </span>
-
-                    {% if video.duration %}
-                        <span class="vd-stat-divider"></span>
-                        <span class="vd-stat">
-                            Duration: {{ video.duration }}
-                        </span>
-                    {% endif %}
-
-                    {% if video.is_premium %}
-                        <span class="vd-stat-divider"></span>
-                        <span class="vd-stat" style="color:#ff922e;font-weight:800">
-                            KSh {{ video.price }}
-                        </span>
-                    {% endif %}
+                    <span><span class="vd-stat-icon">▶</span> {{ video.views }} view{{ video.views|pluralize }}</span>
+                    <span>·</span>
+                    <span>{{ video.created_at|date:"M j, Y" }}</span>
+                    {% if video.duration %}<span>·</span><span>{{ video.duration }}</span>{% endif %}
+                    {% if video.is_premium %}<span>·</span><span style="color:#ff922e;font-weight:800">KSh {{ video.price }}</span>{% endif %}
                 </div>
             </header>
 
-            <!-- Creator information -->
             <section class="vd-creator-section">
                 <div class="vd-creator">
                     <div class="vd-avatar" aria-hidden="true">
-                        {{ video.creator.username|first }}
+                        {% if video.creator.profile.avatar_image %}
+                            <img src="{{ video.creator.profile.avatar_image.url }}" alt="">
+                        {% elif video.creator.profile.avatar %}
+                            <img src="{{ video.creator.profile.avatar }}" alt="">
+                        {% else %}
+                            {{ video.creator.username|first|default:"S" }}
+                        {% endif %}
                     </div>
-
                     <div class="vd-creator-info">
                         <div class="vd-creator-name">{{ video.creator.username }}</div>
-                        <div class="vd-creator-caption">Content creator on StreamSphere</div>
+                        <div class="vd-creator-caption">
+                            {{ follower_count }} follower{{ follower_count|pluralize }} · StreamSphere creator
+                        </div>
                     </div>
                 </div>
 
                 <div class="vd-creator-actions">
                     {% if user.is_authenticated and user.pk == video.creator_id %}
-                        <a href="{% url 'accounts:profile' %}" class="vd-button">
-                            Manage my content
-                        </a>
+                        <a href="{% url 'accounts:profile' %}" class="vd-button">Manage my content</a>
+                    {% elif user.is_authenticated %}
+                        <form class="vd-inline-form" method="post" action="{% url 'creators:toggle_follow' video.creator.username %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button class="vd-button {% if following_creator %}vd-button-following{% else %}vd-button-primary{% endif %}" type="submit">
+                                {% if following_creator %}Following ✓{% else %}+ Follow{% endif %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <a class="vd-button vd-button-primary" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Sign in to follow</a>
                     {% endif %}
-                    <a href="{% url 'videos:list' %}" class="vd-button">
-                        Discover more
-                    </a>
+                    <a href="{% url 'videos:list' %}" class="vd-button">Discover more</a>
                 </div>
             </section>
 
-            <!-- Full description panel -->
-            <section class="vd-description-panel">
+            <div class="vd-social-actions" aria-label="Video actions">
+                {% if user.is_authenticated %}
+                    <form class="vd-inline-form" method="post" action="{% url 'videos:like' video.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="vd-button {% if liked %}vd-button-liked{% endif %}">
+                            {% if liked %}♥ Liked{% else %}♡ Like{% endif %}
+                            <span class="vd-count">{{ like_count }}</span>
+                        </button>
+                    </form>
+                    <a class="vd-button vd-notification-link" href="{% url 'accounts:notifications' %}">
+                        ♧ Notifications
+                    </a>
+                {% else %}
+                    <a class="vd-button" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">♡ Like · {{ like_count }}</a>
+                {% endif %}
+                <a class="vd-button" href="#vd-comments">Comments · {{ comment_count }}</a>
+            </div>
+
+            <section class="vd-panel">
                 <div class="vd-panel-heading">
                     <h2>About this video</h2>
                     <span>VIDEO DETAILS</span>
                 </div>
-
                 <div class="vd-description-body">
                     {% if video.description %}
                         {{ video.description }}
                     {% else %}
-                        <span class="vd-description-empty">
-                            The creator hasn't added a description for this video yet.
-                        </span>
+                        <span style="color:#858b8f">The creator hasn't added a description yet.</span>
                     {% endif %}
                 </div>
-
                 <div class="vd-description-footer">
                     <span>Published by <strong>{{ video.creator.username }}</strong></span>
                     <span>Uploaded {{ video.created_at|timesince }} ago</span>
-                    {% if video.is_premium %}
-                        <span>Price <strong>KSh {{ video.price }}</strong></span>
-                    {% endif %}
+                    {% if video.is_premium %}<span>Price <strong>KSh {{ video.price }}</strong></span>{% endif %}
                 </div>
             </section>
 
-            <!-- Mobile related videos -->
-            <section class="vd-sidebar" style="margin-top:30px" aria-label="Related videos">
+            <section class="vd-panel" id="vd-comments">
+                <div class="vd-panel-heading">
+                    <h2>Comments</h2>
+                    <span>{{ comment_count }} total</span>
+                </div>
+                <div class="vd-comments">
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'videos:comment' video.pk %}" class="vd-comment-form">
+                            {% csrf_token %}
+                            <div class="vd-avatar vd-avatar-small" aria-hidden="true">
+                                {% if user.profile.avatar_image %}
+                                    <img src="{{ user.profile.avatar_image.url }}" alt="">
+                                {% elif user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar }}" alt="">
+                                {% else %}
+                                    {{ user.username|first|default:"S" }}
+                                {% endif %}
+                            </div>
+                            <div class="vd-comment-compose">
+                                <textarea class="vd-input" name="text" maxlength="2000" required placeholder="Share your thoughts..."></textarea>
+                                <button type="submit" class="vd-button vd-button-primary vd-comment-submit">Post comment</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="vd-signin-note">
+                            <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}">Sign in</a> to join the conversation.
+                        </div>
+                    {% endif %}
+
+                    {% for comment in comments %}
+                        <article class="vd-comment">
+                            <div class="vd-avatar vd-avatar-small" aria-hidden="true">
+                                {% if comment.user.profile.avatar_image %}
+                                    <img src="{{ comment.user.profile.avatar_image.url }}" alt="">
+                                {% elif comment.user.profile.avatar %}
+                                    <img src="{{ comment.user.profile.avatar }}" alt="">
+                                {% else %}
+                                    {{ comment.user.username|first|default:"S" }}
+                                {% endif %}
+                            </div>
+                            <div class="vd-comment-content">
+                                <div class="vd-comment-top">
+                                    <span class="vd-comment-author">{{ comment.user.username }}</span>
+                                    <span class="vd-comment-date">{{ comment.created_at|timesince }} ago</span>
+                                    {% if comment.user_id == video.creator_id %}<span class="vd-count">CREATOR</span>{% endif %}
+                                </div>
+                                <div class="vd-comment-text">{{ comment.text }}</div>
+
+                                {% if user.is_authenticated %}
+                                    {% if user.pk == comment.user_id or user.pk == video.creator_id %}
+                                        <form method="post" action="{% url 'videos:delete_comment' comment.pk %}">
+                                            {% csrf_token %}
+                                            <button class="vd-comment-delete" type="submit">Delete comment</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="vd-empty">No comments yet. Start the conversation.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="vd-mobile-related" style="margin-top:30px" aria-label="Related videos">
                 <div class="vd-sidebar-header">
-                    <div>
-                        <h2>More to discover</h2>
-                        <p>Keep exploring StreamSphere.</p>
-                    </div>
+                    <div><h2>More to discover</h2><p>Keep exploring StreamSphere.</p></div>
                     <a href="{% url 'videos:list' %}">View all →</a>
                 </div>
-
                 {% if related_videos %}
                     <div class="vd-related-list">
                         {% for related in related_videos %}
                             <a class="vd-related" href="{{ related.get_absolute_url }}">
                                 <div class="vd-related-media">
-                                    {% if related.thumbnail_url %}
-                                        <img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">
-                                    {% else %}
-                                        <div class="vd-related-placeholder">▶</div>
-                                    {% endif %}
-
-                                    {% if related.duration %}
-                                        <span class="vd-related-duration">{{ related.duration }}</span>
-                                    {% endif %}
-
-                                    {% if related.is_premium %}
-                                        <span class="vd-related-premium">Premium</span>
-                                    {% endif %}
+                                    {% if related.thumbnail_url %}<img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">{% else %}<div class="vd-related-placeholder">▶</div>{% endif %}
+                                    {% if related.duration %}<span class="vd-related-duration">{{ related.duration }}</span>{% endif %}
+                                    {% if related.is_premium %}<span class="vd-related-premium">Premium</span>{% endif %}
                                 </div>
-
-                                <div class="vd-related-info">
+                                <div>
                                     <div class="vd-related-title">{{ related.title }}</div>
                                     <div class="vd-related-creator">{{ related.creator.username }}</div>
-                                    <div class="vd-related-meta">
-                                        {{ related.views }} views · {{ related.created_at|timesince }} ago
-                                    </div>
-                                    {% if related.is_premium %}
-                                        <div class="vd-related-price">KSh {{ related.price }}</div>
-                                    {% endif %}
+                                    <div class="vd-related-meta">{{ related.views }} views · {{ related.created_at|timesince }} ago</div>
+                                    {% if related.is_premium %}<div class="vd-related-price">KSh {{ related.price }}</div>{% endif %}
                                 </div>
                             </a>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="vd-empty">
-                        <div class="vd-empty-icon">▶</div>
-                        <h3>More videos are coming</h3>
-                        <p>When creators publish more content, you'll find it here.</p>
-                    </div>
+                    <div class="vd-empty">More videos will appear here as creators publish content.</div>
                 {% endif %}
-
-                <div class="vd-discover">
-                    <h2>Find your next favorite</h2>
-                    <p>Explore the latest uploads and discover more creators across StreamSphere.</p>
-                    <a class="vd-button vd-button-primary" href="{% url 'videos:list' %}">
-                        Explore all videos →
-                    </a>
-                </div>
             </section>
         </article>
 
-        <!-- DESKTOP RELATED VIDEO SIDEBAR -->
-        <aside class="vd-sidebar" aria-label="Recommended videos">
+        <aside class="vd-sidebar vd-desktop-sidebar" aria-label="Recommended videos">
             <div class="vd-sidebar-header">
-                <div>
-                    <h2>Recommended videos</h2>
-                    <p>More content to explore.</p>
-                </div>
+                <div><h2>Recommended videos</h2><p>More content to explore.</p></div>
                 <a href="{% url 'videos:list' %}">View all →</a>
             </div>
-
             {% if related_videos %}
                 <div class="vd-related-list">
                     {% for related in related_videos %}
                         <a class="vd-related" href="{{ related.get_absolute_url }}">
                             <div class="vd-related-media">
-                                {% if related.thumbnail_url %}
-                                    <img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">
-                                {% else %}
-                                    <div class="vd-related-placeholder">▶</div>
-                                {% endif %}
-
-                                {% if related.duration %}
-                                    <span class="vd-related-duration">{{ related.duration }}</span>
-                                {% endif %}
-
-                                {% if related.is_premium %}
-                                    <span class="vd-related-premium">Premium</span>
-                                {% endif %}
+                                {% if related.thumbnail_url %}<img src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">{% else %}<div class="vd-related-placeholder">▶</div>{% endif %}
+                                {% if related.duration %}<span class="vd-related-duration">{{ related.duration }}</span>{% endif %}
+                                {% if related.is_premium %}<span class="vd-related-premium">Premium</span>{% endif %}
                             </div>
-
-                            <div class="vd-related-info">
+                            <div>
                                 <div class="vd-related-title">{{ related.title }}</div>
                                 <div class="vd-related-creator">{{ related.creator.username }}</div>
-                                <div class="vd-related-meta">
-                                    {{ related.views }} views · {{ related.created_at|timesince }} ago
-                                </div>
-                                {% if related.is_premium %}
-                                    <div class="vd-related-price">KSh {{ related.price }}</div>
-                                {% endif %}
+                                <div class="vd-related-meta">{{ related.views }} views · {{ related.created_at|timesince }} ago</div>
+                                {% if related.is_premium %}<div class="vd-related-price">KSh {{ related.price }}</div>{% endif %}
                             </div>
                         </a>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="vd-empty">
-                    <div class="vd-empty-icon">▶</div>
-                    <h3>No recommendations yet</h3>
-                    <p>More videos will appear here as creators publish content.</p>
-                </div>
+                <div class="vd-empty">No recommendations yet.</div>
             {% endif %}
-
             <div class="vd-discover">
                 <h2>Explore the library</h2>
                 <p>Browse published videos and discover your next favorite creator.</p>
-                <a class="vd-button vd-button-primary" href="{% url 'videos:list' %}">
-                    Browse videos →
-                </a>
+                <a class="vd-button vd-button-primary" href="{% url 'videos:list' %}">Browse videos →</a>
             </div>
         </aside>
-
     </div>
 </main>
 {% endblock %}

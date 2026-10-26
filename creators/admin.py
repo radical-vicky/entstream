@@ -1,3 +1,12 @@
-from django.contrib import admin
 
-# Register your models here.
+from django.contrib import admin
+from .models import Follow
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ("follower", "following", "created_at")
+    search_fields = ("follower__username", "following__username")
+    list_filter = ("created_at",)
+    list_select_related = ("follower", "following")
+    readonly_fields = ("created_at",)
