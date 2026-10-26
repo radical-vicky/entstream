@@ -10,4 +10,11 @@ urlpatterns = [
     path("creators/", include("creators.urls")),
     path("accounts/", include("allauth.urls")),
     path("accounts/", include("accounts.urls")),
+    path("chat/", include("chat.urls")),
+    path("streams/", include("streaming.urls")),
+    path("streaming/", include("streaming.urls")),
+    path("subscriptions/", include("subscriptions.urls")),
+    path("earnings/", include("earnings.urls")),
+    path("moderation/", include("moderation.urls")),
+    path("payments/", include("payments.urls")),
 ]

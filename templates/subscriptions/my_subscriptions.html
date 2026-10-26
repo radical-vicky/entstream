@@ -1,0 +1,103 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Subscriptions | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-mysubs{max-width:1050px;margin:0 auto;padding:32px 20px 60px;color:#f5f5f5}
+.ss-mysubs *{box-sizing:border-box}
+.ss-mysubs .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ff7900;text-transform:uppercase}
+.ss-mysubs h1{font-size:clamp(28px,4vw,38px);margin:9px 0}
+.ss-mysubs .intro{color:#aaa;line-height:1.7}
+.ss-mysubs .toplinks{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 28px}
+.ss-mysubs .btn{display:inline-block;padding:12px 16px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:800;text-decoration:none;border-radius:0;cursor:pointer}
+.ss-mysubs .btn-secondary{background:transparent;color:#ff7900}
+.ss-mysubs .sub-list{display:grid;gap:14px}
+.ss-mysubs .sub-card{background:#151515;border:1px solid #303030;padding:21px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.ss-mysubs .sub-card h2{font-size:20px;margin:0 0 8px;overflow-wrap:anywhere}
+.ss-mysubs .muted{color:#999;font-size:13px;line-height:1.8}
+.ss-mysubs .status{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:850;padding:6px 8px;margin-bottom:12px;background:#292929;color:#ccc}
+.ss-mysubs .status-active{background:#142c1d;color:#86d9a0}
+.ss-mysubs .status-pending{background:#33240f;color:#ffbf70}
+.ss-mysubs .status-cancelled,.ss-mysubs .status-expired{background:#2a1b19;color:#e7a098}
+.ss-mysubs .actions{display:flex;flex-direction:column;gap:10px;min-width:155px}
+.ss-mysubs .actions .btn{text-align:center;font-size:13px}
+.ss-mysubs .notice{padding:13px;background:#201a14;border-left:3px solid #ff7900;margin-bottom:12px;line-height:1.7}
+.ss-mysubs .empty{padding:35px 20px;border:1px dashed #444;text-align:center;color:#aaa}
+.ss-mysubs .empty h2{color:#fff}
+.ss-mysubs form{margin:0}
+@media(max-width:620px){.ss-mysubs{padding:24px 13px 45px}.ss-mysubs .sub-card{grid-template-columns:1fr;padding:17px}.ss-mysubs .actions{min-width:0}.ss-mysubs .actions .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-mysubs">
+    <div class="eyebrow">Your account</div>
+    <h1>My subscriptions</h1>
+    <p class="intro">Review your subscription status, plan, and expiry date.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="notice">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="toplinks">
+        <a class="btn" href="{% url 'subscriptions:plans' %}">Browse plans</a>
+    </div>
+
+    {% if subscriptions %}
+        <div class="sub-list">
+            {% for subscription in subscriptions %}
+                <article class="sub-card">
+                    <div>
+                        <span class="status status-{{ subscription.status }}">
+                            {{ subscription.get_status_display }}
+                        </span>
+                        <h2>{{ subscription.plan.name }}</h2>
+                        <div class="muted">
+                            Price: {{ subscription.plan.price|floatformat:2 }}<br>
+                            Plan duration: {{ subscription.plan.duration_days }} days<br>
+
+                            {% if subscription.started_at %}
+                                Started: {{ subscription.started_at|date:"M j, Y H:i" }}<br>
+                            {% endif %}
+
+                            {% if subscription.expires_at %}
+                                Expires: {{ subscription.expires_at|date:"M j, Y H:i" }}<br>
+                            {% endif %}
+
+                            Requested: {{ subscription.created_at|date:"M j, Y H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        {% if subscription.status == "pending" %}
+                            <span class="muted">Awaiting verified payment</span>
+                            <form method="post" action="{% url 'subscriptions:cancel' subscription.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-secondary" type="submit">Cancel request</button>
+                            </form>
+                        {% elif subscription.is_current %}
+                            <span class="muted">Your subscription is active.</span>
+                            <form method="post" action="{% url 'subscriptions:cancel' subscription.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-secondary" type="submit">Cancel subscription</button>
+                            </form>
+                        {% else %}
+                            <a class="btn btn-secondary" href="{% url 'subscriptions:plans' %}">View plans</a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <h2>No subscriptions yet</h2>
+            <p>Choose a plan to get started.</p>
+            <a class="btn" href="{% url 'subscriptions:plans' %}">Explore plans</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

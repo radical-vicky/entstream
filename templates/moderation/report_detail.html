@@ -1,0 +1,160 @@
+
+{% extends "base.html" %}
+
+{% block title %}Review Report #{{ report.pk }} | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-report-detail{max-width:1100px;margin:0 auto;padding:30px 20px 60px;color:#f5f5f5}
+.ss-report-detail *{box-sizing:border-box}
+.ss-report-detail a{color:#ff7900;text-decoration:none}
+.ss-report-detail h1{font-size:clamp(27px,4vw,36px);margin:10px 0}
+.ss-report-detail .muted{color:#999;line-height:1.8;font-size:13px}
+.ss-report-detail .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.8fr);gap:18px;margin-top:22px}
+.ss-report-detail .panel{background:#151515;border:1px solid #303030;padding:22px;margin-bottom:18px;min-width:0}
+.ss-report-detail .panel h2{font-size:19px;margin:0 0 17px}
+.ss-report-detail .detail-row{padding:12px 0;border-bottom:1px solid #303030;display:flex;justify-content:space-between;gap:16px}
+.ss-report-detail .detail-row span{color:#999}
+.ss-report-detail .detail-row strong{text-align:right;overflow-wrap:anywhere}
+.ss-report-detail .ss-input{width:100%;padding:12px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
+.ss-report-detail .field{margin:17px 0}
+.ss-report-detail label{display:block;font-size:13px;font-weight:750;margin-bottom:8px}
+.ss-report-detail .btn{display:inline-flex;justify-content:center;padding:12px 15px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;border-radius:0;cursor:pointer}
+.ss-report-detail .btn-secondary{background:transparent;color:#ff7900}
+.ss-report-detail .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.ss-report-detail .errors{color:#ff9c85;font-size:13px;line-height:1.7}
+.ss-report-detail .note{background:#201a14;border-left:3px solid #ff7900;padding:13px;color:#dfc9ac;line-height:1.7;font-size:13px}
+.ss-report-detail .history-item{border-top:1px solid #303030;padding:14px 0}
+.ss-report-detail .history-item:first-of-type{border-top:0}
+.ss-report-detail .history-item strong{display:block;margin-bottom:6px}
+@media(max-width:800px){.ss-report-detail{padding:22px 13px 40px}.ss-report-detail .grid{grid-template-columns:1fr}.ss-report-detail .panel{padding:17px}}
+@media(max-width:480px){.ss-report-detail .detail-row{flex-direction:column;gap:5px}.ss-report-detail .detail-row strong{text-align:left}.ss-report-detail .actions .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-report-detail">
+    <a href="{% url 'moderation:report_queue' %}">← Moderation queue</a>
+    <h1>Report #{{ report.pk }}</h1>
+    <p class="muted">Review the reported item, record your decision, and document any action taken.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="note" style="margin-top:12px">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="grid">
+        <div>
+            <section class="panel">
+                <h2>Report details</h2>
+                <div class="detail-row"><span>Target type</span><strong>{{ report.get_target_type_display }}</strong></div>
+                <div class="detail-row"><span>Target ID</span><strong>{{ report.target_id }}</strong></div>
+                <div class="detail-row"><span>Reason</span><strong>{{ report.get_reason_display }}</strong></div>
+                <div class="detail-row"><span>Reporter</span><strong>{{ report.reporter.username }}</strong></div>
+                <div class="detail-row"><span>Status</span><strong>{{ report.get_status_display }}</strong></div>
+                <div class="detail-row"><span>Submitted</span><strong>{{ report.created_at|date:"M j, Y H:i" }}</strong></div>
+                <div class="detail-row"><span>Reviewed by</span><strong>{{ report.reviewer.username|default:"Not reviewed" }}</strong></div>
+
+                <h2 style="margin-top:22px">Reporter details</h2>
+                {% if report.details %}
+                    <p style="line-height:1.8;white-space:pre-line">{{ report.details }}</p>
+                {% else %}
+                    <p class="muted">No additional details were provided.</p>
+                {% endif %}
+
+                <h2 style="margin-top:22px">Reported item</h2>
+                {% if target %}
+                    {% if report.target_type == "video" %}
+                        <p><strong>{{ target.title }}</strong></p>
+                        <p class="muted">{{ target.description|default:"No description"|truncatechars:400 }}</p>
+                        <p class="muted">Creator: {{ target.creator.username }}</p>
+                    {% elif report.target_type == "comment" %}
+                        <p style="line-height:1.8;white-space:pre-line">{{ target.text }}</p>
+                        <p class="muted">Comment author: {{ target.user.username }}</p>
+                    {% else %}
+                        <p><strong>{{ target.username }}</strong></p>
+                        <p class="muted">Account email: {{ target.email|default:"Not provided" }}</p>
+                        <p class="muted">Account active: {{ target.is_active|yesno:"Yes,No" }}</p>
+                    {% endif %}
+                {% else %}
+                    <p class="muted">This item no longer exists. Record the outcome without applying an action to a missing target.</p>
+                {% endif %}
+            </section>
+
+            <section class="panel">
+                <h2>Review decision</h2>
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="errors">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}
+                                <div class="errors">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="actions">
+                        <button class="btn" type="submit">Save review</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <aside>
+            <section class="panel">
+                <h2>Take moderation action</h2>
+
+                {% if target %}
+                    <p class="muted">Actions are applied to the target immediately. Confirm the item and action before submitting.</p>
+
+                    <form method="post" action="{% url 'moderation:take_action' report.pk %}">
+                        {% csrf_token %}
+
+                        {% for field in action_form %}
+                            <div class="field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="errors">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="actions">
+                            <button class="btn" type="submit">Apply action</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="muted">No action is available because the target no longer exists.</p>
+                {% endif %}
+            </section>
+
+            <section class="panel">
+                <h2>Action history</h2>
+
+                {% if actions %}
+                    {% for action in actions %}
+                        <div class="history-item">
+                            <strong>{{ action.get_action_type_display }}</strong>
+                            <div class="muted">By {{ action.moderator.username }} · {{ action.created_at|date:"M j, Y H:i" }}</div>
+                            {% if action.note %}
+                                <p style="line-height:1.7">{{ action.note }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="muted">No moderation actions have been recorded for this report.</p>
+                {% endif %}
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}

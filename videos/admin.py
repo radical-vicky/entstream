@@ -38,3 +38,32 @@ class VideoCommentAdmin(admin.ModelAdmin):
     @admin.display(description="Comment")
     def short_text(self, obj):
         return obj.text[:70] + ("…" if len(obj.text) > 70 else "")
+    
+
+
+from .models import VideoPurchase
+
+@admin.register(VideoPurchase)
+class VideoPurchaseAdmin(admin.ModelAdmin):
+    list_display = (
+        "buyer",
+        "video",
+        "amount_paid",
+        "currency",
+        "payment_reference",
+        "purchased_at",
+    )
+    search_fields = (
+        "buyer__username",
+        "video__title",
+        "payment_reference",
+    )
+    list_filter = ("currency", "purchased_at")
+    readonly_fields = (
+        "buyer",
+        "video",
+        "amount_paid",
+        "currency",
+        "payment_reference",
+        "purchased_at",
+    )

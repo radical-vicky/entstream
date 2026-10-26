@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+{% block title %}Payment Details | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-payment-detail{max-width:760px;margin:35px auto;padding:0 18px;color:#f4f4f5}
+.ss-payment-panel{background:#111114;border:1px solid #303036;padding:clamp(20px,4vw,35px)}
+.ss-payment-panel h1{margin:0 0 8px;font-size:29px}
+.ss-payment-intro{color:#a1a1aa;margin-bottom:25px}
+.ss-payment-row{display:flex;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:1px solid #303036}
+.ss-payment-row span:first-child{color:#a1a1aa}
+.ss-payment-row span:last-child{text-align:right;overflow-wrap:anywhere}
+.ss-payment-amount{font-size:25px;font-weight:900;color:#ff9d42}
+.ss-payment-status{font-weight:800}
+.ss-payment-status.succeeded{color:#4ade80}
+.ss-payment-status.failed,.ss-payment-status.cancelled{color:#f87171}
+.ss-payment-status.pending,.ss-payment-status.processing{color:#fdba74}
+.ss-payment-back{display:inline-block;margin-top:22px;background:#ff7900;color:#111!important;padding:12px 17px;text-decoration:none;font-weight:850}
+</style>
+
+<div class="ss-payment-detail">
+    <div class="ss-payment-panel">
+        <h1>Payment details</h1>
+        <p class="ss-payment-intro">Transaction information for your account.</p>
+
+        <div class="ss-payment-row">
+            <span>Amount</span>
+            <span class="ss-payment-amount">{{ payment.currency }} {{ payment.amount|floatformat:2 }}</span>
+        </div>
+        <div class="ss-payment-row">
+            <span>Reference</span>
+            <span>{{ payment.reference }}</span>
+        </div>
+        <div class="ss-payment-row">
+            <span>Purpose</span>
+            <span>{{ payment.get_purpose_display }}</span>
+        </div>
+        <div class="ss-payment-row">
+            <span>Status</span>
+            <span class="ss-payment-status {{ payment.status }}">{{ payment.get_status_display }}</span>
+        </div>
+        <div class="ss-payment-row">
+            <span>Provider</span>
+            <span>{{ payment.provider }}</span>
+        </div>
+        {% if payment.provider_reference %}
+            <div class="ss-payment-row">
+                <span>Provider reference</span>
+                <span>{{ payment.provider_reference }}</span>
+            </div>
+        {% endif %}
+        {% if payment.description %}
+            <div class="ss-payment-row">
+                <span>Description</span>
+                <span>{{ payment.description }}</span>
+            </div>
+        {% endif %}
+        <div class="ss-payment-row">
+            <span>Created</span>
+            <span>{{ payment.created_at|date:"M j, Y, g:i A" }}</span>
+        </div>
+        {% if payment.verified_at %}
+            <div class="ss-payment-row">
+                <span>Verified</span>
+                <span>{{ payment.verified_at|date:"M j, Y, g:i A" }}</span>
+            </div>
+        {% endif %}
+
+        <a class="ss-payment-back" href="{% url 'payments:history' %}">Back to payment history</a>
+    </div>
+</div>
+{% endblock %}

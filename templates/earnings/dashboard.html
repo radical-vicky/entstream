@@ -1,0 +1,164 @@
+
+{% extends "base.html" %}
+
+{% block title %}Creator Earnings | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-earn{max-width:1200px;margin:0 auto;padding:30px 20px 60px;color:#f4f4f4}
+.ss-earn *{box-sizing:border-box}
+.ss-earn a{text-decoration:none}
+.ss-earn .eyebrow{color:#ff7900;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.ss-earn h1{font-size:clamp(28px,4vw,40px);margin:9px 0}
+.ss-earn .intro{color:#aaa;line-height:1.7}
+.ss-earn .topline{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.ss-earn .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:800;border-radius:0}
+.ss-earn .btn-secondary{background:transparent;color:#ff7900}
+.ss-earn .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 34px}
+.ss-earn .stat{background:#151515;border:1px solid #303030;padding:19px;min-width:0}
+.ss-earn .stat span{display:block;font-size:13px;color:#aaa;margin-bottom:11px}
+.ss-earn .stat strong{font-size:clamp(20px,2.7vw,29px);overflow-wrap:anywhere}
+.ss-earn .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 0 14px}
+.ss-earn .section-head h2{font-size:21px;margin:0}
+.ss-earn .table-wrap{overflow-x:auto;border:1px solid #303030}
+.ss-earn table{width:100%;border-collapse:collapse;min-width:680px;background:#151515}
+.ss-earn th,.ss-earn td{text-align:left;padding:14px 15px;border-bottom:1px solid #303030;font-size:13px}
+.ss-earn th{color:#aaa;background:#101010;font-weight:700}
+.ss-earn td{color:#eee}
+.ss-earn .ref{font-family:monospace;color:#ffad65}
+.ss-earn .status{display:inline-block;padding:5px 7px;background:#292929;color:#ddd;font-size:11px;text-transform:uppercase;font-weight:800}
+.ss-earn .status-completed,.ss-earn .status-paid{background:#142b1d;color:#8bdaa3}
+.ss-earn .status-pending,.ss-earn .status-approved,.ss-earn .status-processing{background:#33240f;color:#ffc17b}
+.ss-earn .status-failed,.ss-earn .status-rejected,.ss-earn .status-reversed{background:#321b19;color:#f09a90}
+.ss-earn .empty{padding:25px;background:#151515;color:#aaa;border:1px dashed #444}
+.ss-earn .pagination{display:flex;justify-content:center;align-items:center;gap:15px;padding:18px;color:#aaa}
+.ss-earn .pagination a{color:#ff7900;font-weight:800}
+.ss-earn .notice{padding:13px 15px;margin:18px 0;background:#201a14;border-left:3px solid #ff7900;color:#e6d2b9;line-height:1.7}
+@media(max-width:900px){.ss-earn .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.ss-earn{padding:22px 12px 40px}.ss-earn .stats{gap:9px}.ss-earn .stat{padding:13px}.ss-earn .topline .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-earn">
+    <div class="topline">
+        <div>
+            <div class="eyebrow">Creator centre</div>
+            <h1>Your earnings</h1>
+            <p class="intro">Track credited earnings, available funds, and withdrawal requests.</p>
+        </div>
+        <a class="btn" href="{% url 'earnings:withdraw' %}">Request withdrawal</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="notice">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="stats">
+        <div class="stat">
+            <span>Available balance</span>
+            <strong>KSh {{ balance.available_balance|floatformat:2 }}</strong>
+        </div>
+        <div class="stat">
+            <span>Pending balance</span>
+            <strong>KSh {{ balance.pending_balance|floatformat:2 }}</strong>
+        </div>
+        <div class="stat">
+            <span>Total earned</span>
+            <strong>KSh {{ balance.total_earned|floatformat:2 }}</strong>
+        </div>
+        <div class="stat">
+            <span>Total paid out</span>
+            <strong>KSh {{ balance.total_paid_out|floatformat:2 }}</strong>
+        </div>
+    </div>
+
+    <div class="notice">
+        Only verified, completed transactions should be credited to your earnings. Withdrawal requests are reviewed before payout.
+    </div>
+
+    <div class="section-head">
+        <h2>Transaction history</h2>
+        <span style="color:#999;font-size:13px">{{ page_obj.paginator.count }} records</span>
+    </div>
+
+    {% if transactions %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in transactions %}
+                        <tr>
+                            <td class="ref">{{ item.reference }}</td>
+                            <td>{{ item.get_transaction_type_display }}</td>
+                            <td>{{ item.description|default:"—"|truncatechars:70 }}</td>
+                            <td>KSh {{ item.amount|floatformat:2 }}</td>
+                            <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
+                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty">No earning transactions have been recorded yet.</div>
+    {% endif %}
+
+    <div class="section-head">
+        <h2>Recent withdrawals</h2>
+        <a href="{% url 'earnings:withdraw' %}" style="color:#ff7900;font-weight:800">Request payout →</a>
+    </div>
+
+    {% if withdrawals %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in withdrawals %}
+                        <tr>
+                            <td class="ref">{{ item.reference }}</td>
+                            <td>{{ item.get_payout_method_display|default:item.payout_method|title }}</td>
+                            <td>KSh {{ item.amount|floatformat:2 }}</td>
+                            <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
+                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty">You haven't requested a withdrawal yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

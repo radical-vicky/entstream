@@ -1,0 +1,95 @@
+
+{% extends "base.html" %}
+{% block title %}{{ stream.title }} | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-detail{max-width:1100px;margin:30px auto;padding:0 18px;color:#f4f4f5}
+.ss-player{aspect-ratio:16/9;background:#08080a;border:1px solid #303036;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ss-player video{width:100%;height:100%;object-fit:contain}
+.ss-player-message{text-align:center;padding:25px;max-width:600px}
+.ss-player-message .play{font-size:48px;color:#ff7900}
+.ss-player-message h2{margin:10px 0}
+.ss-player-message p{color:#a1a1aa;line-height:1.7}
+.ss-detail-main{padding:22px 0}
+.ss-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ss-detail h1{font-size:clamp(25px,4vw,36px);margin:0 0 12px}
+.ss-muted{color:#a1a1aa;line-height:1.7}
+.ss-pill{display:inline-block;padding:6px 9px;font-size:11px;font-weight:900;background:#27272a}
+.ss-pill-live{background:#7f1d1d;color:#fecaca}
+.ss-btn{display:inline-block;padding:11px 15px;background:#ff7900;color:#111!important;text-decoration:none;font-weight:800;border:0;border-radius:2px;cursor:pointer}
+.ss-info-panel{background:#111114;border:1px solid #29292e;padding:20px;margin-top:20px}
+.ss-description{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+
+<div class="ss-detail">
+    <div class="ss-player">
+        {% if stream.status == 'live' and stream.playback_url %}
+            <video controls playsinline preload="metadata" poster="{{ stream.thumbnail_url }}">
+                <source src="{{ stream.playback_url }}">
+                Your browser does not support embedded video.
+            </video>
+        {% elif stream.thumbnail_url %}
+            <div style="width:100%;height:100%;position:relative">
+                <img src="{{ stream.thumbnail_url }}" alt="{{ stream.title }}" style="width:100%;height:100%;object-fit:cover">
+                <div style="position:absolute;inset:0;background:#0008;display:grid;place-items:center">
+                    <div class="ss-player-message">
+                        <div class="play">▶</div>
+                        {% if stream.status == 'scheduled' %}
+                            <h2>Coming soon</h2>
+                            <p>Scheduled for {{ stream.scheduled_at|date:"M j, Y" }} at {{ stream.scheduled_at|time:"g:i A" }}.</p>
+                        {% elif stream.status == 'ended' %}
+                            <h2>Stream ended</h2>
+                            <p>This broadcast has ended.</p>
+                        {% else %}
+                            <h2>{{ stream.get_status_display }}</h2>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="ss-player-message">
+                <div class="play">▶</div>
+                {% if stream.status == 'live' %}
+                    <h2>Stream is marked live</h2>
+                    <p>Live playback is not configured yet. Connect a compatible streaming provider and set the playback URL.</p>
+                {% elif stream.status == 'scheduled' %}
+                    <h2>Coming soon</h2>
+                    <p>Scheduled for {{ stream.scheduled_at|date:"M j, Y" }} at {{ stream.scheduled_at|time:"g:i A" }}.</p>
+                {% elif stream.status == 'ended' %}
+                    <h2>Stream ended</h2>
+                    <p>This broadcast has ended.</p>
+                {% else %}
+                    <h2>{{ stream.get_status_display }}</h2>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="ss-detail-main">
+        <div class="ss-detail-head">
+            <div>
+                <span class="ss-pill {% if stream.status == 'live' %}ss-pill-live{% endif %}">{{ stream.get_status_display|upper }}</span>
+                <h1 style="margin-top:12px">{{ stream.title }}</h1>
+                <div class="ss-muted">
+                    By {{ stream.creator.get_full_name|default:stream.creator.username }}
+                    {% if stream.category %} · {{ stream.category }}{% endif %}
+                    {% if stream.status == 'live' %} · {{ stream.viewer_count }} watching{% endif %}
+                </div>
+            </div>
+
+            {% if is_owner %}
+                <a class="ss-btn" href="{% url 'streaming:my_streams' %}">Manage my streams</a>
+            {% endif %}
+        </div>
+
+        <section class="ss-info-panel">
+            <h3>About this stream</h3>
+            <div class="ss-muted ss-description">{{ stream.description|default:"The creator hasn't added a description yet." }}</div>
+            {% if stream.status == 'scheduled' %}
+                <p class="ss-muted">Scheduled: {{ stream.scheduled_at|date:"l, M j, Y" }} at {{ stream.scheduled_at|time:"g:i A" }}</p>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+
+{% if user.is_authenticated and user.pk != creator_user.pk %}
+    <form method="post" action="{% url 'creators:toggle_follow' creator_user.username %}">
+        {% csrf_token %}
+        <button type="submit" class="ss-follow-button {% if is_following %}ss-following{% endif %}">
+            {% if is_following %}
+                Following
+            {% else %}
+                + Follow
+            {% endif %}
+        </button>
+    </form>
+{% endif %}
+
+<style>
+.ss-follow-button {
+    padding: 11px 18px;
+    border: 1px solid #ff7900;
+    background: #ff7900;
+    color: #111;
+    font-weight: 850;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.ss-follow-button.ss-following {
+    background: #17171b;
+    border-color: #414149;
+    color: #f4f4f5;
+}
+.ss-follow-button:hover {
+    filter: brightness(1.08);
+}
+</style>

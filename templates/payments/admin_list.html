@@ -1,0 +1,78 @@
+
+{% extends "base.html" %}
+{% block title %}Payment Management | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-pay-admin{max-width:1400px;margin:auto;padding:30px 18px;color:#f4f4f5}
+.ss-pay-admin h1{font-size:32px;margin:0 0 8px}
+.ss-pay-admin p{color:#a1a1aa}
+.ss-pay-filter{display:flex;gap:12px;flex-wrap:wrap;background:#111114;padding:18px;border:1px solid #303036;margin:22px 0}
+.ss-pay-filter input,.ss-pay-filter select{background:#09090b;color:#fff;border:1px solid #414149;padding:11px;min-width:180px}
+.ss-pay-btn{background:#ff7900;color:#111;padding:11px 16px;border:0;font-weight:850;cursor:pointer}
+.ss-pay-table-wrap{overflow-x:auto;border:1px solid #303036}
+.ss-pay-table{width:100%;min-width:900px;border-collapse:collapse;background:#111114}
+.ss-pay-table th,.ss-pay-table td{padding:13px;text-align:left;border-bottom:1px solid #303036;font-size:13px}
+.ss-pay-table th{color:#a1a1aa;text-transform:uppercase;font-size:11px}
+.ss-pay-table a{color:#ff9d42;text-decoration:none}
+.ss-pay-admin .pagination{display:flex;justify-content:space-between;margin-top:20px}
+.ss-pay-admin .pagination a{color:#ff9d42}
+</style>
+
+<div class="ss-pay-admin">
+    <h1>Payment management</h1>
+    <p>Review transaction records and verified payment statuses.</p>
+
+    <form class="ss-pay-filter" method="get">
+        {{ form.reference }}
+        {{ form.status }}
+        {{ form.purpose }}
+        <button class="ss-pay-btn" type="submit">Filter</button>
+    </form>
+
+    <div class="ss-pay-table-wrap">
+        <table class="ss-pay-table">
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>User</th>
+                    <th>Purpose</th>
+                    <th>Amount</th>
+                    <th>Provider</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.reference }}</td>
+                        <td>{{ payment.user.username }}</td>
+                        <td>{{ payment.get_purpose_display }}</td>
+                        <td>{{ payment.currency }} {{ payment.amount|floatformat:2 }}</td>
+                        <td>{{ payment.provider }}</td>
+                        <td>{{ payment.get_status_display }}</td>
+                        <td>{{ payment.created_at|date:"M j, Y, g:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">No matching payments found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span>
+            {% if page_obj.has_previous %}
+                <a href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">← Previous</a>
+            {% endif %}
+        </span>
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <span>
+            {% if page_obj.has_next %}
+                <a href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">Next →</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}

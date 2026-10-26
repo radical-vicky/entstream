@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+
+{% block title %}Report Content | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-report{max-width:760px;margin:0 auto;padding:32px 20px 60px;color:#f5f5f5}
+.ss-report *{box-sizing:border-box}
+.ss-report .eyebrow{color:#ff7900;font-size:12px;letter-spacing:2px;font-weight:800;text-transform:uppercase}
+.ss-report h1{font-size:clamp(28px,4vw,36px);margin:10px 0}
+.ss-report .intro{color:#aaa;line-height:1.8}
+.ss-report .panel{margin-top:25px;padding:24px;background:#151515;border:1px solid #303030}
+.ss-report .target{padding:14px;background:#201a14;border-left:3px solid #ff7900;margin-bottom:22px;line-height:1.7;overflow-wrap:anywhere}
+.ss-report .field{margin-bottom:20px}
+.ss-report label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
+.ss-report .ss-input{display:block;width:100%;padding:13px 14px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
+.ss-report .ss-input:focus{outline:none;border-color:#ff7900}
+.ss-report textarea.ss-input{resize:vertical}
+.ss-report .errors,.ss-report .errorlist{color:#ff9c85;font-size:13px;line-height:1.7}
+.ss-report .btn{display:inline-flex;justify-content:center;padding:13px 18px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;text-decoration:none;cursor:pointer;border-radius:0}
+.ss-report .btn-secondary{background:transparent;color:#ff7900}
+.ss-report .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}
+.ss-report .note{margin-top:20px;color:#999;font-size:12px;line-height:1.8}
+@media(max-width:540px){.ss-report{padding:22px 13px 40px}.ss-report .panel{padding:17px}.ss-report .actions .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-report">
+    <div class="eyebrow">Community safety</div>
+    <h1>Report content</h1>
+    <p class="intro">Help us review content that may violate StreamSphere's rules. Reports are reviewed by authorized moderators.</p>
+
+    <div class="panel">
+        <div class="target">
+            <strong>Reported item:</strong>
+            {% if target_type == "video" %}
+                Video — {{ target.title }}
+            {% elif target_type == "comment" %}
+                Comment — {{ target.text|truncatechars:180 }}
+            {% else %}
+                Account — {{ target.username }}
+            {% endif %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <div class="errors">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="actions">
+                <button class="btn" type="submit">Submit report</button>
+                <a class="btn btn-secondary" href="{% url 'videos:list' %}">Cancel</a>
+            </div>
+
+            <p class="note">Submit accurate information. False or abusive reports can make it harder to respond to genuine safety concerns.</p>
+        </form>
+    </div>
+</div>
+{% endblock %}

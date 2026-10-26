@@ -127,3 +127,44 @@ class VideoComment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user} on {self.video}"
+
+
+
+from django.conf import settings
+from django.db import models
+
+
+class VideoPurchase(models.Model):
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="video_purchases",
+    )
+    video = models.ForeignKey(
+        "videos.Video",
+        on_delete=models.PROTECT,
+        related_name="purchases",
+    )
+    payment_reference = models.CharField(
+        max_length=80,
+        unique=True,
+    )
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3, default="KES")
+    purchased_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-purchased_at",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["buyer", "video"],
+                name="unique_video_purchase_per_buyer",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(amount_paid__gte=0),
+                name="video_purchase_amount_nonnegative",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.buyer} purchased {self.video}"

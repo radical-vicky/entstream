@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+{% block title %}My Streams | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-mine{max-width:1250px;margin:auto;padding:32px 20px;color:#f4f4f5}
+.ss-mine-head{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:25px}
+.ss-mine h1{font-size:34px;margin:0}
+.ss-btn{display:inline-block;padding:11px 15px;background:#ff7900;color:#111!important;text-decoration:none;font-weight:800;border:0;border-radius:2px;cursor:pointer;font-size:13px}
+.ss-btn-muted{background:#27272a;color:#fff!important}
+.ss-btn-danger{background:#7f1d1d;color:#fff!important}
+.ss-table-wrap{overflow-x:auto;border:1px solid #29292e}
+.ss-table{width:100%;border-collapse:collapse;min-width:760px;background:#111114}
+.ss-table th,.ss-table td{padding:15px;text-align:left;border-bottom:1px solid #29292e;vertical-align:middle}
+.ss-table th{color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.ss-table td{font-size:14px}
+.ss-title{font-weight:800;color:#fff;text-decoration:none}
+.ss-status{display:inline-block;padding:5px 8px;font-size:11px;font-weight:800;background:#27272a;color:#e4e4e7}
+.ss-status-live{background:#7f1d1d;color:#fecaca}
+.ss-status-scheduled{background:#422006;color:#fed7aa}
+.ss-actions{display:flex;gap:7px;flex-wrap:wrap}
+.ss-actions form{display:inline}
+.ss-empty{padding:30px;border:1px dashed #3f3f46;color:#a1a1aa}
+.ss-empty a{color:#ff9d42}
+</style>
+
+<div class="ss-mine">
+    <div class="ss-mine-head">
+        <div>
+            <h1>My streams</h1>
+            <p style="color:#a1a1aa">Manage your scheduled and live broadcasts.</p>
+        </div>
+        <a class="ss-btn" href="{% url 'streaming:schedule' %}">＋ Schedule stream</a>
+    </div>
+
+    {% if streams %}
+        <div class="ss-table-wrap">
+            <table class="ss-table">
+                <thead>
+                    <tr>
+                        <th>Stream</th>
+                        <th>Status</th>
+                        <th>Schedule</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stream in streams %}
+                        <tr>
+                            <td>
+                                <a class="ss-title" href="{% url 'streaming:detail' stream.pk %}">{{ stream.title }}</a>
+                                {% if stream.category %}
+                                    <div style="color:#a1a1aa;font-size:12px;margin-top:5px">{{ stream.category }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="ss-status {% if stream.status == 'live' %}ss-status-live{% elif stream.status == 'scheduled' %}ss-status-scheduled{% endif %}">
+                                    {{ stream.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ stream.scheduled_at|date:"M j, Y" }}<br>{{ stream.scheduled_at|time:"g:i A" }}</td>
+                            <td>{{ stream.total_views }}</td>
+                            <td>
+                                <div class="ss-actions">
+                                    <a class="ss-btn ss-btn-muted" href="{% url 'streaming:detail' stream.pk %}">View</a>
+
+                                    {% if stream.status == 'scheduled' %}
+                                        <a class="ss-btn ss-btn-muted" href="{% url 'streaming:edit' stream.pk %}">Edit</a>
+                                        <form method="post" action="{% url 'streaming:start' stream.pk %}">
+                                            {% csrf_token %}
+                                            <button class="ss-btn" type="submit">Go live</button>
+                                        </form>
+                                        <form method="post" action="{% url 'streaming:cancel' stream.pk %}" onsubmit="return confirm('Cancel this scheduled stream?');">
+                                            {% csrf_token %}
+                                            <button class="ss-btn ss-btn-danger" type="submit">Cancel</button>
+                                        </form>
+                                    {% elif stream.status == 'live' %}
+                                        <form method="post" action="{% url 'streaming:end' stream.pk %}" onsubmit="return confirm('End this stream?');">
+                                            {% csrf_token %}
+                                            <button class="ss-btn ss-btn-danger" type="submit">End stream</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="ss-empty">
+            <h3>No streams yet</h3>
+            <p>Schedule your first stream to get started.</p>
+            <a href="{% url 'streaming:schedule' %}">Create your first stream →</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

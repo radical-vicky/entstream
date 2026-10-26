@@ -1,0 +1,70 @@
+
+{% extends "base.html" %}
+
+{% block title %}Request Withdrawal | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-withdraw{max-width:760px;margin:0 auto;padding:32px 20px 60px;color:#f5f5f5}
+.ss-withdraw *{box-sizing:border-box}
+.ss-withdraw .eyebrow{font-size:12px;letter-spacing:2px;color:#ff7900;font-weight:800;text-transform:uppercase}
+.ss-withdraw h1{font-size:clamp(27px,4vw,36px);margin:10px 0}
+.ss-withdraw .intro{color:#aaa;line-height:1.7}
+.ss-withdraw .panel{margin-top:23px;padding:24px;background:#151515;border:1px solid #303030}
+.ss-withdraw .available{padding:17px;background:#211a13;border-left:3px solid #ff7900;margin-bottom:24px}
+.ss-withdraw .available span{display:block;color:#bbb;font-size:13px;margin-bottom:7px}
+.ss-withdraw .available strong{font-size:28px}
+.ss-withdraw .field{margin-bottom:20px}
+.ss-withdraw label{display:block;margin-bottom:8px;font-size:14px;font-weight:750}
+.ss-withdraw .ss-input{display:block;width:100%;padding:13px 14px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
+.ss-withdraw .ss-input:focus{outline:none;border-color:#ff7900}
+.ss-withdraw .errors,.ss-withdraw .errorlist{color:#ff9c85;font-size:13px;line-height:1.7}
+.ss-withdraw .btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 17px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;text-decoration:none;border-radius:0;cursor:pointer}
+.ss-withdraw .btn-secondary{background:transparent;color:#ff7900}
+.ss-withdraw .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.ss-withdraw .note{color:#aaa;font-size:12px;line-height:1.8;margin-top:20px}
+@media(max-width:540px){.ss-withdraw{padding:22px 13px 40px}.ss-withdraw .panel{padding:17px}.ss-withdraw .actions .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-withdraw">
+    <div class="eyebrow">Creator payouts</div>
+    <h1>Request a withdrawal</h1>
+    <p class="intro">Submit your payout details for review. Your balance is reserved while the request is pending.</p>
+
+    <div class="panel">
+        <div class="available">
+            <span>Available balance</span>
+            <strong>KSh {{ balance.available_balance|floatformat:2 }}</strong>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <div class="errors">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="actions">
+                <button class="btn" type="submit">Submit withdrawal request</button>
+                <a class="btn btn-secondary" href="{% url 'earnings:dashboard' %}">Cancel</a>
+            </div>
+
+            <p class="note">
+                Check your payout details carefully. Never enter your M-Pesa PIN, bank password, or one-time password in this form. Payouts require a separate verified payment process.
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}

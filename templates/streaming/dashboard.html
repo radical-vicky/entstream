@@ -1,0 +1,131 @@
+
+{% extends "base.html" %}
+
+{% block title %}Live Studio | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-studio{max-width:1200px;margin:0 auto;padding:30px 22px 60px;color:#f3f3f3}
+.ss-studio *{box-sizing:border-box}
+.ss-studio a{text-decoration:none;color:inherit}
+.ss-studio .muted{color:#9b9b9b}
+.ss-studio .eyebrow{color:#ff7900;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.ss-studio h1{font-size:clamp(28px,4vw,40px);margin:8px 0;font-weight:850}
+.ss-studio .intro{color:#aaa;margin:0;line-height:1.7}
+.ss-studio .topline{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.ss-studio .ss-btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 18px;border:1px solid #ff7900;background:#ff7900;color:#111;font-weight:800;cursor:pointer}
+.ss-studio .ss-btn:hover{background:#ff922e}
+.ss-studio .ss-btn-outline{background:transparent;color:#ff7900}
+.ss-studio .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0 34px}
+.ss-studio .stat{background:#151515;border:1px solid #303030;padding:20px}
+.ss-studio .stat span{display:block;color:#aaa;font-size:13px;margin-bottom:9px}
+.ss-studio .stat strong{font-size:29px}
+.ss-studio .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 0 15px}
+.ss-studio .section-head h2{font-size:21px;margin:0}
+.ss-studio .stream-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.ss-studio .stream-card{background:#151515;border:1px solid #303030;min-width:0}
+.ss-studio .thumb{height:170px;background:#202020;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ss-studio .thumb img{width:100%;height:100%;object-fit:cover}
+.ss-studio .thumb-placeholder{font-size:42px;color:#ff7900}
+.ss-studio .card-body{padding:17px}
+.ss-studio .status{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:800;padding:6px 8px;background:#292929;color:#ccc}
+.ss-studio .status-live{background:#3a1710;color:#ff8b61}
+.ss-studio .status-scheduled{background:#33240f;color:#ffb75e}
+.ss-studio .status-ended{background:#242424;color:#aaa}
+.ss-studio .card-body h3{font-size:17px;margin:13px 0 7px;overflow-wrap:anywhere}
+.ss-studio .card-body p{font-size:13px;line-height:1.6;color:#aaa}
+.ss-studio .card-footer{border-top:1px solid #303030;padding-top:13px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#aaa}
+.ss-studio .card-footer a{color:#ff7900;font-weight:800}
+.ss-studio .empty{padding:35px 20px;background:#151515;border:1px dashed #444;text-align:center;color:#aaa}
+.ss-studio .empty h3{color:#fff;margin-top:0}
+.ss-studio .empty p{line-height:1.7}
+@media(max-width:850px){.ss-studio .stream-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.ss-studio{padding:22px 14px 40px}.ss-studio .stats{grid-template-columns:1fr}.ss-studio .stat{padding:15px}.ss-studio .stream-grid{grid-template-columns:1fr}.ss-studio .thumb{height:200px}.ss-studio .topline .ss-btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-studio">
+    <div class="topline">
+        <div>
+            <div class="eyebrow">Creator tools</div>
+            <h1>Live Studio</h1>
+            <p class="intro">Create broadcasts, manage upcoming streams, and review your previous sessions.</p>
+        </div>
+        <a class="ss-btn" href="{% url 'streaming:create' %}">+ Create stream</a>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <span>Live now</span>
+            <strong>{{ live_streams.count }}</strong>
+        </div>
+        <div class="stat">
+            <span>Upcoming streams</span>
+            <strong>{{ upcoming_streams.count }}</strong>
+        </div>
+        <div class="stat">
+            <span>Ended streams</span>
+            <strong>{{ ended_streams.count }}</strong>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding:13px 15px;margin-bottom:12px;background:#202020;border-left:3px solid #ff7900;color:#eee">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="section-head">
+        <h2>Your streams</h2>
+        <span class="muted">{{ streams.count }} total</span>
+    </div>
+
+    {% if streams %}
+        <div class="stream-grid">
+            {% for stream in streams %}
+                <article class="stream-card">
+                    <a href="{% url 'streaming:detail' stream.pk %}" class="thumb">
+                        {% if stream.thumbnail_url %}
+                            <img src="{{ stream.thumbnail_url }}" alt="{{ stream.title }} thumbnail">
+                        {% else %}
+                            <span class="thumb-placeholder" aria-hidden="true">▶</span>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <span class="status status-{{ stream.status }}">{{ stream.get_status_display }}</span>
+                        <h3>{{ stream.title }}</h3>
+                        <p>
+                            {% if stream.description %}
+                                {{ stream.description|truncatechars:105 }}
+                            {% else %}
+                                <span class="muted">No description added.</span>
+                            {% endif %}
+                        </p>
+                        <div class="card-footer">
+                            <span>
+                                {% if stream.status == "live" %}
+                                    {{ stream.viewer_count }} viewers
+                                {% elif stream.scheduled_at %}
+                                    {{ stream.scheduled_at|date:"M j, Y · H:i" }}
+                                {% else %}
+                                    Created {{ stream.created_at|date:"M j, Y" }}
+                                {% endif %}
+                            </span>
+                            <a href="{% url 'streaming:detail' stream.pk %}">Manage →</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <h3>Your first broadcast starts here.</h3>
+            <p>Create a stream, add its details, and connect your streaming provider to prepare for broadcasting.</p>
+            <a class="ss-btn" href="{% url 'streaming:create' %}">Create your first stream</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

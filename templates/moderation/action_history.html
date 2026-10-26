@@ -1,0 +1,78 @@
+
+{% extends "base.html" %}
+
+{% block title %}Moderation History | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-history{max-width:1200px;margin:0 auto;padding:30px 20px 60px;color:#f5f5f5}
+.ss-history *{box-sizing:border-box}
+.ss-history h1{font-size:clamp(28px,4vw,38px);margin:0 0 8px}
+.ss-history .muted{color:#999;line-height:1.7}
+.ss-history .table-wrap{overflow-x:auto;margin-top:25px;border:1px solid #303030}
+.ss-history table{width:100%;min-width:760px;border-collapse:collapse;background:#151515}
+.ss-history th,.ss-history td{padding:14px;text-align:left;border-bottom:1px solid #303030;font-size:13px;vertical-align:top}
+.ss-history th{background:#101010;color:#aaa}
+.ss-history .ref{color:#ffb36b;font-family:monospace}
+.ss-history a{color:#ff7900;text-decoration:none;font-weight:800}
+.ss-history .pagination{display:flex;justify-content:center;gap:15px;padding:20px}
+.ss-history .empty{padding:30px;border:1px dashed #444;color:#aaa;margin-top:20px}
+@media(max-width:550px){.ss-history{padding:22px 12px 40px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-history">
+    <h1>Moderation history</h1>
+    <p class="muted">An audit trail of recorded moderator actions.</p>
+
+    {% if actions %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Moderator</th>
+                        <th>Report</th>
+                        <th>Note</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in actions %}
+                        <tr>
+                            <td>{{ item.get_action_type_display }}</td>
+                            <td>{{ item.target_type|title }} #{{ item.target_id }}</td>
+                            <td>{{ item.moderator.username }}</td>
+                            <td>
+                                {% if item.report_id %}
+                                    <a href="{% url 'moderation:report_detail' item.report_id %}">Report #{{ item.report_id }}</a>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ item.note|default:"—"|truncatechars:100 }}</td>
+                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty">No moderation actions have been recorded.</div>
+    {% endif %}
+</div>
+{% endblock %}

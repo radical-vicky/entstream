@@ -1,0 +1,362 @@
+
+{% extends "base.html" %}
+
+{% block title %}Chat - StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-conversation-page {
+    --orange: #ff7900;
+    --bg: #0b0b0d;
+    --panel: #141417;
+    --border: #303035;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    min-height: calc(100vh - 60px);
+    padding: 20px 12px 30px;
+    background: var(--bg);
+    color: var(--text);
+}
+.ss-conversation-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1000px;
+    height: min(780px, calc(100vh - 110px));
+    min-height: 480px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    background: var(--panel);
+}
+.ss-conversation-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--border);
+}
+.ss-conversation-back {
+    color: var(--orange);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+.ss-conversation-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 50%;
+    background: #29292e;
+    color: var(--orange);
+    font-weight: 900;
+}
+.ss-conversation-user { flex: 1; min-width: 0; }
+.ss-conversation-user h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+}
+.ss-conversation-user p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+.ss-conversation-messages {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.ss-message-row { display: flex; justify-content: flex-start; }
+.ss-message-row.own { justify-content: flex-end; }
+.ss-message-bubble {
+    max-width: min(75%, 600px);
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: #202024;
+    overflow-wrap: anywhere;
+}
+.ss-message-row.own .ss-message-bubble {
+    border-color: #9a4a08;
+    background: #452308;
+}
+.ss-message-sender {
+    margin-bottom: 6px;
+    color: var(--orange);
+    font-size: 11px;
+    font-weight: 850;
+}
+.ss-message-body {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.ss-message-time {
+    margin-top: 8px;
+    color: #b0b0b7;
+    font-size: 10px;
+    text-align: right;
+}
+.ss-message-attachment {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--orange);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+.ss-message-attachment img {
+    display: block;
+    max-width: 100%;
+    max-height: 280px;
+    margin-top: 8px;
+    object-fit: contain;
+}
+.ss-message-delete {
+    display: block;
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fca5a5;
+    font-size: 11px;
+    cursor: pointer;
+}
+.ss-conversation-empty {
+    margin: auto;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.7;
+}
+.ss-conversation-composer {
+    padding: 15px;
+    border-top: 1px solid var(--border);
+    background: #101012;
+}
+.ss-conversation-composer textarea,
+.ss-conversation-composer input[type="file"] {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    outline: none;
+    background: #09090b;
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+}
+.ss-conversation-composer textarea {
+    min-height: 65px;
+    max-height: 160px;
+    resize: vertical;
+}
+.ss-conversation-composer textarea:focus,
+.ss-conversation-composer input[type="file"]:focus {
+    border-color: var(--orange);
+}
+.ss-composer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+.ss-composer-hint { color: var(--muted); font-size: 11px; }
+.ss-send-btn {
+    min-height: 42px;
+    padding: 0 20px;
+    border: 1px solid var(--orange);
+    border-radius: 0;
+    background: var(--orange);
+    color: #111;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+}
+.ss-send-btn:hover { background: #ff922e; }
+.ss-chat-alert {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    color: #fecaca;
+    font-size: 13px;
+}
+@media (max-width: 520px) {
+    .ss-conversation-page { padding: 8px 0; }
+    .ss-conversation-wrap {
+        height: calc(100dvh - 80px);
+        min-height: 420px;
+        border-right: 0;
+        border-left: 0;
+    }
+    .ss-conversation-messages { padding: 13px 10px; }
+    .ss-message-bubble { max-width: 88%; }
+    .ss-conversation-composer { padding: 10px; }
+    .ss-composer-hint { max-width: 55%; line-height: 1.5; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="ss-conversation-page">
+    <section class="ss-conversation-wrap">
+
+        <header class="ss-conversation-header">
+            <a class="ss-conversation-back"
+               href="{% url 'chat:inbox' %}"
+               aria-label="Back to messages">←</a>
+
+            <div class="ss-conversation-avatar">
+                {% if recipient %}
+                    {{ recipient.username|first|upper }}
+                {% else %}
+                    S
+                {% endif %}
+            </div>
+
+            <div class="ss-conversation-user">
+                <h1>
+                    {% if recipient %}
+                        {{ recipient.get_full_name|default:recipient.username }}
+                    {% else %}
+                        {{ conversation.subject|default:"Conversation" }}
+                    {% endif %}
+                </h1>
+                <p>StreamSphere messages</p>
+            </div>
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="ss-chat-alert" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="ss-conversation-messages" id="ssConversationMessages">
+            {% for message in chat_messages %}
+                <div class="ss-message-row {% if message.sender_id == request.user.id %}own{% endif %}">
+                    <article class="ss-message-bubble">
+                        {% if message.sender_id != request.user.id %}
+                            <div class="ss-message-sender">
+                                {{ message.sender.get_full_name|default:message.sender.username }}
+                            </div>
+                        {% endif %}
+
+                        {% if message.body %}
+                            <div class="ss-message-body">{{ message.body }}</div>
+                        {% endif %}
+
+                        {% if message.attachment %}
+                            {% with file_url=message.attachment.url %}
+                            {% if message.attachment.name|lower|slice:"-4:" == ".jpg" or message.attachment.name|lower|slice:"-5:" == ".jpeg" or message.attachment.name|lower|slice:"-4:" == ".png" or message.attachment.name|lower|slice:"-5:" == ".webp" or message.attachment.name|lower|slice:"-4:" == ".gif" %}
+                                <a class="ss-message-attachment"
+                                   href="{{ file_url }}" target="_blank"
+                                   rel="noopener noreferrer">
+                                    <img src="{{ file_url }}" alt="Message attachment">
+                                    Open image
+                                </a>
+                            {% else %}
+                                <a class="ss-message-attachment"
+                                   href="{{ file_url }}" target="_blank"
+                                   rel="noopener noreferrer">
+                                    Open attachment
+                                </a>
+                            {% endif %}
+                            {% endwith %}
+                        {% endif %}
+
+                        <div class="ss-message-time">
+                            {{ message.created_at|date:"M j, Y · H:i" }}
+                            {% if message.sender_id == request.user.id and message.is_read %}
+                                · Read
+                            {% endif %}
+                        </div>
+
+                        {% if message.sender_id == request.user.id %}
+                            <form method="post"
+                                  action="{% url 'chat:delete_message' message.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="ss-message-delete"
+                                        onclick="return confirm('Delete this message?')">
+                                    Delete message
+                                </button>
+                            </form>
+                        {% endif %}
+                    </article>
+                </div>
+            {% empty %}
+                <div class="ss-conversation-empty">
+                    <p>No messages yet.</p>
+                    <p>Send a message to start the conversation.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <form class="ss-conversation-composer"
+              method="post"
+              enctype="multipart/form-data"
+              id="ssMessageForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="ss-chat-alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {{ form.body }}
+            {% for error in form.body.errors %}
+                <div class="ss-chat-alert">{{ error }}</div>
+            {% endfor %}
+
+            <div style="margin-top:10px">
+                {{ form.attachment }}
+                {% for error in form.attachment.errors %}
+                    <div class="ss-chat-alert">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="ss-composer-bottom">
+                <span class="ss-composer-hint">
+                    Keep messages respectful. Attachments up to 15 MB.
+                </span>
+                <button class="ss-send-btn" type="submit">Send</button>
+            </div>
+        </form>
+
+    </section>
+</main>
+
+<script>
+(function () {
+    const messageArea = document.getElementById("ssConversationMessages");
+    const form = document.getElementById("ssMessageForm");
+    const bodyInput = document.getElementById("id_body");
+
+    if (messageArea) {
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+
+    if (bodyInput) {
+        bodyInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+
+                if (bodyInput.value.trim() && form) {
+                    form.requestSubmit();
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+
+{% extends "base.html" %}
+
+{% block title %}Subscription Plans | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-plans{max-width:1150px;margin:0 auto;padding:38px 22px 65px;color:#f5f5f5}
+.ss-plans *{box-sizing:border-box}
+.ss-plans .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ff7900;text-transform:uppercase}
+.ss-plans h1{font-size:clamp(30px,5vw,44px);margin:10px 0}
+.ss-plans .intro{color:#aaa;line-height:1.8;max-width:700px}
+.ss-plans .heading{text-align:center;margin-bottom:35px}
+.ss-plans .plans-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:30px}
+.ss-plans .plan-card{background:#151515;border:1px solid #333;padding:25px;display:flex;flex-direction:column;min-width:0}
+.ss-plans .plan-card.featured{border-color:#ff7900}
+.ss-plans .plan-card h2{font-size:22px;margin:0 0 12px;overflow-wrap:anywhere}
+.ss-plans .plan-description{color:#aaa;line-height:1.7;min-height:55px}
+.ss-plans .price{font-size:36px;font-weight:850;margin:20px 0 4px;overflow-wrap:anywhere}
+.ss-plans .period{color:#999;font-size:13px}
+.ss-plans .plan-duration{border-top:1px solid #303030;margin-top:20px;padding-top:18px;color:#bbb;font-size:14px}
+.ss-plans .btn{display:block;width:100%;margin-top:24px;text-align:center;padding:13px 14px;background:#ff7900;color:#111;font-weight:850;border:1px solid #ff7900;border-radius:0;text-decoration:none;cursor:pointer}
+.ss-plans button.btn{font:inherit;font-weight:850}
+.ss-plans .btn-secondary{background:transparent;color:#ff7900}
+.ss-plans .notice{padding:14px;background:#201a14;border-left:3px solid #ff7900;margin:18px 0;line-height:1.7;color:#e4d3be}
+.ss-plans .empty{border:1px dashed #444;padding:35px;text-align:center;color:#aaa}
+.ss-plans .current{display:inline-block;background:#2a2115;color:#ffbd75;font-size:11px;font-weight:800;padding:6px 8px;text-transform:uppercase;margin-bottom:15px}
+@media(max-width:850px){.ss-plans .plans-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.ss-plans{padding:25px 13px 45px}.ss-plans .plans-grid{grid-template-columns:1fr}.ss-plans .plan-card{padding:21px}.ss-plans .plan-description{min-height:0}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-plans">
+    <div class="heading">
+        <div class="eyebrow">Support creators. Get more.</div>
+        <h1>Choose your plan</h1>
+        <p class="intro" style="margin:0 auto">
+            Find a subscription that fits how you watch StreamSphere. Your access begins after payment is verified.
+        </p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="notice">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if active_subscription %}
+        <div class="notice">
+            You currently have the <strong>{{ active_subscription.plan.name }}</strong> plan.
+            It expires on {{ active_subscription.expires_at|date:"M j, Y" }}.
+            <a href="{% url 'subscriptions:my_subscriptions' %}" style="color:#ff7900;font-weight:800">Manage subscription →</a>
+        </div>
+    {% endif %}
+
+    {% if plans %}
+        <div class="plans-grid">
+            {% for plan in plans %}
+                <article class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
+                    {% if active_subscription and active_subscription.plan_id == plan.id %}
+                        <span class="current">Your current plan</span>
+                    {% endif %}
+
+                    <h2>{{ plan.name }}</h2>
+
+                    <p class="plan-description">
+                        {% if plan.description %}
+                            {{ plan.description }}
+                        {% else %}
+                            Access StreamSphere with this subscription option.
+                        {% endif %}
+                    </p>
+
+                    <div class="price">{{ plan.price|floatformat:2 }}</div>
+                    <div class="period">Price per subscription period</div>
+
+                    <div class="plan-duration">
+                        Valid for {{ plan.duration_days }} day{{ plan.duration_days|pluralize }}
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'subscriptions:subscribe' plan.id %}">
+                            {% csrf_token %}
+                            <button class="btn" type="submit">Continue to subscription</button>
+                        </form>
+                    {% else %}
+                        <a class="btn" href="{% url 'account_login' %}?next={% url 'subscriptions:plans' %}">
+                            Sign in to subscribe
+                        </a>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <h2>No plans are available yet.</h2>
+            <p>An administrator can add subscription plans through Django admin.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

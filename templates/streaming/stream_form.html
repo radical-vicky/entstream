@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+{% block title %}{{ page_title }} | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-form-page{max-width:850px;margin:38px auto;padding:0 18px;color:#f4f4f5}
+.ss-form-panel{background:#111114;border:1px solid #2b2b31;padding:clamp(20px,4vw,36px)}
+.ss-form-panel h1{margin:0 0 8px;font-size:30px}
+.ss-form-intro{color:#a1a1aa;margin:0 0 25px}
+.ss-field{margin-bottom:20px}
+.ss-field label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
+.ss-field input:not([type=checkbox]),.ss-field textarea,.ss-field select{box-sizing:border-box;width:100%;padding:13px;background:#09090b;border:1px solid #3f3f46;color:#fff;border-radius:2px}
+.ss-field input:focus,.ss-field textarea:focus{outline:1px solid #ff7900;border-color:#ff7900}
+.ss-field input[type=checkbox]{accent-color:#ff7900}
+.ss-help{font-size:12px;color:#a1a1aa;margin-top:6px}
+.ss-errors{color:#fda4af;font-size:13px;margin-top:6px}
+.ss-submit{background:#ff7900;color:#111;font-weight:850;padding:13px 20px;border:0;border-radius:2px;cursor:pointer}
+.ss-back{color:#ff9d42;text-decoration:none;margin-left:15px}
+.ss-nonfield{background:#431407;color:#fed7aa;padding:12px;margin-bottom:18px}
+</style>
+
+<div class="ss-form-page">
+    <div class="ss-form-panel">
+        <h1>{{ page_title }}</h1>
+        <p class="ss-form-intro">Set up your stream details. You can adjust the schedule before going live.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ss-nonfield">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="ss-field">
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <label>{{ field }} {{ field.label }}</label>
+                    {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}<div class="ss-help">{{ field.help_text }}</div>{% endif %}
+                    {% for error in field.errors %}<div class="ss-errors">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+
+            <button class="ss-submit" type="submit">Save stream</button>
+            <a class="ss-back" href="{% url 'streaming:my_streams' %}">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

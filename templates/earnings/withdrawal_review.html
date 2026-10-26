@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+
+{% block title %}Review Withdrawal | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-review-form{max-width:800px;margin:0 auto;padding:30px 20px 60px;color:#f5f5f5}
+.ss-review-form *{box-sizing:border-box}
+.ss-review-form h1{font-size:clamp(26px,4vw,36px);margin:10px 0}
+.ss-review-form .muted{color:#aaa;line-height:1.7}
+.ss-review-form .panel{background:#151515;border:1px solid #303030;padding:23px;margin-top:23px}
+.ss-review-form .detail{padding:13px 0;border-bottom:1px solid #303030;display:flex;justify-content:space-between;gap:18px;overflow-wrap:anywhere}
+.ss-review-form .detail span{color:#aaa}
+.ss-review-form .detail strong{text-align:right;overflow-wrap:anywhere}
+.ss-review-form .field{margin:20px 0}
+.ss-review-form label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
+.ss-review-form .ss-input{width:100%;padding:13px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
+.ss-review-form .errors{color:#ff9c85;font-size:13px;line-height:1.7}
+.ss-review-form .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.ss-review-form .btn{display:inline-flex;justify-content:center;padding:13px 17px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;text-decoration:none;cursor:pointer;border-radius:0}
+.ss-review-form .btn-secondary{background:transparent;color:#ff7900}
+.ss-review-form .warning{background:#211a13;border-left:3px solid #ff7900;padding:13px;color:#e1cbb0;line-height:1.7;font-size:13px}
+@media(max-width:540px){.ss-review-form{padding:22px 13px 40px}.ss-review-form .panel{padding:16px}.ss-review-form .detail{flex-direction:column;gap:5px}.ss-review-form .detail strong{text-align:left}.ss-review-form .actions .btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ss-review-form">
+    <p><a href="{% url 'earnings:withdrawal_review_list' %}" style="color:#ff7900;text-decoration:none">← All withdrawal requests</a></p>
+    <h1>Review withdrawal</h1>
+    <p class="muted">Confirm the request details and verify the payout before recording it as paid.</p>
+
+    <div class="panel">
+        <div class="detail"><span>Reference</span><strong>{{ withdrawal.reference }}</strong></div>
+        <div class="detail"><span>Creator</span><strong>{{ withdrawal.creator.username }}</strong></div>
+        <div class="detail"><span>Amount</span><strong>KSh {{ withdrawal.amount|floatformat:2 }}</strong></div>
+        <div class="detail"><span>Method</span><strong>{{ withdrawal.payout_method|title }}</strong></div>
+        <div class="detail"><span>Payout account</span><strong>{{ withdrawal.payout_account }}</strong></div>
+        <div class="detail"><span>Current status</span><strong>{{ withdrawal.get_status_display }}</strong></div>
+        <div class="detail"><span>Submitted</span><strong>{{ withdrawal.created_at|date:"M j, Y H:i" }}</strong></div>
+
+        <div class="warning" style="margin-top:20px">
+            Only mark this request as paid after confirming the actual payout through your payment provider. Changing the status here does not send money.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <div class="errors">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="actions">
+                <button class="btn" type="submit">Save review</button>
+                <a class="btn btn-secondary" href="{% url 'earnings:withdrawal_review_list' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

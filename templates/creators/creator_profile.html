@@ -1,0 +1,483 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ creator.username }} - StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-creator-page {
+    --orange: #ff7900;
+    --bg: #0b0b0d;
+    --panel: #141417;
+    --border: #303035;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    min-height: 100vh;
+    padding: 28px 18px 60px;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.ss-creator-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.ss-creator-banner {
+    min-height: 155px;
+    border: 1px solid var(--border);
+    background:
+        radial-gradient(ellipse at 80% 20%, #59300f 0%, transparent 42%),
+        linear-gradient(115deg, #18181b, #101012 65%, #251406);
+}
+
+.ss-creator-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    padding: 0 26px 24px;
+    border: 1px solid var(--border);
+    border-top: 0;
+    background: var(--panel);
+}
+
+.ss-creator-avatar {
+    width: 112px;
+    height: 112px;
+    flex: 0 0 112px;
+    margin-top: -35px;
+    border: 4px solid var(--panel);
+    border-radius: 50%;
+    background: #27272a;
+    object-fit: cover;
+}
+
+.ss-creator-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--orange);
+    font-size: 40px;
+    font-weight: 900;
+}
+
+.ss-creator-info {
+    flex: 1;
+    min-width: 0;
+    padding-top: 20px;
+}
+
+.ss-creator-info h1 {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 850;
+    letter-spacing: -1px;
+}
+
+.ss-creator-handle {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.ss-creator-bio {
+    margin-top: 15px;
+    color: #d4d4d8;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.ss-creator-location {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.ss-creator-website {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--orange);
+    overflow-wrap: anywhere;
+}
+
+.ss-creator-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+}
+
+.ss-creator-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 17px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ss-creator-btn-primary {
+    border-color: var(--orange);
+    background: var(--orange);
+    color: #111;
+}
+
+.ss-creator-btn:hover {
+    border-color: var(--orange);
+}
+
+.ss-creator-btn-primary:hover {
+    background: #ff922e;
+}
+
+.ss-creator-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    background: var(--border);
+}
+
+.ss-creator-stat {
+    padding: 20px;
+    background: var(--panel);
+}
+
+.ss-creator-stat strong {
+    display: block;
+    font-size: 23px;
+    font-weight: 850;
+}
+
+.ss-creator-stat span {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.ss-creator-section {
+    margin-top: 32px;
+}
+
+.ss-creator-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.ss-creator-section-heading h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 850;
+}
+
+.ss-creator-video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.ss-creator-video {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color .15s ease;
+}
+
+.ss-creator-video:hover {
+    border-color: var(--orange);
+}
+
+.ss-creator-thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #202024;
+}
+
+.ss-creator-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ss-creator-thumbnail span {
+    color: var(--orange);
+    font-size: 32px;
+}
+
+.ss-creator-video-details {
+    padding: 15px;
+}
+
+.ss-creator-video-details h3 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.ss-creator-video-details p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.ss-creator-empty {
+    padding: 38px 20px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    text-align: center;
+}
+
+.ss-creator-empty h3 {
+    margin: 0 0 8px;
+}
+
+.ss-creator-empty p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.ss-creator-messages {
+    margin-bottom: 16px;
+}
+
+.ss-creator-message {
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--orange);
+    background: var(--panel);
+    color: var(--text);
+}
+
+@media (max-width: 760px) {
+    .ss-creator-page {
+        padding: 18px 12px 40px;
+    }
+
+    .ss-creator-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0 18px 20px;
+    }
+
+    .ss-creator-avatar {
+        width: 92px;
+        height: 92px;
+        flex-basis: 92px;
+    }
+
+    .ss-creator-info {
+        padding-top: 0;
+    }
+
+    .ss-creator-actions {
+        width: 100%;
+    }
+
+    .ss-creator-btn {
+        flex: 1;
+    }
+
+    .ss-creator-video-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .ss-creator-video-details {
+        padding: 11px;
+    }
+
+    .ss-creator-video-details h3 {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .ss-creator-video-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ss-creator-stats .ss-creator-stat {
+        padding: 14px 10px;
+    }
+
+    .ss-creator-stat strong {
+        font-size: 19px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="ss-creator-page">
+    <div class="ss-creator-wrap">
+
+        {% if messages %}
+        <div class="ss-creator-messages">
+            {% for message in messages %}
+            <div class="ss-creator-message" role="status">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="ss-creator-banner"></div>
+
+        <section class="ss-creator-card">
+            {% if profile.avatar_image %}
+                <img class="ss-creator-avatar"
+                     src="{{ profile.avatar_image.url }}"
+                     alt="{{ creator.username }} profile photo">
+            {% elif profile.avatar %}
+                <img class="ss-creator-avatar"
+                     src="{{ profile.avatar }}"
+                     alt="{{ creator.username }} profile photo">
+            {% else %}
+                <div class="ss-creator-avatar ss-creator-avatar-fallback">
+                    {{ creator.username|first|upper }}
+                </div>
+            {% endif %}
+
+            <div class="ss-creator-info">
+                <h1>{{ creator.get_full_name|default:creator.username }}</h1>
+                <div class="ss-creator-handle">
+                    @{{ creator.username }}
+                </div>
+
+                {% if profile.bio %}
+                    <p class="ss-creator-bio">{{ profile.bio|linebreaksbr }}</p>
+                {% else %}
+                    <p class="ss-creator-bio">
+                        This creator hasn't added a bio yet.
+                    </p>
+                {% endif %}
+
+                {% if profile.location %}
+                    <div class="ss-creator-location">
+                        Location: {{ profile.location }}
+                    </div>
+                {% endif %}
+
+                {% if profile.website %}
+                    <a class="ss-creator-website"
+                       href="{{ profile.website }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Visit website
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="ss-creator-actions">
+                {% if request.user.is_authenticated %}
+                    {% if request.user.pk != creator.pk %}
+                    <form method="post"
+                          action="{% url 'creators:toggle_follow' creator.username %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next"
+                               value="{{ request.get_full_path }}">
+
+                        {% if is_following %}
+                            <button class="ss-creator-btn" type="submit">
+                                Following
+                            </button>
+                        {% else %}
+                            <button class="ss-creator-btn ss-creator-btn-primary"
+                                    type="submit">
+                                Follow creator
+                            </button>
+                        {% endif %}
+                    </form>
+                    {% else %}
+                    <a class="ss-creator-btn ss-creator-btn-primary"
+                       href="{% url 'accounts:profile' %}">
+                        Edit my profile
+                    </a>
+                    {% endif %}
+                {% else %}
+                    <a class="ss-creator-btn ss-creator-btn-primary"
+                       href="{% url 'account_login' %}">
+                        Sign in to follow
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="ss-creator-stats">
+            <div class="ss-creator-stat">
+                <strong>{{ video_count }}</strong>
+                <span>Published videos</span>
+            </div>
+            <div class="ss-creator-stat">
+                <strong>{{ followers_count }}</strong>
+                <span>Followers</span>
+            </div>
+            <div class="ss-creator-stat">
+                <strong>{{ following_count }}</strong>
+                <span>Following</span>
+            </div>
+        </section>
+
+        <section class="ss-creator-section">
+            <div class="ss-creator-section-heading">
+                <h2>Published videos</h2>
+            </div>
+
+            {% if videos %}
+            <div class="ss-creator-video-grid">
+                {% for video in videos %}
+                <a class="ss-creator-video"
+                   href="{% url 'videos:detail' video.pk %}">
+
+                    <div class="ss-creator-thumbnail">
+                        {% if video.thumbnail_url %}
+                            <img src="{{ video.thumbnail_url }}"
+                                 alt="{{ video.title }}"
+                                 loading="lazy">
+                        {% else %}
+                            <span aria-hidden="true">▶</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="ss-creator-video-details">
+                        <h3>{{ video.title }}</h3>
+                        <p>{{ video.views|default:0 }} views</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="ss-creator-empty">
+                <h3>No published videos yet</h3>
+                <p>
+                    Videos this creator publishes will appear here.
+                </p>
+            </div>
+            {% endif %}
+        </section>
+
+    </div>
+</main>
+{% endblock %}

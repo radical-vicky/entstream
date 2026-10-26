@@ -1,0 +1,145 @@
+
+{% extends "base.html" %}
+
+{% block title %}Messages - StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ss-chat-page {
+    --orange: #ff7900;
+    --bg: #0b0b0d;
+    --panel: #141417;
+    --border: #303035;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    min-height: calc(100vh - 60px);
+    padding: 26px 16px 50px;
+    background: var(--bg);
+    color: var(--text);
+}
+.ss-chat-wrap { max-width: 1050px; margin: auto; }
+.ss-chat-top {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; margin-bottom: 22px;
+}
+.ss-chat-top h1 { margin: 0 0 6px; font-size: 30px; font-weight: 850; }
+.ss-chat-top p { margin: 0; color: var(--muted); font-size: 14px; }
+.ss-chat-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 42px; padding: 0 15px; border: 1px solid var(--border);
+    border-radius: 0; background: transparent; color: var(--text);
+    font-weight: 800; font-size: 13px; text-decoration: none; cursor: pointer;
+}
+.ss-chat-btn:hover { border-color: var(--orange); }
+.ss-chat-btn-primary { background: var(--orange); border-color: var(--orange); color: #111; }
+.ss-chat-search { display: flex; gap: 8px; margin-bottom: 16px; }
+.ss-chat-search input {
+    flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid var(--border);
+    border-radius: 0; outline: 0; background: var(--panel); color: var(--text);
+}
+.ss-chat-search input:focus { border-color: var(--orange); }
+.ss-chat-list { border: 1px solid var(--border); background: var(--panel); }
+.ss-chat-item {
+    display: flex; align-items: center; gap: 14px; padding: 17px;
+    border-bottom: 1px solid var(--border); color: inherit; text-decoration: none;
+}
+.ss-chat-item:last-child { border-bottom: 0; }
+.ss-chat-item:hover { background: #1b1b1f; }
+.ss-chat-avatar {
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; flex: 0 0 48px; border-radius: 50%;
+    background: #29292e; color: var(--orange); font-weight: 900;
+}
+.ss-chat-details { flex: 1; min-width: 0; }
+.ss-chat-name { font-size: 14px; font-weight: 850; overflow-wrap: anywhere; }
+.ss-chat-subject { margin-top: 5px; color: var(--muted); font-size: 12px; }
+.ss-chat-unread {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 23px; height: 23px; padding: 0 5px; background: var(--orange);
+    color: #111; font-size: 11px; font-weight: 900;
+}
+.ss-chat-empty {
+    padding: 50px 18px; border: 1px solid var(--border);
+    background: var(--panel); text-align: center;
+}
+.ss-chat-empty h2 { margin: 0 0 8px; font-size: 19px; }
+.ss-chat-empty p { margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
+@media (max-width: 520px) {
+    .ss-chat-page { padding: 20px 10px 35px; }
+    .ss-chat-top { align-items: flex-start; flex-direction: column; }
+    .ss-chat-search { flex-direction: column; }
+    .ss-chat-search .ss-chat-btn { width: 100%; box-sizing: border-box; }
+    .ss-chat-item { padding: 13px 10px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="ss-chat-page">
+    <div class="ss-chat-wrap">
+        <header class="ss-chat-top">
+            <div>
+                <h1>Messages</h1>
+                <p>Conversations with your StreamSphere community.</p>
+            </div>
+        </header>
+
+        <form class="ss-chat-search" method="get">
+            <input type="search" name="q" value="{{ query }}"
+                   placeholder="Search conversations or usernames..."
+                   aria-label="Search conversations">
+            <button class="ss-chat-btn ss-chat-btn-primary" type="submit">
+                Search
+            </button>
+        </form>
+
+        {% if conversations %}
+        <section class="ss-chat-list">
+            {% for conversation in conversations %}
+                {% with other=conversation.other_participant(request.user) %}
+                <a class="ss-chat-item"
+                   href="{% url 'chat:conversation' conversation.pk %}">
+                    <div class="ss-chat-avatar">
+                        {{ other.username|first|upper|default:"?" }}
+                    </div>
+                    <div class="ss-chat-details">
+                        <div class="ss-chat-name">
+                            {% if other %}
+                                {{ other.get_full_name|default:other.username }}
+                            {% else %}
+                                {{ conversation.subject|default:"Conversation" }}
+                            {% endif %}
+                        </div>
+                        <div class="ss-chat-subject">
+                            {% if conversation.subject %}
+                                {{ conversation.subject }}
+                            {% else %}
+                                Open conversation
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if conversation.unread_count %}
+                        <span class="ss-chat-unread">
+                            {{ conversation.unread_count }}
+                        </span>
+                    {% endif %}
+                </a>
+                {% endwith %}
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="ss-chat-empty">
+            <h2>No conversations found</h2>
+            <p>
+                Start a conversation from a creator's profile, or search
+                again using a different username.
+            </p>
+            <a class="ss-chat-btn ss-chat-btn-primary"
+               href="{% url 'videos:list' %}">
+                Explore videos
+            </a>
+        </section>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

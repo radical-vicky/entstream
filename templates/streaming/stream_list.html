@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+{% block title %}Live Streams | StreamSphere{% endblock %}
+
+{% block content %}
+<style>
+.ss-stream-page{max-width:1440px;margin:auto;padding:32px 22px;color:#f4f4f5}
+.ss-stream-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.ss-stream-heading h1{font-size:clamp(28px,4vw,42px);margin:0;font-weight:850}
+.ss-stream-heading p{color:#a1a1aa;margin:8px 0 0}
+.ss-btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;background:#ff7900;color:#111!important;text-decoration:none;font-weight:800;border:0;border-radius:3px;cursor:pointer}
+.ss-search{display:flex;gap:8px;margin:20px 0 30px;max-width:620px}
+.ss-search input{flex:1;min-width:0;background:#111114;color:#fff;border:1px solid #333;padding:13px}
+.ss-section-title{font-size:23px;margin:30px 0 16px}
+.ss-stream-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.ss-stream-card{background:#111114;border:1px solid #29292e;min-width:0}
+.ss-stream-thumb{aspect-ratio:16/9;background:#202024;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.ss-stream-thumb img{width:100%;height:100%;object-fit:cover}
+.ss-stream-placeholder{font-size:42px;color:#ff7900}
+.ss-live-label{position:absolute;top:10px;left:10px;background:#e11d48;color:#fff;font-size:11px;font-weight:900;padding:5px 8px}
+.ss-stream-info{padding:16px}
+.ss-stream-info h3{margin:0 0 8px;font-size:18px;overflow-wrap:anywhere}
+.ss-stream-info h3 a{color:#fff;text-decoration:none}
+.ss-stream-info p{color:#a1a1aa;margin:7px 0;font-size:14px}
+.ss-stream-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:15px;font-size:12px;color:#a1a1aa}
+.ss-empty{border:1px dashed #3f3f46;padding:30px;color:#a1a1aa}
+@media(max-width:600px){.ss-stream-page{padding:22px 14px}.ss-stream-grid{grid-template-columns:1fr}.ss-stream-heading .ss-btn{width:100%}}
+</style>
+
+<div class="ss-stream-page">
+    <div class="ss-stream-heading">
+        <div>
+            <h1>Live on StreamSphere</h1>
+            <p>Watch creators live or find their next scheduled stream.</p>
+        </div>
+        {% if user.is_authenticated %}
+            <a class="ss-btn" href="{% url 'streaming:schedule' %}">＋ Schedule a stream</a>
+        {% endif %}
+    </div>
+
+    <form class="ss-search" method="get">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search streams, creators or categories">
+        <button class="ss-btn" type="submit">Search</button>
+    </form>
+
+    <h2 class="ss-section-title">🔴 Live now</h2>
+    {% if live_streams %}
+        <div class="ss-stream-grid">
+            {% for stream in live_streams %}
+                <article class="ss-stream-card">
+                    <a href="{% url 'streaming:detail' stream.pk %}" class="ss-stream-thumb">
+                        {% if stream.thumbnail_url %}
+                            <img src="{{ stream.thumbnail_url }}" alt="{{ stream.title }}">
+                        {% else %}
+                            <span class="ss-stream-placeholder">▶</span>
+                        {% endif %}
+                        <span class="ss-live-label">LIVE</span>
+                    </a>
+                    <div class="ss-stream-info">
+                        <h3><a href="{% url 'streaming:detail' stream.pk %}">{{ stream.title }}</a></h3>
+                        <p>By {{ stream.creator.get_full_name|default:stream.creator.username }}</p>
+                        {% if stream.category %}<p>{{ stream.category }}</p>{% endif %}
+                        <div class="ss-stream-footer">
+                            <span>{{ stream.viewer_count }} watching</span>
+                            <a class="ss-btn" href="{% url 'streaming:detail' stream.pk %}">Watch</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="ss-empty">No public streams are live right now. Check the upcoming schedule below.</div>
+    {% endif %}
+
+    <h2 class="ss-section-title">Upcoming streams</h2>
+    {% if upcoming_streams %}
+        <div class="ss-stream-grid">
+            {% for stream in upcoming_streams %}
+                <article class="ss-stream-card">
+                    <a href="{% url 'streaming:detail' stream.pk %}" class="ss-stream-thumb">
+                        {% if stream.thumbnail_url %}
+                            <img src="{{ stream.thumbnail_url }}" alt="{{ stream.title }}">
+                        {% else %}
+                            <span class="ss-stream-placeholder">▶</span>
+                        {% endif %}
+                    </a>
+                    <div class="ss-stream-info">
+                        <h3><a href="{% url 'streaming:detail' stream.pk %}">{{ stream.title }}</a></h3>
+                        <p>By {{ stream.creator.get_full_name|default:stream.creator.username }}</p>
+                        <p>{{ stream.scheduled_at|date:"M j, Y" }} · {{ stream.scheduled_at|time:"g:i A" }}</p>
+                        {% if stream.category %}<p>{{ stream.category }}</p>{% endif %}
+                        <div class="ss-stream-footer">
+                            <span>Scheduled</span>
+                            <a class="ss-btn" href="{% url 'streaming:detail' stream.pk %}">Details</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="ss-empty">There are no upcoming public streams matching your search.</div>
+    {% endif %}
+</div>
+{% endblock %}
