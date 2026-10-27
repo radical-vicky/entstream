@@ -13,7 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Read from environment variable in production
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-&z$8dz!ej(krca_-unq_-2q(wkb$smqpswadg5o=74lm6dl=5a",
@@ -40,8 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    # Cloudinary must be placed before staticfiles if used for static files,
-    # but here we use it for media only, so staticfiles can stay here.
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "allauth",
@@ -64,7 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # Recommended for static files on Vercel
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Must be right after SecurityMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -94,8 +91,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# Use DATABASE_URL from environment (e.g., Supabase, Neon, Railway)
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
@@ -111,7 +106,6 @@ if DATABASE_URL:
         }
     }
 else:
-    # Fallback for local development
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -139,15 +133,12 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Required for collectstatic on Vercel
 
-# WhiteNoise configuration for serving static files efficiently
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Vercel requires static files to be collected into this specific directory
+STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
 
 # Media (user uploads) - Cloudinary
-# Vercel's filesystem is read-only, so local media storage will not work.
 MEDIA_URL = "/media/"
-# MEDIA_ROOT is not used for Cloudinary, but kept for local fallback
 MEDIA_ROOT = BASE_DIR / "media"
 
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
@@ -162,7 +153,6 @@ if all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
         secure=True,
     )
 
-# Tell Django to use Cloudinary for media files
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
