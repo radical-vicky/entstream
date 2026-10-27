@@ -1,52 +1,1138 @@
 
 {% extends "base.html" %}
-{% block title %}{{ page_title }} | StreamSphere{% endblock %}
+
+{% block title %}Create a Stream | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================
+   STREAMSPHERE — STREAM CREATION STUDIO
+   Charcoal / orange / clean typography / responsive layout
+   ========================================================== */
+
+.ss-form-page {
+    --bg: #0b0d10;
+    --panel: #12151a;
+    --panel-2: #191d24;
+    --panel-3: #20252d;
+    --line: #2b3039;
+    --text: #f4f6f8;
+    --muted: #9ba3af;
+    --orange: #ff7900;
+    --orange-light: #ffb477;
+    --green: #48d597;
+    --red: #ff737b;
+
+    min-height: calc(100vh - 60px);
+    padding: clamp(16px, 3vw, 34px) clamp(12px, 3vw, 30px) 60px;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.ss-form-page,
+.ss-form-page * {
+    box-sizing: border-box;
+}
+
+.ss-form-page h1,
+.ss-form-page h2,
+.ss-form-page h3,
+.ss-form-page p {
+    margin-top: 0;
+}
+
+.ss-form-page a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ss-form-page input,
+.ss-form-page textarea,
+.ss-form-page select,
+.ss-form-page button {
+    font: inherit;
+}
+
+.ss-form-page :is(a, button, input, textarea, select):focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+.ss-form-container {
+    width: 100%;
+    max-width: 1320px;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.ss-form-muted {
+    color: var(--muted);
+}
+
+.ss-form-eyebrow {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--orange-light);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.ss-form-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 11px 17px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--panel-2);
+    color: var(--text) !important;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
+}
+
+.ss-form-btn:hover {
+    background: var(--panel-3);
+    border-color: #555d69;
+}
+
+.ss-form-btn-primary {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #15100b !important;
+}
+
+.ss-form-btn-primary:hover {
+    background: #ff9740;
+    border-color: #ff9740;
+}
+
+.ss-form-btn:disabled {
+    cursor: not-allowed;
+    opacity: .6;
+}
+
+/* Header */
+
+.ss-form-hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+    padding: clamp(24px, 4vw, 42px);
+    border: 1px solid var(--line);
+    background:
+        radial-gradient(
+            ellipse at 85% 15%,
+            rgba(255,121,0,.19),
+            transparent 38%
+        ),
+        linear-gradient(125deg, #191d24, #0e1014 72%, #21180f);
+}
+
+.ss-form-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+}
+
+.ss-form-hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(29px, 4.5vw, 46px);
+    font-weight: 900;
+    letter-spacing: -.045em;
+    line-height: 1.1;
+}
+
+.ss-form-hero p {
+    max-width: 610px;
+    margin-bottom: 0;
+    color: #c1c7d0;
+    font-size: 13px;
+    line-height: 1.85;
+}
+
+.ss-form-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 22px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ss-form-breadcrumbs a:hover {
+    color: var(--orange-light);
+}
+
+.ss-form-breadcrumb-separator {
+    color: #5b626d;
+}
+
+/* Main columns */
+
+.ss-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    gap: 22px;
+}
+
+.ss-form-main,
+.ss-form-sidebar {
+    min-width: 0;
+}
+
+.ss-form-panel {
+    min-width: 0;
+    border: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.ss-form-panel + .ss-form-panel {
+    margin-top: 18px;
+}
+
+.ss-form-panel-header {
+    padding: 21px 23px 17px;
+    border-bottom: 1px solid var(--line);
+}
+
+.ss-form-panel-header h2 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 850;
+}
+
+.ss-form-panel-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.ss-form-panel-body {
+    padding: 23px;
+}
+
+/* Fields */
+
+.ss-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 17px;
+}
+
+.ss-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.ss-field-full {
+    grid-column: 1 / -1;
+}
+
+.ss-field label,
+.ss-field-label {
+    color: #e8ebef;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.ss-required {
+    margin-left: 3px;
+    color: var(--orange-light);
+}
+
+.ss-field-help {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.ss-field-control,
+.ss-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.ss-field textarea,
+.ss-field select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 45px;
+    padding: 12px 13px;
+    border: 1px solid #363d48;
+    border-radius: 0;
+    background: #0d1014;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.6;
+    transition: border-color .18s ease, background .18s ease;
+}
+
+.ss-field textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.ss-field-control::placeholder,
+.ss-field input::placeholder,
+.ss-field textarea::placeholder {
+    color: #78818e;
+}
+
+.ss-field-control:focus,
+.ss-field input:focus,
+.ss-field textarea:focus,
+.ss-field select:focus {
+    border-color: var(--orange);
+    background: #111419;
+    outline: none;
+}
+
+.ss-field select {
+    color-scheme: dark;
+}
+
+.ss-field input[type="checkbox"],
+.ss-field input[type="radio"] {
+    accent-color: var(--orange);
+}
+
+.ss-field input[type="file"] {
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+    border: 1px dashed #4b5360;
+    background: #0d1014;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ss-field input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 10px;
+    border: 1px solid #55402e;
+    border-radius: 0;
+    background: #2a1c11;
+    color: var(--orange-light);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ss-field-errors,
+.ss-form-non-field-errors {
+    color: #ff9da3;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.ss-field-errors ul,
+.ss-form-non-field-errors ul {
+    margin: 0;
+    padding-left: 17px;
+}
+
+.ss-field.has-errors input,
+.ss-field.has-errors textarea,
+.ss-field.has-errors select {
+    border-color: #a7444c;
+}
+
+.ss-form-non-field-errors {
+    margin-bottom: 20px;
+    padding: 13px 15px;
+    border: 1px solid #6b3037;
+    background: #211417;
+}
+
+.ss-form-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid var(--line);
+    background: #0d1014;
+}
+
+.ss-form-checkbox input {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.ss-form-checkbox label {
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+/* File previews */
+
+.ss-upload-zone {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px dashed #414955;
+    background: #0d1014;
+}
+
+.ss-upload-zone p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.ss-thumbnail-preview {
+    display: none;
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border: 1px solid var(--line);
+    background: #090b0e;
+}
+
+.ss-thumbnail-preview.is-visible {
+    display: block;
+}
+
+/* Sidebar preview */
+
+.ss-form-preview {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.ss-form-preview-heading {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.ss-form-preview-heading h2 {
+    margin: 0 0 5px;
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.ss-form-preview-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.ss-preview-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(255,121,0,.14), transparent 45%),
+        linear-gradient(135deg, #252a32, #111419);
+    color: #aeb5bf;
+    font-size: 11px;
+    text-align: center;
+}
+
+.ss-preview-image img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ss-preview-image img.is-visible {
+    display: block;
+}
+
+.ss-preview-body {
+    padding: 17px;
+}
+
+.ss-preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    color: var(--orange-light);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.ss-preview-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--orange);
+}
+
+.ss-preview-title {
+    margin: 0 0 9px;
+    font-size: 17px;
+    font-weight: 850;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.ss-preview-description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.ss-preview-meta {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid var(--line);
+}
+
+.ss-preview-meta-item span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.ss-preview-meta-item strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* Guidance */
+
+.ss-form-tips {
+    margin-top: 18px;
+    padding: 19px;
+    border: 1px solid #49301f;
+    background:
+        radial-gradient(ellipse at 90% 10%, rgba(255,121,0,.09), transparent 55%),
+        #13161b;
+}
+
+.ss-form-tips h3 {
+    margin: 0 0 13px;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.ss-form-tip {
+    display: flex;
+    gap: 11px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.ss-form-tip:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.ss-form-tip-mark {
+    display: flex;
+    flex: 0 0 26px;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid #5a3a22;
+    background: #26190f;
+    color: var(--orange-light);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ss-form-tip p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+/* Sticky actions */
+
+.ss-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 18px;
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    background: rgba(18, 21, 26, .96);
+    backdrop-filter: blur(12px);
+}
+
+.ss-form-actions-note {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.ss-form-actions-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+    .ss-form-layout {
+        grid-template-columns: minmax(0, 1fr) 290px;
+        gap: 15px;
+    }
+
+    .ss-form-panel-body {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 760px) {
+    .ss-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ss-form-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        gap: 14px;
+    }
+
+    .ss-form-tips {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .ss-form-hero {
+        padding: 24px 17px;
+    }
+
+    .ss-form-grid {
+        grid-template-columns: 1fr;
+        gap: 17px;
+    }
+
+    .ss-field-full {
+        grid-column: auto;
+    }
+
+    .ss-form-panel-header {
+        padding: 17px;
+    }
+
+    .ss-form-panel-body {
+        padding: 16px;
+    }
+
+    .ss-form-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .ss-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 13px;
+    }
+
+    .ss-form-actions-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ss-form-actions-buttons .ss-form-btn {
+        width: 100%;
+        padding-inline: 9px;
+    }
+
+    .ss-form-actions-note {
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-form-page *,
+    .ss-form-page *::before,
+    .ss-form-page *::after {
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-.ss-form-page{max-width:850px;margin:38px auto;padding:0 18px;color:#f4f4f5}
-.ss-form-panel{background:#111114;border:1px solid #2b2b31;padding:clamp(20px,4vw,36px)}
-.ss-form-panel h1{margin:0 0 8px;font-size:30px}
-.ss-form-intro{color:#a1a1aa;margin:0 0 25px}
-.ss-field{margin-bottom:20px}
-.ss-field label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
-.ss-field input:not([type=checkbox]),.ss-field textarea,.ss-field select{box-sizing:border-box;width:100%;padding:13px;background:#09090b;border:1px solid #3f3f46;color:#fff;border-radius:2px}
-.ss-field input:focus,.ss-field textarea:focus{outline:1px solid #ff7900;border-color:#ff7900}
-.ss-field input[type=checkbox]{accent-color:#ff7900}
-.ss-help{font-size:12px;color:#a1a1aa;margin-top:6px}
-.ss-errors{color:#fda4af;font-size:13px;margin-top:6px}
-.ss-submit{background:#ff7900;color:#111;font-weight:850;padding:13px 20px;border:0;border-radius:2px;cursor:pointer}
-.ss-back{color:#ff9d42;text-decoration:none;margin-left:15px}
-.ss-nonfield{background:#431407;color:#fed7aa;padding:12px;margin-bottom:18px}
-</style>
-
 <div class="ss-form-page">
-    <div class="ss-form-panel">
-        <h1>{{ page_title }}</h1>
-        <p class="ss-form-intro">Set up your stream details. You can adjust the schedule before going live.</p>
+  <div class="ss-form-container">
 
-        <form method="post">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="ss-nonfield">{{ form.non_field_errors }}</div>
-            {% endif %}
+    <nav class="ss-form-breadcrumbs" aria-label="Breadcrumb">
+      <a href="{% url 'home' %}">Home</a>
+      <span class="ss-form-breadcrumb-separator">/</span>
+      <a href="{% url 'streaming:list' %}">Streams</a>
+      <span class="ss-form-breadcrumb-separator">/</span>
+      <span>Create stream</span>
+    </nav>
 
-            {% for field in form %}
-                <div class="ss-field">
-                    {% if field.field.widget.input_type == "checkbox" %}
-                        <label>{{ field }} {{ field.label }}</label>
-                    {% else %}
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                    {% endif %}
-                    {% if field.help_text %}<div class="ss-help">{{ field.help_text }}</div>{% endif %}
-                    {% for error in field.errors %}<div class="ss-errors">{{ error }}</div>{% endfor %}
+    {% if messages %}
+      <div class="ss-form-panel" style="margin-bottom:18px;" aria-live="polite">
+        {% for message in messages %}
+          <div style="padding:13px 16px; border-bottom:1px solid var(--line); font-size:12px;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <header class="ss-form-hero">
+      <div class="ss-form-hero-content">
+        <span class="ss-form-eyebrow">StreamSphere · Creator Studio</span>
+        <h1>Bring your next stream to life.</h1>
+        <p>
+          Set up your broadcast details, choose a title that gets attention,
+          and prepare your audience for what's coming next.
+        </p>
+      </div>
+    </header>
+
+    <form method="post"
+          enctype="multipart/form-data"
+          id="ss-stream-form"
+          novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="ss-form-non-field-errors" role="alert">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="ss-form-layout">
+
+        <main class="ss-form-main">
+
+          <!-- Basic information -->
+          <section class="ss-form-panel">
+            <div class="ss-form-panel-header">
+              <span class="ss-form-eyebrow">Step 01 · Essentials</span>
+              <h2>Stream information</h2>
+              <p>Give your stream a clear title and tell viewers what to expect.</p>
+            </div>
+
+            <div class="ss-form-panel-body">
+              <div class="ss-form-grid">
+
+                {% for field in form %}
+                  {% if field.name == "title" %}
+                    <div class="ss-field ss-field-full {% if field.errors %}has-errors{% endif %}">
+                      <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %}<span class="ss-required">*</span>{% endif %}
+                      </label>
+
+                      {{ field }}
+
+                      {% if field.help_text %}
+                        <div class="ss-field-help">{{ field.help_text|safe }}</div>
+                      {% else %}
+                        <div class="ss-field-help">Use a clear, memorable title for your broadcast.</div>
+                      {% endif %}
+
+                      {% if field.errors %}
+                        <div class="ss-field-errors">{{ field.errors }}</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+
+                {% for field in form %}
+                  {% if field.name == "description" %}
+                    <div class="ss-field ss-field-full {% if field.errors %}has-errors{% endif %}">
+                      <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %}<span class="ss-required">*</span>{% endif %}
+                      </label>
+
+                      {{ field }}
+
+                      {% if field.help_text %}
+                        <div class="ss-field-help">{{ field.help_text|safe }}</div>
+                      {% else %}
+                        <div class="ss-field-help">Explain the topic, format, or purpose of your stream.</div>
+                      {% endif %}
+
+                      {% if field.errors %}
+                        <div class="ss-field-errors">{{ field.errors }}</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+
+                {% for field in form %}
+                  {% if field.name != "title" and field.name != "description" and field.name != "thumbnail" and field.name != "thumbnail_url" %}
+                    <div class="ss-field {% if field.errors %}has-errors{% endif %}">
+                      <label for="{{ field.id_for_label }}">
+                        {{ field.label }}{% if field.field.required %}<span class="ss-required">*</span>{% endif %}
+                      </label>
+
+                      {{ field }}
+
+                      {% if field.help_text %}
+                        <div class="ss-field-help">{{ field.help_text|safe }}</div>
+                      {% endif %}
+
+                      {% if field.errors %}
+                        <div class="ss-field-errors">{{ field.errors }}</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+
+              </div>
+            </div>
+          </section>
+
+          <!-- Thumbnail -->
+          {% if "thumbnail" in form.fields or "thumbnail_url" in form.fields %}
+            <section class="ss-form-panel">
+              <div class="ss-form-panel-header">
+                <span class="ss-form-eyebrow">Step 02 · Presentation</span>
+                <h2>Stream thumbnail</h2>
+                <p>A good thumbnail helps viewers recognise your broadcast.</p>
+              </div>
+
+              <div class="ss-form-panel-body">
+                <div class="ss-form-grid">
+
+                  {% if "thumbnail" in form.fields %}
+                    <div class="ss-field ss-field-full {% if form.thumbnail.errors %}has-errors{% endif %}">
+                      <label for="{{ form.thumbnail.id_for_label }}">
+                        {{ form.thumbnail.label }}{% if form.thumbnail.field.required %}<span class="ss-required">*</span>{% endif %}
+                      </label>
+
+                      <div class="ss-upload-zone">
+                        {{ form.thumbnail }}
+                        <p>Select an image file if your form supports thumbnail uploads.</p>
+                        <img id="ss-thumbnail-preview"
+                             class="ss-thumbnail-preview"
+                             alt="Selected thumbnail preview">
+                      </div>
+
+                      {% if form.thumbnail.help_text %}
+                        <div class="ss-field-help">{{ form.thumbnail.help_text|safe }}</div>
+                      {% endif %}
+
+                      {% if form.thumbnail.errors %}
+                        <div class="ss-field-errors">{{ form.thumbnail.errors }}</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
+                  {% if "thumbnail_url" in form.fields %}
+                    <div class="ss-field ss-field-full {% if form.thumbnail_url.errors %}has-errors{% endif %}">
+                      <label for="{{ form.thumbnail_url.id_for_label }}">
+                        {{ form.thumbnail_url.label }}{% if form.thumbnail_url.field.required %}<span class="ss-required">*</span>{% endif %}
+                      </label>
+
+                      {{ form.thumbnail_url }}
+
+                      {% if form.thumbnail_url.help_text %}
+                        <div class="ss-field-help">{{ form.thumbnail_url.help_text|safe }}</div>
+                      {% endif %}
+
+                      {% if form.thumbnail_url.errors %}
+                        <div class="ss-field-errors">{{ form.thumbnail_url.errors }}</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
                 </div>
-            {% endfor %}
+              </div>
+            </section>
+          {% endif %}
 
-            <button class="ss-submit" type="submit">Save stream</button>
-            <a class="ss-back" href="{% url 'streaming:my_streams' %}">Cancel</a>
-        </form>
-    </div>
+          <!-- Form actions -->
+          <div class="ss-form-actions">
+            <div class="ss-form-actions-note">
+              Fields marked <span class="ss-required">*</span> are required.
+              Review your details before submitting.
+            </div>
+
+            <div class="ss-form-actions-buttons">
+              <a class="ss-form-btn"
+                 href="{% url 'streaming:list' %}">
+                Cancel
+              </a>
+
+              <button class="ss-form-btn ss-form-btn-primary"
+                      id="ss-submit-button"
+                      type="submit">
+                Save stream
+              </button>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- Preview and tips -->
+        <aside class="ss-form-sidebar">
+
+          <section class="ss-form-preview" aria-labelledby="ss-preview-heading">
+            <div class="ss-form-preview-heading">
+              <span class="ss-form-eyebrow">Live preview</span>
+              <h2 id="ss-preview-heading">Viewer's perspective</h2>
+              <p>This preview updates as you enter your details.</p>
+            </div>
+
+            <div class="ss-preview-image" id="ss-preview-image">
+              <span id="ss-preview-placeholder">Your thumbnail will appear here</span>
+              <img id="ss-preview-image-element" alt="Stream thumbnail preview">
+            </div>
+
+            <div class="ss-preview-body">
+              <div class="ss-preview-status">Stream preview</div>
+
+              <h3 class="ss-preview-title" id="ss-preview-title">
+                Your stream title
+              </h3>
+
+              <p class="ss-preview-description" id="ss-preview-description">
+                Your stream description will appear here.
+              </p>
+
+              <div class="ss-preview-meta">
+                <div class="ss-preview-meta-item">
+                  <span>Category</span>
+                  <strong id="ss-preview-category">Not selected</strong>
+                </div>
+
+                <div class="ss-preview-meta-item">
+                  <span>Schedule</span>
+                  <strong id="ss-preview-schedule">Not specified</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="ss-form-tips">
+            <h3>Before you submit</h3>
+
+            <div class="ss-form-tip">
+              <span class="ss-form-tip-mark">01</span>
+              <p>Choose a title that tells viewers what the broadcast is about.</p>
+            </div>
+
+            <div class="ss-form-tip">
+              <span class="ss-form-tip-mark">02</span>
+              <p>Write a useful description so viewers know what to expect.</p>
+            </div>
+
+            <div class="ss-form-tip">
+              <span class="ss-form-tip-mark">03</span>
+              <p>Check the schedule and other required fields before saving.</p>
+            </div>
+          </section>
+
+        </aside>
+
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+(function () {
+    "use strict";
+
+    const root = document.querySelector(".ss-form-page");
+    if (!root) return;
+
+    const form = root.querySelector("#ss-stream-form");
+
+    function fieldByName(name) {
+        return form ? form.querySelector(
+            '[name="' + name + '"]'
+        ) : null;
+    }
+
+    function fieldValue(name) {
+        const field = fieldByName(name);
+        return field ? (field.value || "").trim() : "";
+    }
+
+    const titleInput = fieldByName("title");
+    const descriptionInput = fieldByName("description");
+    const categoryInput = fieldByName("category");
+    const scheduledInput =
+        fieldByName("scheduled_at") ||
+        fieldByName("scheduled_start");
+
+    const previewTitle = root.querySelector("#ss-preview-title");
+    const previewDescription = root.querySelector("#ss-preview-description");
+    const previewCategory = root.querySelector("#ss-preview-category");
+    const previewSchedule = root.querySelector("#ss-preview-schedule");
+
+    function updateText(input, target, fallback) {
+        if (!target) return;
+
+        const value = input ? input.value.trim() : "";
+        target.textContent = value || fallback;
+    }
+
+    function updatePreview() {
+        updateText(titleInput, previewTitle, "Your stream title");
+        updateText(
+            descriptionInput,
+            previewDescription,
+            "Your stream description will appear here."
+        );
+
+        if (previewCategory) {
+            previewCategory.textContent =
+                categoryInput && categoryInput.value
+                    ? categoryInput.options &&
+                      categoryInput.selectedIndex >= 0
+                        ? categoryInput.options[
+                            categoryInput.selectedIndex
+                          ].text
+                        : categoryInput.value
+                    : "Not selected";
+        }
+
+        if (previewSchedule) {
+            previewSchedule.textContent =
+                scheduledInput && scheduledInput.value
+                    ? scheduledInput.value
+                    : "Not specified";
+        }
+    }
+
+    [titleInput, descriptionInput, categoryInput, scheduledInput]
+        .filter(Boolean)
+        .forEach(input => input.addEventListener("input", updatePreview));
+
+    [categoryInput, scheduledInput]
+        .filter(Boolean)
+        .forEach(input => input.addEventListener("change", updatePreview));
+
+    // Preview a selected thumbnail without uploading it first.
+    const thumbnailInput = fieldByName("thumbnail");
+    const previewImage = root.querySelector("#ss-preview-image-element");
+    const previewPlaceholder = root.querySelector("#ss-preview-placeholder");
+    const uploadPreview = root.querySelector("#ss-thumbnail-preview");
+
+    let currentObjectUrl = null;
+
+    if (thumbnailInput && previewImage) {
+        thumbnailInput.addEventListener("change", function () {
+            const file = thumbnailInput.files && thumbnailInput.files[0];
+
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+                currentObjectUrl = null;
+            }
+
+            if (!file || !file.type.startsWith("image/")) {
+                previewImage.classList.remove("is-visible");
+                if (uploadPreview) {
+                    uploadPreview.classList.remove("is-visible");
+                }
+                if (previewPlaceholder) {
+                    previewPlaceholder.hidden = false;
+                }
+                return;
+            }
+
+            currentObjectUrl = URL.createObjectURL(file);
+            previewImage.src = currentObjectUrl;
+            previewImage.classList.add("is-visible");
+
+            if (uploadPreview) {
+                uploadPreview.src = currentObjectUrl;
+                uploadPreview.classList.add("is-visible");
+            }
+
+            if (previewPlaceholder) {
+                previewPlaceholder.hidden = true;
+            }
+        });
+    }
+
+    // If the form uses a thumbnail URL instead of a file.
+    const thumbnailUrlInput = fieldByName("thumbnail_url");
+
+    if (thumbnailUrlInput && previewImage) {
+        thumbnailUrlInput.addEventListener("input", function () {
+            const value = thumbnailUrlInput.value.trim();
+
+            if (!value) {
+                if (!thumbnailInput || !thumbnailInput.files.length) {
+                    previewImage.classList.remove("is-visible");
+                    if (previewPlaceholder) {
+                        previewPlaceholder.hidden = false;
+                    }
+                }
+                return;
+            }
+
+            // Only accept HTTP(S) URLs in the client-side preview.
+            try {
+                const parsed = new URL(value, window.location.origin);
+                if (!["http:", "https:"].includes(parsed.protocol)) return;
+
+                previewImage.src = parsed.href;
+                previewImage.classList.add("is-visible");
+                if (previewPlaceholder) {
+                    previewPlaceholder.hidden = true;
+                }
+            } catch (error) {
+                // Keep the current preview if the URL is incomplete.
+            }
+        });
+    }
+
+    updatePreview();
+
+    // Avoid duplicate submissions while keeping normal Django validation.
+    if (form) {
+        form.addEventListener("submit", function () {
+            const submitButton = root.querySelector("#ss-submit-button");
+            if (!submitButton) return;
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Saving...";
+        });
+    }
+
+    window.addEventListener("beforeunload", function () {
+        if (currentObjectUrl) {
+            URL.revokeObjectURL(currentObjectUrl);
+        }
+    });
+})();
+</script>
 {% endblock %}

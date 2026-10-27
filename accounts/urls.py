@@ -6,6 +6,8 @@ app_name = "accounts"
 
 urlpatterns = [
     path("profile/", views.my_profile, name="profile"),
+    path("profile/edit/", views.profile_edit, name="profile_edit"),
+
     path("notifications/", views.notification_list, name="notifications"),
     path(
         "notifications/<int:pk>/read/",

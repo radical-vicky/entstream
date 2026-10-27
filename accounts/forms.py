@@ -1,4 +1,3 @@
-
 from django import forms
 from .models import Profile
 
@@ -11,6 +10,7 @@ class ProfileForm(forms.ModelForm):
             attrs={
                 "accept": "image/jpeg,image/png,image/webp,image/gif",
                 "class": "sp-avatar-input",
+                "id": "id_avatar_upload",
             }
         ),
     )

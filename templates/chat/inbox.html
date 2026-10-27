@@ -1,145 +1,543 @@
-
 {% extends "base.html" %}
 
-{% block title %}Messages - StreamSphere{% endblock %}
+{% block title %}Messages | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-chat-page {
+.ss-inbox {
     --orange: #ff7900;
     --bg: #0b0b0d;
-    --panel: #141417;
-    --border: #303035;
-    --text: #f4f4f5;
-    --muted: #a1a1aa;
+    --panel: #111114;
+    --panel-hover: #19191e;
+    --border: #29292f;
+    --text: #f5f5f7;
+    --muted: #92929e;
     min-height: calc(100vh - 60px);
-    padding: 26px 16px 50px;
-    background: var(--bg);
+    padding: 34px 20px 60px;
     color: var(--text);
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(255,121,0,.07), transparent 35%),
+        var(--bg);
 }
-.ss-chat-wrap { max-width: 1050px; margin: auto; }
-.ss-chat-top {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 16px; margin-bottom: 22px;
+
+.ss-inbox *, .ss-inbox *::before, .ss-inbox *::after {
+    box-sizing: border-box;
 }
-.ss-chat-top h1 { margin: 0 0 6px; font-size: 30px; font-weight: 850; }
-.ss-chat-top p { margin: 0; color: var(--muted); font-size: 14px; }
-.ss-chat-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-height: 42px; padding: 0 15px; border: 1px solid var(--border);
-    border-radius: 0; background: transparent; color: var(--text);
-    font-weight: 800; font-size: 13px; text-decoration: none; cursor: pointer;
+
+.ss-inbox-wrap {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 }
-.ss-chat-btn:hover { border-color: var(--orange); }
-.ss-chat-btn-primary { background: var(--orange); border-color: var(--orange); color: #111; }
-.ss-chat-search { display: flex; gap: 8px; margin-bottom: 16px; }
-.ss-chat-search input {
-    flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid var(--border);
-    border-radius: 0; outline: 0; background: var(--panel); color: var(--text);
+
+.ss-inbox-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
 }
-.ss-chat-search input:focus { border-color: var(--orange); }
-.ss-chat-list { border: 1px solid var(--border); background: var(--panel); }
-.ss-chat-item {
-    display: flex; align-items: center; gap: 14px; padding: 17px;
-    border-bottom: 1px solid var(--border); color: inherit; text-decoration: none;
+
+.ss-inbox-eyebrow {
+    margin: 0 0 8px;
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .18em;
+    text-transform: uppercase;
 }
-.ss-chat-item:last-child { border-bottom: 0; }
-.ss-chat-item:hover { background: #1b1b1f; }
-.ss-chat-avatar {
-    display: flex; align-items: center; justify-content: center;
-    width: 48px; height: 48px; flex: 0 0 48px; border-radius: 50%;
-    background: #29292e; color: var(--orange); font-weight: 900;
+
+.ss-inbox-title {
+    margin: 0;
+    font-size: clamp(27px, 4vw, 36px);
+    font-weight: 850;
+    letter-spacing: -.045em;
+    line-height: 1.15;
 }
-.ss-chat-details { flex: 1; min-width: 0; }
-.ss-chat-name { font-size: 14px; font-weight: 850; overflow-wrap: anywhere; }
-.ss-chat-subject { margin-top: 5px; color: var(--muted); font-size: 12px; }
-.ss-chat-unread {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 23px; height: 23px; padding: 0 5px; background: var(--orange);
-    color: #111; font-size: 11px; font-weight: 900;
+
+.ss-inbox-description {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
 }
-.ss-chat-empty {
-    padding: 50px 18px; border: 1px solid var(--border);
-    background: var(--panel); text-align: center;
+
+.ss-inbox-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 27px;
+    height: 27px;
+    margin-left: 8px;
+    padding: 0 7px;
+    border: 1px solid rgba(255,121,0,.3);
+    background: rgba(255,121,0,.1);
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 850;
+    vertical-align: middle;
 }
-.ss-chat-empty h2 { margin: 0 0 8px; font-size: 19px; }
-.ss-chat-empty p { margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
-@media (max-width: 520px) {
-    .ss-chat-page { padding: 20px 10px 35px; }
-    .ss-chat-top { align-items: flex-start; flex-direction: column; }
-    .ss-chat-search { flex-direction: column; }
-    .ss-chat-search .ss-chat-btn { width: 100%; box-sizing: border-box; }
-    .ss-chat-item { padding: 13px 10px; }
+
+.ss-inbox-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+}
+
+.ss-inbox-search:focus-within {
+    border-color: rgba(255,121,0,.7);
+    box-shadow: 0 0 0 3px rgba(255,121,0,.07);
+}
+
+.ss-inbox-search input {
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+    padding: 0 10px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+}
+
+.ss-inbox-search input::placeholder {
+    color: #777782;
+}
+
+.ss-inbox-search button {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 0 20px;
+    border: 1px solid var(--orange);
+    background: var(--orange);
+    color: #16110d;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: background .18s ease, transform .18s ease;
+}
+
+.ss-inbox-search button:hover {
+    background: #ff922e;
+}
+
+.ss-inbox-search button:active {
+    transform: translateY(1px);
+}
+
+.ss-inbox-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: rgba(17,17,20,.96);
+    box-shadow: 0 18px 55px rgba(0,0,0,.15);
+    margin-bottom: 24px;
+}
+
+.ss-inbox-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.ss-inbox-panel-head h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.ss-inbox-panel-head span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ss-inbox-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ss-inbox-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+    color: inherit;
+    text-decoration: none;
+    transition: background .18s ease;
+}
+
+.ss-inbox-item:last-child {
+    border-bottom: 0;
+}
+
+.ss-inbox-item:hover {
+    background: var(--panel-hover);
+}
+
+.ss-inbox-item:focus-visible,
+.ss-inbox-search button:focus-visible,
+.ss-inbox-search input:focus-visible,
+.ss-inbox-empty a:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+.ss-inbox-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border: 1px solid #373139;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #292329, #17171b);
+    color: #ff9a43;
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.ss-inbox-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.ss-inbox-name-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ss-inbox-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.ss-inbox-subject {
+    margin-top: 5px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ss-inbox-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.ss-inbox-time {
+    color: #777782;
+    font-size: 10px;
+}
+
+.ss-inbox-unread {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    background: var(--orange);
+    color: #15100b;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ss-inbox-unread-label {
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.ss-inbox-empty {
+    padding: 64px 22px;
+    text-align: center;
+}
+
+.ss-inbox-empty-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 66px;
+    height: 66px;
+    margin: 0 auto 20px;
+    border: 1px solid rgba(255,121,0,.25);
+    background: rgba(255,121,0,.07);
+    color: var(--orange);
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.ss-inbox-empty h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 850;
+}
+
+.ss-inbox-empty p {
+    max-width: 380px;
+    margin: 10px auto 22px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.ss-inbox-empty a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 43px;
+    padding: 0 18px;
+    border: 1px solid var(--orange);
+    background: var(--orange);
+    color: #15100b;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.ss-inbox-empty a:hover {
+    background: #ff922e;
+}
+
+@media (max-width: 600px) {
+    .ss-inbox {
+        padding: 25px 12px 40px;
+    }
+
+    .ss-inbox-header {
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    .ss-inbox-item {
+        gap: 12px;
+        padding: 15px 12px;
+    }
+
+    .ss-inbox-avatar {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+        font-size: 15px;
+    }
+
+    .ss-inbox-panel-head {
+        padding: 15px 13px;
+    }
+
+    .ss-inbox-name {
+        font-size: 13px;
+    }
+
+    .ss-inbox-subject {
+        max-width: 100%;
+        font-size: 11px;
+    }
+
+    .ss-inbox-time {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 390px) {
+    .ss-inbox-search {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ss-inbox-search button {
+        width: 100%;
+    }
+
+    .ss-inbox-item {
+        gap: 9px;
+        padding-right: 9px;
+        padding-left: 9px;
+    }
+
+    .ss-inbox-avatar {
+        width: 39px;
+        height: 39px;
+        flex-basis: 39px;
+    }
+
+    .ss-inbox-meta {
+        gap: 6px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-inbox-item,
+    .ss-inbox-search button {
+        transition: none;
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="ss-chat-page">
-    <div class="ss-chat-wrap">
-        <header class="ss-chat-top">
+<main class="ss-inbox">
+    <div class="ss-inbox-wrap">
+
+        <header class="ss-inbox-header">
             <div>
-                <h1>Messages</h1>
-                <p>Conversations with your StreamSphere community.</p>
+                <p class="ss-inbox-eyebrow">Your community</p>
+                <h1 class="ss-inbox-title">Messages</h1>
+                <p class="ss-inbox-description">
+                    Keep in touch with creators and your StreamSphere community.
+                </p>
             </div>
         </header>
 
-        <form class="ss-chat-search" method="get">
-            <input type="search" name="q" value="{{ query }}"
-                   placeholder="Search conversations or usernames..."
-                   aria-label="Search conversations">
-            <button class="ss-chat-btn ss-chat-btn-primary" type="submit">
-                Search
-            </button>
+        <form class="ss-inbox-search" method="get" role="search">
+            <input
+                type="search"
+                name="q"
+                value="{{ query|default:'' }}"
+                placeholder="Search conversations or find new users..."
+                aria-label="Search conversations or usernames"
+            >
+            <button type="submit">Search</button>
         </form>
 
-        {% if conversations %}
-        <section class="ss-chat-list">
-            {% for conversation in conversations %}
-                {% with other=conversation.other_participant(request.user) %}
-                <a class="ss-chat-item"
-                   href="{% url 'chat:conversation' conversation.pk %}">
-                    <div class="ss-chat-avatar">
-                        {{ other.username|first|upper|default:"?" }}
-                    </div>
-                    <div class="ss-chat-details">
-                        <div class="ss-chat-name">
-                            {% if other %}
-                                {{ other.get_full_name|default:other.username }}
-                            {% else %}
-                                {{ conversation.subject|default:"Conversation" }}
-                            {% endif %}
-                        </div>
-                        <div class="ss-chat-subject">
-                            {% if conversation.subject %}
-                                {{ conversation.subject }}
-                            {% else %}
-                                Open conversation
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% if conversation.unread_count %}
-                        <span class="ss-chat-unread">
-                            {{ conversation.unread_count }}
-                        </span>
-                    {% endif %}
-                </a>
-                {% endwith %}
-            {% endfor %}
-        </section>
-        {% else %}
-        <section class="ss-chat-empty">
-            <h2>No conversations found</h2>
-            <p>
-                Start a conversation from a creator's profile, or search
-                again using a different username.
-            </p>
-            <a class="ss-chat-btn ss-chat-btn-primary"
-               href="{% url 'videos:list' %}">
-                Explore videos
-            </a>
-        </section>
+        {% if user_results %}
+            <section class="ss-inbox-panel" aria-label="New users">
+                <div class="ss-inbox-panel-head">
+                    <h2>Start a new conversation</h2>
+                </div>
+                <div class="ss-inbox-list">
+                    {% for u in user_results %}
+                        <a class="ss-inbox-item" href="{% url 'chat:start' username=u.username %}">
+                            <div class="ss-inbox-avatar" aria-hidden="true">
+                                {{ u.username|first|upper }}
+                            </div>
+                            <div class="ss-inbox-details">
+                                <div class="ss-inbox-name-line">
+                                    <span class="ss-inbox-name">{{ u.get_full_name|default:u.username }}</span>
+                                </div>
+                                <div class="ss-inbox-subject">@{{ u.username }} — Click to send a message</div>
+                            </div>
+                            <div class="ss-inbox-meta">
+                                <span class="ss-inbox-time">Message &rarr;</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
         {% endif %}
+
+        {% if conversations %}
+            <section class="ss-inbox-panel" aria-label="Your conversations">
+                <div class="ss-inbox-panel-head">
+                    <h2>All conversations</h2>
+                    <span>
+                        {% with total=conversations|length %}
+                            {{ total }} conversation{{ total|pluralize }}
+                        {% endwith %}
+                    </span>
+                </div>
+
+                <div class="ss-inbox-list">
+                    {% for conversation in conversations %}
+                        {% with other=conversation.other_user %}
+                            <a
+                                class="ss-inbox-item"
+                                href="{% url 'chat:conversation' conversation.pk %}"
+                            >
+                                <div class="ss-inbox-avatar" aria-hidden="true">
+                                    {% if other %}
+                                        {{ other.username|first|upper|default:"?" }}
+                                    {% else %}
+                                        {{ conversation.subject|first|upper|default:"S" }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="ss-inbox-details">
+                                    <div class="ss-inbox-name-line">
+                                        <span class="ss-inbox-name">
+                                            {% if other %}
+                                                {{ other.get_full_name|default:other.username }}
+                                            {% else %}
+                                                {{ conversation.subject|default:"Conversation" }}
+                                            {% endif %}
+                                        </span>
+
+                                        {% if conversation.unread_count %}
+                                            <span class="ss-inbox-unread-label">Unread</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="ss-inbox-subject">
+                                        {% if conversation.subject %}
+                                            {{ conversation.subject }}
+                                        {% else %}
+                                            Open conversation to view messages
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="ss-inbox-meta">
+                                    {% if conversation.unread_count %}
+                                        <span class="ss-inbox-unread">
+                                            {{ conversation.unread_count }}
+                                        </span>
+                                    {% endif %}
+                                    <span class="ss-inbox-time">Open chat&nbsp; →</span>
+                                </div>
+                            </a>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% else %}
+            {% if not user_results %}
+                <section class="ss-inbox-panel ss-inbox-empty">
+                    <div class="ss-inbox-empty-mark" aria-hidden="true">S</div>
+
+                    {% if query %}
+                        <h2>No matching conversations</h2>
+                        <p>
+                            We couldn't find a conversation or user matching
+                            “{{ query }}”. Try another username or search term.
+                        </p>
+                        <a href="{% url 'chat:inbox' %}">View all messages</a>
+                    {% else %}
+                        <h2>Your conversations start here</h2>
+                        <p>
+                            You don't have any conversations yet. Use the search bar above 
+                            to find creators and start chatting, or explore StreamSphere to connect.
+                        </p>
+                        <a href="{% url 'videos:list' %}">Explore videos</a>
+                    {% endif %}
+                </section>
+            {% endif %}
+        {% endif %}
+
     </div>
 </main>
 {% endblock %}

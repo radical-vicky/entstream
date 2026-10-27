@@ -1,75 +1,485 @@
-
 {% extends "base.html" %}
 
 {% block title %}Withdrawal Reviews | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-review{max-width:1200px;margin:0 auto;padding:30px 20px 60px;color:#f5f5f5}
+.ss-review{
+    --accent:#ff7900;
+    --accent-light:#ffad65;
+    --bg:#0b0b0d;
+    --panel:#141416;
+    --border:#2b2b30;
+    --text:#f4f4f5;
+    --muted:#96969f;
+    max-width:1440px;
+    margin:0 auto;
+    padding:36px 24px 70px;
+    color:var(--text);
+}
 .ss-review *{box-sizing:border-box}
-.ss-review h1{font-size:clamp(27px,4vw,38px);margin:0 0 9px}
-.ss-review .muted{color:#999;line-height:1.7}
-.ss-review .table-wrap{overflow-x:auto;margin-top:25px;border:1px solid #303030}
-.ss-review table{width:100%;min-width:760px;border-collapse:collapse;background:#151515}
-.ss-review th,.ss-review td{padding:14px;text-align:left;border-bottom:1px solid #303030;font-size:13px}
-.ss-review th{background:#101010;color:#aaa}
-.ss-review .ref{font-family:monospace;color:#ffb36b}
-.ss-review .btn{display:inline-block;padding:9px 12px;background:#ff7900;color:#111;font-weight:800;text-decoration:none}
-.ss-review .status{font-size:11px;padding:5px 7px;background:#292929;color:#ddd;text-transform:uppercase;font-weight:800}
-.ss-review .pagination{display:flex;gap:15px;justify-content:center;padding:20px}
-.ss-review .pagination a{color:#ff7900;text-decoration:none;font-weight:800}
-.ss-review .empty{padding:30px;border:1px dashed #444;margin-top:20px;color:#aaa}
+.ss-review a{text-decoration:none}
+.ss-review .eyebrow{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+.ss-review h1{
+    margin:10px 0 12px;
+    font-size:clamp(30px,4vw,42px);
+    line-height:1.15;
+    font-weight:850;
+    letter-spacing:-1.4px;
+}
+.ss-review .muted{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.8;
+    max-width:650px;
+    margin:0;
+}
+.ss-review .page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:30px;
+}
+.ss-review .header-label{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    border:1px solid #3b3025;
+    background:#21180f;
+    color:var(--accent-light);
+    font-size:11px;
+    font-weight:800;
+}
+.ss-review .header-dot{
+    width:7px;
+    height:7px;
+    background:var(--accent);
+    border-radius:50%;
+}
+.ss-review .summary{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:25px;
+}
+.ss-review .summary-card{
+    min-width:0;
+    padding:20px;
+    background:linear-gradient(145deg,#171719,#111113);
+    border:1px solid var(--border);
+    position:relative;
+    overflow:hidden;
+}
+.ss-review .summary-card:before{
+    content:"";
+    position:absolute;
+    left:0;top:0;
+    width:35px;height:2px;
+    background:var(--accent);
+}
+.ss-review .summary-label{
+    display:block;
+    color:#a0a0aa;
+    font-size:12px;
+    margin-bottom:17px;
+}
+.ss-review .summary-value{
+    display:block;
+    font-size:clamp(21px,2.5vw,30px);
+    font-weight:850;
+    letter-spacing:-.7px;
+    overflow-wrap:anywhere;
+}
+.ss-review .summary-foot{
+    color:#777780;
+    font-size:11px;
+    margin-top:9px;
+    line-height:1.6;
+}
+.ss-review .panel{
+    border:1px solid var(--border);
+    background:var(--panel);
+}
+.ss-review .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    padding:21px 22px;
+    border-bottom:1px solid var(--border);
+}
+.ss-review .panel-head h2{
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:-.3px;
+    margin:0;
+}
+.ss-review .panel-subtitle{
+    color:var(--muted);
+    font-size:12px;
+    margin:7px 0 0;
+    line-height:1.6;
+}
+.ss-review .record-count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:7px 10px;
+    background:#242428;
+    border:1px solid #37373d;
+    color:#dddde2;
+    font-size:11px;
+    font-weight:800;
+}
+.ss-review .table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+.ss-review table{
+    width:100%;
+    min-width:940px;
+    border-collapse:collapse;
+    background:var(--panel);
+}
+.ss-review th{
+    padding:14px 17px;
+    text-align:left;
+    background:#101012;
+    color:#92929b;
+    font-size:10px;
+    font-weight:850;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+.ss-review td{
+    padding:16px 17px;
+    border-top:1px solid #28282d;
+    color:#e7e7eb;
+    font-size:12px;
+    vertical-align:middle;
+}
+.ss-review tbody tr{transition:background .15s ease}
+.ss-review tbody tr:hover{background:#1a1a1e}
+.ss-review .ref{
+    color:var(--accent-light);
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:11px;
+    white-space:nowrap;
+}
+.ss-review .creator{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:150px;
+}
+.ss-review .creator-mark{
+    display:grid;
+    place-items:center;
+    flex:0 0 34px;
+    width:34px;
+    height:34px;
+    background:#24190f;
+    border:1px solid #49301b;
+    color:var(--accent-light);
+    font-size:12px;
+    font-weight:850;
+}
+.ss-review .creator-name{
+    color:#f1f1f4;
+    font-weight:750;
+    overflow-wrap:anywhere;
+}
+.ss-review .creator-caption{
+    display:block;
+    color:#777780;
+    font-size:10px;
+    margin-top:4px;
+}
+.ss-review .method{
+    color:#c7c7ce;
+    white-space:nowrap;
+}
+.ss-review .amount{
+    font-weight:850;
+    white-space:nowrap;
+}
+.ss-review .status{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 8px;
+    border:1px solid #393940;
+    background:#232327;
+    color:#d4d4da;
+    font-size:9px;
+    font-weight:850;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+.ss-review .status-pending{
+    color:#ffc17b;
+    background:#302214;
+    border-color:#574025;
+}
+.ss-review .status-approved,
+.ss-review .status-processing{
+    color:#ffcf91;
+    background:#2b2116;
+    border-color:#57452c;
+}
+.ss-review .status-paid,
+.ss-review .status-completed{
+    color:#8bdaa3;
+    background:#14271c;
+    border-color:#244b32;
+}
+.ss-review .status-rejected,
+.ss-review .status-failed,
+.ss-review .status-reversed{
+    color:#f09a90;
+    background:#301b1b;
+    border-color:#57302e;
+}
+.ss-review .review-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    min-height:36px;
+    padding:9px 12px;
+    background:var(--accent);
+    border:1px solid var(--accent);
+    color:#17100a;
+    font-size:11px;
+    font-weight:850;
+    white-space:nowrap;
+    transition:background .18s ease,border-color .18s ease;
+}
+.ss-review .review-btn:hover{
+    background:#ff9233;
+    border-color:#ff9233;
+}
+.ss-review .date{
+    color:#aaaab3;
+    font-size:11px;
+    white-space:nowrap;
+}
+.ss-review .pagination{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:18px;
+    padding:20px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:12px;
+}
+.ss-review .pagination a{
+    color:var(--accent-light);
+    font-weight:800;
+}
+.ss-review .pagination a:hover{color:#fff}
+.ss-review .empty{
+    padding:55px 20px;
+    text-align:center;
+    background:#121214;
+}
+.ss-review .empty-icon{
+    display:grid;
+    place-items:center;
+    width:48px;
+    height:48px;
+    margin:0 auto 17px;
+    background:#21170f;
+    border:1px solid #49301b;
+    color:var(--accent-light);
+    font-size:20px;
+    font-weight:800;
+}
+.ss-review .empty-title{
+    color:#f0f0f3;
+    font-size:15px;
+    font-weight:850;
+    margin-bottom:8px;
+}
+.ss-review .empty-copy{
+    max-width:400px;
+    margin:0 auto;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.8;
+}
+.ss-review .panel-foot{
+    padding:14px 20px;
+    border-top:1px solid var(--border);
+    color:#777780;
+    font-size:11px;
+    line-height:1.7;
+}
+@media(max-width:850px){
+    .ss-review{padding:28px 17px 55px}
+    .ss-review .summary{gap:10px}
+    .ss-review .summary-card{padding:16px}
+}
+@media(max-width:560px){
+    .ss-review{padding:23px 12px 40px}
+    .ss-review .page-header{align-items:flex-start;gap:14px;margin-bottom:22px}
+    .ss-review .header-label{font-size:10px}
+    .ss-review .summary{grid-template-columns:1fr;gap:9px;margin-bottom:17px}
+    .ss-review .summary-card{padding:16px}
+    .ss-review .summary-label{margin-bottom:10px}
+    .ss-review .summary-value{font-size:24px}
+    .ss-review .panel-head{padding:17px 14px}
+    .ss-review .empty{padding:40px 16px}
+}
+@media(prefers-reduced-motion:reduce){
+    .ss-review *{transition:none!important}
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ss-review">
-    <h1>Withdrawal requests</h1>
-    <p class="muted">Review requests and record the payout status after checking the relevant evidence.</p>
-
-    {% if withdrawals %}
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Creator</th>
-                        <th>Method</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Requested</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in withdrawals %}
-                        <tr>
-                            <td class="ref">{{ item.reference }}</td>
-                            <td>{{ item.creator.username }}</td>
-                            <td>{{ item.payout_method|title }}</td>
-                            <td>KSh {{ item.amount|floatformat:2 }}</td>
-                            <td><span class="status">{{ item.get_status_display }}</span></td>
-                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
-                            <td><a class="btn" href="{% url 'earnings:withdrawal_review' item.pk %}">Review</a></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<main class="ss-review">
+    <header class="page-header">
+        <div>
+            <div class="eyebrow">Finance / Operations</div>
+            <h1>Withdrawal reviews</h1>
+            <p class="muted">
+                Review creator payout requests, verify the relevant evidence,
+                and record the appropriate decision through the review workflow.
+            </p>
         </div>
 
-        {% if page_obj.has_other_pages %}
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
-                {% endif %}
-                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
-                {% endif %}
+        <div class="header-label">
+            <span class="header-dot" aria-hidden="true"></span>
+            Payout management
+        </div>
+    </header>
+
+    <section class="summary" aria-label="Withdrawal review overview">
+        <article class="summary-card">
+            <span class="summary-label">Requests in this view</span>
+            <strong class="summary-value">
+                {{ page_obj.paginator.count|default:withdrawals|length }}
+            </strong>
+            <p class="summary-foot">Requests available in the current listing</p>
+        </article>
+
+        <article class="summary-card">
+            <span class="summary-label">Review workspace</span>
+            <strong class="summary-value">Creator payouts</strong>
+            <p class="summary-foot">Inspect individual requests before recording decisions</p>
+        </article>
+
+        <article class="summary-card">
+            <span class="summary-label">Verification</span>
+            <strong class="summary-value">Evidence first</strong>
+            <p class="summary-foot">Confirm payout details and supporting records</p>
+        </article>
+    </section>
+
+    <section class="panel" aria-labelledby="withdrawal-list-title">
+        <div class="panel-head">
+            <div>
+                <h2 id="withdrawal-list-title">All withdrawal requests</h2>
+                <p class="panel-subtitle">Open a request to inspect its details and available review actions.</p>
+            </div>
+            {% if page_obj %}
+                <span class="record-count">{{ page_obj.paginator.count }} records</span>
+            {% else %}
+                <span class="record-count">{{ withdrawals|length }} records</span>
+            {% endif %}
+        </div>
+
+        {% if withdrawals %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Creator</th>
+                            <th>Payout method</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in withdrawals %}
+                            <tr>
+                                <td class="ref">{{ item.reference|default:"—" }}</td>
+                                <td>
+                                    <div class="creator">
+                                        <span class="creator-mark" aria-hidden="true">
+                                            {{ item.creator.username|first|upper }}
+                                        </span>
+                                        <span>
+                                            <span class="creator-name">{{ item.creator.username }}</span>
+                                            <span class="creator-caption">Creator account</span>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="method">{{ item.get_payout_method_display|default:item.payout_method|title }}</td>
+                                <td class="amount">KSh {{ item.amount|floatformat:2 }}</td>
+                                <td>
+                                    <span class="status status-{{ item.status|lower }}">
+                                        {{ item.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="date">{{ item.created_at|date:"M j, Y H:i" }}</td>
+                                <td>
+                                    <a class="review-btn" href="{% url 'earnings:withdrawal_review' item.pk %}">
+                                        Review <span aria-hidden="true">→</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if page_obj and page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Withdrawal request pages">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+                    {% endif %}
+
+                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+
+            <div class="panel-foot">
+                Review each request's evidence and payout details before recording a decision.
+                A status label alone does not confirm that a payout was actually sent.
+            </div>
+        {% else %}
+            <div class="empty">
+                <div class="empty-icon" aria-hidden="true">—</div>
+                <div class="empty-title">No withdrawal requests</div>
+                <p class="empty-copy">
+                    There are no requests to display right now. New creator withdrawal
+                    requests will appear here when submitted.
+                </p>
             </div>
         {% endif %}
-    {% else %}
-        <div class="empty">No withdrawal requests have been submitted.</div>
-    {% endif %}
-</div>
+    </section>
+</main>
 {% endblock %}

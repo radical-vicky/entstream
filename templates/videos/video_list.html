@@ -1,764 +1,945 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Explore Videos | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-    .video-list-page {
-        width: min(100% - 40px, 1600px);
-        margin: 0 auto;
-        padding: 34px 0 64px;
-        color: var(--ss-text, #f4f4f5);
-    }
+/* ==========================================================
+   STREAMSPHERE — VIDEO DISCOVERY
+   Sharp corners | Borderless cards | Charcoal + orange
+   ========================================================== */
 
-    .video-list-heading {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 28px;
-    }
+:root {
+    --vl-bg: var(--ss-bg, #090b0e);
+    --vl-surface: var(--ss-panel, #11161d);
+    --vl-surface-hover: #191f27;
+    --vl-text: var(--ss-text, #f0f3f6);
+    --vl-muted: #9298a3;
+    --vl-orange: var(--ss-orange, #ff7900);
+    --vl-orange-hover: #ff8c26;
+    --vl-green: #36c98f;
+    --vl-transition: 180ms ease;
+}
 
-    .video-list-eyebrow {
-        margin: 0 0 9px;
-        color: var(--ss-orange, #ff7900);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }
+.vl-page,
+.vl-page * {
+    box-sizing: border-box;
+}
 
-    .video-list-heading h1 {
-        margin: 0;
-        font-size: clamp(28px, 3vw, 42px);
-        font-weight: 850;
-        letter-spacing: -1.5px;
-        line-height: 1.12;
-    }
+.vl-page {
+    min-height: calc(100vh - 60px);
+    padding: 32px clamp(16px, 4vw, 56px) 64px;
+    background: var(--ss-bg, #090b0e);
+    color: var(--ss-text, #f0f3f6);
+}
 
-    .video-list-description {
-        margin: 11px 0 0;
-        color: var(--ss-muted, #9999a3);
-        font-size: 14px;
-        line-height: 1.7;
-    }
+.vl-container {
+    width: 100%;
+    max-width: var(--ss-content-max, 1680px);
+    margin: 0 auto;
+}
 
-    .video-list-count {
-        flex-shrink: 0;
-        padding: 10px 13px;
-        border: 1px solid var(--ss-border, #303038);
-        background: var(--ss-panel, #17171c);
-        color: var(--ss-muted, #a1a1aa);
-        font-size: 12px;
-        font-weight: 700;
-    }
+/* Page heading */
 
-    .video-filter-bar {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 190px auto;
-        gap: 12px;
-        margin-bottom: 30px;
-        padding: 15px;
-        border: 1px solid var(--ss-border, #303038);
-        background: var(--ss-panel, #141419);
-    }
+.vl-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
 
-    .video-search-field {
-        display: flex;
-        align-items: center;
-        min-width: 0;
-        border: 1px solid var(--ss-border, #303038);
-        background: #0d0d11;
-    }
+.vl-heading {
+    min-width: 0;
+}
 
-    .video-search-field:focus-within {
-        border-color: var(--ss-orange, #ff7900);
-    }
+.vl-eyebrow {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--vl-orange);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
 
-    .video-search-field input {
-        width: 100%;
-        min-width: 0;
-        height: 44px;
-        padding: 0 14px;
-        border: 0;
-        outline: none;
-        background: transparent;
-        color: var(--ss-text, #f4f4f5);
-        font: inherit;
-        font-size: 13px;
-    }
+.vl-title {
+    margin: 0;
+    color: var(--vl-text);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+}
 
-    .video-search-field input::placeholder {
-        color: #777781;
-    }
+.vl-subtitle {
+    max-width: 620px;
+    margin: 12px 0 0;
+    color: var(--vl-muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
 
-    .video-sort-select {
-        width: 100%;
-        min-width: 0;
-        height: 44px;
-        padding: 0 12px;
-        border: 1px solid var(--ss-border, #303038);
-        border-radius: 0;
-        outline: none;
-        background: #0d0d11;
-        color: var(--ss-text, #f4f4f5);
-        font: inherit;
-        font-size: 13px;
-        cursor: pointer;
-    }
+/* Buttons — all sharp corners */
 
-    .video-sort-select:focus {
-        border-color: var(--ss-orange, #ff7900);
-    }
+.vl-page .vl-upload-btn,
+.vl-page .vl-search-btn,
+.vl-page .vl-empty-action,
+.vl-page .vl-page-link {
+    border-radius: 0;
+}
 
-    .video-filter-button {
-        min-height: 44px;
-        padding: 0 20px;
-        border: 1px solid var(--ss-orange, #ff7900);
-        border-radius: 0;
-        background: var(--ss-orange, #ff7900);
-        color: #111;
-        font-size: 12px;
-        font-weight: 850;
-        cursor: pointer;
-        transition: background 160ms ease, border-color 160ms ease;
-    }
+.vl-upload-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--vl-orange);
+    background: var(--vl-orange);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background var(--vl-transition),
+                border-color var(--vl-transition);
+}
 
-    .video-filter-button:hover {
-        border-color: #ff9638;
-        background: #ff9638;
-    }
+.vl-upload-btn:hover {
+    border-color: var(--vl-orange-hover);
+    background: var(--vl-orange-hover);
+    color: #fff;
+}
 
-    .video-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+/* Search and sorting */
+
+.vl-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 190px auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.vl-search {
+    position: relative;
+    min-width: 0;
+}
+
+.vl-search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    color: var(--vl-muted);
+    font-size: 20px;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.vl-search-input,
+.vl-sort-select {
+    width: 100%;
+    height: 48px;
+    outline: none;
+    border: 1px solid #282d35;
+    border-radius: 0;
+    background: var(--vl-surface);
+    color: var(--vl-text);
+    font: inherit;
+    font-size: 13px;
+    transition: border-color var(--vl-transition);
+}
+
+.vl-search-input {
+    padding: 0 15px 0 45px;
+}
+
+.vl-search-input::placeholder {
+    color: #777e89;
+}
+
+.vl-search-input:focus,
+.vl-sort-select:focus {
+    border-color: var(--vl-orange);
+}
+
+.vl-sort-select {
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.vl-sort-select option {
+    background: var(--vl-surface);
+    color: var(--vl-text);
+}
+
+.vl-search-btn {
+    height: 48px;
+    padding: 0 22px;
+    border: 1px solid var(--vl-orange);
+    background: var(--vl-orange);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background var(--vl-transition);
+}
+
+.vl-search-btn:hover {
+    background: var(--vl-orange-hover);
+}
+
+/* Results information */
+
+.vl-results-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.vl-results-label {
+    margin: 0;
+    color: var(--vl-muted);
+    font-size: 13px;
+}
+
+.vl-results-label strong {
+    color: var(--vl-text);
+    font-weight: 700;
+}
+
+.vl-clear-link {
+    color: var(--vl-orange);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vl-clear-link:hover {
+    color: var(--vl-orange-hover);
+}
+
+/* Video grid */
+
+.vl-video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 22px;
+    row-gap: 34px;
+}
+
+.vl-video-card {
+    min-width: 0;
+    overflow: hidden;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    transition: transform var(--vl-transition);
+}
+
+.vl-video-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Video thumbnail */
+
+.vl-thumb-link {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: none;
+    border-radius: 0;
+    background: var(--vl-surface);
+    text-decoration: none;
+}
+
+.vl-thumb {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border: none;
+    transition: transform 260ms ease;
+}
+
+.vl-video-card:hover .vl-thumb {
+    transform: scale(1.035);
+}
+
+/* Thumbnail fallback */
+
+.vl-thumb-placeholder {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 50% 45%, #29221e 0, transparent 52%),
+        linear-gradient(145deg, #1c2027, #101216);
+}
+
+.vl-play-symbol {
+    display: flex;
+    width: 54px;
+    height: 54px;
+    align-items: center;
+    justify-content: center;
+    padding-left: 4px;
+    border-radius: 0;
+    background: var(--vl-orange);
+    color: #fff;
+    font-size: 21px;
+}
+
+/* Thumbnail overlays */
+
+.vl-thumb-shade {
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(transparent, rgb(0 0 0 / 55%));
+    pointer-events: none;
+}
+
+.vl-duration {
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    padding: 5px 7px;
+    border-radius: 0;
+    background: rgb(0 0 0 / 82%);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.vl-premium-badge,
+.vl-free-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 6px 9px;
+    border-radius: 0;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.vl-premium-badge {
+    background: var(--vl-orange);
+    color: #fff;
+}
+
+.vl-free-badge {
+    background: rgb(13 18 20 / 90%);
+    color: #b7f7d8;
+}
+
+/* Video information */
+
+.vl-video-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 1px 0;
+}
+
+.vl-avatar {
+    display: flex;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0;
+    background: #272b32;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.vl-video-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.vl-video-title {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--vl-text);
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.vl-video-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.vl-video-title a:hover {
+    color: var(--vl-orange);
+}
+
+.vl-creator {
+    overflow: hidden;
+    margin: 7px 0 0;
+    color: #b1b6bf;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vl-video-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 7px;
+    margin-top: 5px;
+    color: var(--vl-muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.vl-meta-dot {
+    color: #555c66;
+}
+
+/* Empty state */
+
+.vl-empty {
+    display: flex;
+    min-height: 330px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.vl-empty-icon {
+    display: flex;
+    width: 72px;
+    height: 72px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 0;
+    background: #191b20;
+    color: var(--vl-orange);
+    font-size: 30px;
+}
+
+.vl-empty-title {
+    margin: 0;
+    color: var(--vl-text);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.vl-empty-text {
+    max-width: 420px;
+    margin: 10px 0 22px;
+    color: var(--vl-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.vl-empty-action {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 17px;
+    border: 1px solid var(--vl-orange);
+    background: var(--vl-orange);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.vl-empty-action:hover {
+    background: var(--vl-orange-hover);
+    color: #fff;
+}
+
+/* Pagination */
+
+.vl-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 48px;
+}
+
+.vl-page-link {
+    display: inline-flex;
+    min-width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid #282d35;
+    border-radius: 0;
+    background: var(--vl-surface);
+    color: #d6d9df;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color var(--vl-transition),
+                background var(--vl-transition),
+                color var(--vl-transition);
+}
+
+.vl-page-link:hover {
+    border-color: var(--vl-orange);
+    color: var(--vl-orange);
+}
+
+.vl-page-link.is-current {
+    border-color: var(--vl-orange);
+    background: var(--vl-orange);
+    color: #fff;
+}
+
+.vl-page-link.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.vl-page-summary {
+    margin-top: 15px;
+    color: var(--vl-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Responsive layouts */
+
+@media (max-width: 1250px) {
+    .vl-video-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 28px 18px;
     }
+}
 
-    .video-card {
-        min-width: 0;
-        overflow: hidden;
-        background: transparent;
+@media (max-width: 850px) {
+    .vl-page {
+        padding: 26px 20px 48px;
     }
 
-    .video-card-link {
-        display: block;
-        color: inherit;
-        text-decoration: none;
+    .vl-video-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px 16px;
     }
 
-    .video-card-link:focus-visible,
-    .video-creator-avatar:focus-visible {
-        outline: 2px solid var(--ss-orange, #ff7900);
-        outline-offset: 4px;
+    .vl-toolbar {
+        grid-template-columns: minmax(0, 1fr) 160px;
     }
 
-    .video-card-thumbnail {
-        position: relative;
+    .vl-search-btn {
+        grid-column: 1 / -1;
         width: 100%;
-        aspect-ratio: 16 / 9;
-        overflow: hidden;
-        border: 1px solid var(--ss-border, #303038);
-        background: #19191f;
+    }
+}
+
+@media (max-width: 560px) {
+    .vl-page {
+        padding: 23px 14px 40px;
     }
 
-    .video-card-thumbnail img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 240ms ease, opacity 240ms ease;
-    }
-
-    .video-card-link:hover .video-card-thumbnail img {
-        transform: scale(1.045);
-        opacity: 0.9;
-    }
-
-    .video-thumbnail-placeholder {
-        display: flex;
-        width: 100%;
-        height: 100%;
+    .vl-header {
         align-items: center;
-        justify-content: center;
-        background:
-            linear-gradient(135deg, rgba(255, 121, 0, 0.12), transparent 55%),
-            #19191f;
+        gap: 12px;
+        margin-bottom: 24px;
     }
 
-    .video-thumbnail-placeholder svg {
-        width: 36px;
-        height: 36px;
-        color: #777781;
+    .vl-title {
+        font-size: 29px;
+        letter-spacing: -0.9px;
     }
 
-    .video-duration {
-        position: absolute;
-        right: 8px;
-        bottom: 8px;
-        padding: 4px 6px;
-        background: rgba(0, 0, 0, 0.88);
-        color: #fff;
-        font-size: 10px;
-        font-weight: 750;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .video-premium-badge {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        padding: 5px 7px;
-        background: var(--ss-orange, #ff7900);
-        color: #101010;
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 0.7px;
-        text-transform: uppercase;
-    }
-
-    .video-card-info {
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-        padding-top: 13px;
-    }
-
-    /* Creator avatar: circular image, centered fallback initial */
-    .video-creator-avatar {
-        display: inline-flex;
-        width: 40px;
-        height: 40px;
-        flex: 0 0 40px;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border: 1px solid var(--ss-border, #303038);
-        border-radius: 50%;
-        background: #24242b;
-        color: var(--ss-orange, #ff7900);
-        font-size: 14px;
-        font-weight: 850;
-        text-transform: uppercase;
-        text-decoration: none;
-        line-height: 1;
-    }
-
-    .video-creator-avatar img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .video-card-copy {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .video-card-title {
-        display: -webkit-box;
-        overflow: hidden;
-        margin: 0;
-        color: var(--ss-text, #f4f4f5);
-        font-size: 14px;
-        font-weight: 750;
-        line-height: 1.5;
-        overflow-wrap: anywhere;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
-
-    .video-card-link:hover .video-card-title {
-        color: var(--ss-orange, #ff7900);
-    }
-
-    .video-card-creator {
-        display: block;
-        overflow: hidden;
-        margin-top: 7px;
-        color: var(--ss-muted, #9999a3);
+    .vl-subtitle {
+        margin-top: 8px;
         font-size: 12px;
-        text-overflow: ellipsis;
+    }
+
+    .vl-eyebrow {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+    }
+
+    .vl-upload-btn {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 12px;
         white-space: nowrap;
     }
 
-    .video-card-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 5px;
+    .vl-upload-label {
+        display: none;
+    }
+
+    .vl-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .vl-search-input,
+    .vl-sort-select,
+    .vl-search-btn {
+        height: 44px;
+    }
+
+    .vl-sort-select,
+    .vl-search-btn {
+        grid-column: 1;
+    }
+
+    .vl-results-bar {
+        margin-bottom: 16px;
+    }
+
+    .vl-video-grid {
+        column-gap: 12px;
+        row-gap: 24px;
+    }
+
+    .vl-video-info {
+        gap: 8px;
+        padding-top: 10px;
+    }
+
+    .vl-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
+    }
+
+    .vl-video-title {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .vl-creator {
         margin-top: 5px;
-        color: var(--ss-muted, #85858f);
+        font-size: 10px;
+    }
+
+    .vl-video-meta {
+        gap: 3px 5px;
+        margin-top: 4px;
+        font-size: 10px;
+    }
+
+    .vl-duration {
+        right: 6px;
+        bottom: 6px;
+        padding: 4px 5px;
+        font-size: 9px;
+    }
+
+    .vl-premium-badge,
+    .vl-free-badge {
+        top: 6px;
+        left: 6px;
+        padding: 5px 6px;
+        font-size: 8px;
+    }
+
+    .vl-play-symbol {
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 360px) {
+    .vl-video-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .vl-video-title {
+        font-size: 14px;
+    }
+
+    .vl-creator,
+    .vl-video-meta {
         font-size: 11px;
-        line-height: 1.6;
     }
+}
 
-    .video-meta-separator {
-        color: #55555f;
+@media (prefers-reduced-motion: reduce) {
+    .vl-video-card,
+    .vl-thumb,
+    .vl-upload-btn {
+        transition: none;
     }
-
-    .video-empty-state {
-        grid-column: 1 / -1;
-        padding: 68px 24px;
-        border: 1px solid var(--ss-border, #303038);
-        background: var(--ss-panel, #141419);
-        text-align: center;
-    }
-
-    .video-empty-icon {
-        display: inline-flex;
-        width: 58px;
-        height: 58px;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        border: 1px solid var(--ss-border, #303038);
-        background: #1c1c22;
-        color: var(--ss-orange, #ff7900);
-    }
-
-    .video-empty-icon svg {
-        width: 27px;
-        height: 27px;
-    }
-
-    .video-empty-state h2 {
-        margin: 0;
-        font-size: 21px;
-        font-weight: 800;
-    }
-
-    .video-empty-state p {
-        max-width: 440px;
-        margin: 10px auto 22px;
-        color: var(--ss-muted, #9999a3);
-        font-size: 13px;
-        line-height: 1.7;
-    }
-
-    .video-empty-action {
-        display: inline-flex;
-        min-height: 42px;
-        align-items: center;
-        justify-content: center;
-        padding: 0 17px;
-        border: 1px solid var(--ss-orange, #ff7900);
-        background: var(--ss-orange, #ff7900);
-        color: #111;
-        font-size: 12px;
-        font-weight: 850;
-        text-decoration: none;
-    }
-
-    .video-pagination {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        margin-top: 42px;
-    }
-
-    .video-page-link,
-    .video-page-current,
-    .video-page-disabled {
-        display: inline-flex;
-        min-width: 40px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        padding: 0 12px;
-        border: 1px solid var(--ss-border, #303038);
-        background: var(--ss-panel, #17171c);
-        color: var(--ss-text, #f4f4f5);
-        font-size: 12px;
-        font-weight: 750;
-        text-decoration: none;
-    }
-
-    .video-page-link:hover {
-        border-color: var(--ss-orange, #ff7900);
-        color: var(--ss-orange, #ff7900);
-    }
-
-    .video-page-current {
-        border-color: var(--ss-orange, #ff7900);
-        background: var(--ss-orange, #ff7900);
-        color: #111;
-    }
-
-    .video-page-disabled {
-        color: #62626b;
-        cursor: not-allowed;
-    }
-
-    .video-page-summary {
-        width: 100%;
-        margin-top: 8px;
-        color: var(--ss-muted, #9999a3);
-        font-size: 11px;
-        text-align: center;
-    }
-
-    @media (min-width: 1500px) {
-        .video-grid {
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 30px 20px;
-        }
-    }
-
-    @media (max-width: 1100px) {
-        .video-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .video-list-page {
-            width: min(100% - 32px, 1600px);
-        }
-    }
-
-    @media (max-width: 700px) {
-        .video-list-page {
-            width: calc(100% - 28px);
-            padding-top: 25px;
-        }
-
-        .video-list-heading {
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .video-list-heading h1 {
-            font-size: 30px;
-        }
-
-        .video-list-count {
-            padding: 8px;
-            font-size: 10px;
-        }
-
-        .video-filter-bar {
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 9px;
-            padding: 10px;
-            margin-bottom: 23px;
-        }
-
-        .video-search-field {
-            grid-column: 1 / -1;
-        }
-
-        .video-sort-select {
-            height: 42px;
-        }
-
-        .video-filter-button {
-            min-height: 42px;
-            padding: 0 15px;
-        }
-
-        .video-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 23px 12px;
-        }
-
-        .video-card-info {
-            gap: 8px;
-            padding-top: 10px;
-        }
-
-        .video-creator-avatar {
-            width: 32px;
-            height: 32px;
-            flex-basis: 32px;
-            font-size: 11px;
-        }
-
-        .video-card-title {
-            font-size: 12px;
-            line-height: 1.45;
-        }
-
-        .video-card-creator {
-            margin-top: 5px;
-            font-size: 11px;
-        }
-
-        .video-card-meta {
-            gap: 4px;
-            margin-top: 4px;
-            font-size: 10px;
-        }
-
-        .video-premium-badge {
-            top: 5px;
-            left: 5px;
-            padding: 4px 5px;
-            font-size: 8px;
-        }
-
-        .video-duration {
-            right: 5px;
-            bottom: 5px;
-            padding: 3px 5px;
-            font-size: 9px;
-        }
-
-        .video-empty-state {
-            padding: 48px 16px;
-        }
-
-        .video-pagination {
-            gap: 5px;
-            margin-top: 32px;
-        }
-
-        .video-page-link,
-        .video-page-current,
-        .video-page-disabled {
-            min-width: 35px;
-            height: 36px;
-            padding: 0 9px;
-        }
-    }
-
-    @media (max-width: 380px) {
-        .video-list-page {
-            width: calc(100% - 20px);
-        }
-
-        .video-grid {
-            gap: 20px 9px;
-        }
-
-        .video-card-info {
-            gap: 7px;
-        }
-
-        .video-creator-avatar {
-            width: 27px;
-            height: 27px;
-            flex-basis: 27px;
-        }
-
-        .video-card-title {
-            font-size: 11px;
-        }
-
-        .video-card-meta {
-            font-size: 9px;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .video-card-thumbnail img {
-            transition: none;
-        }
-    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="video-list-page">
-    <header class="video-list-heading">
-        <div>
-            <p class="video-list-eyebrow">Discover StreamSphere</p>
-            <h1>Explore videos<span style="color: var(--ss-orange, #ff7900);">.</span></h1>
-            <p class="video-list-description">
-                Find something worth watching, from fresh uploads to popular creators.
-            </p>
-        </div>
+<main class="vl-page">
+    <div class="vl-container">
 
-        <div class="video-list-count">
-            {{ total_videos|default:videos|length }} videos
-        </div>
-    </header>
+        <!-- Header -->
+        <header class="vl-header">
+            <div class="vl-heading">
+                <span class="vl-eyebrow">Your next watch starts here</span>
+                <h1 class="vl-title">Explore videos</h1>
+                <p class="vl-subtitle">
+                    Discover new videos, explore creators, and find something
+                    worth watching on StreamSphere.
+                </p>
+            </div>
 
-    <form class="video-filter-bar" method="get" action="{% url 'videos:list' %}">
-        <label class="video-search-field">
-            <input
-                type="search"
-                name="q"
-                value="{{ search_query|default:'' }}"
-                placeholder="Search videos or creators..."
-                aria-label="Search videos or creators"
+            {% if user.is_authenticated %}
+                <a class="vl-upload-btn" href="{% url 'videos:upload' %}">
+                    <span aria-hidden="true">+</span>
+                    <span class="vl-upload-label">Upload video</span>
+                </a>
+            {% endif %}
+        </header>
+
+        <!-- Search and sorting -->
+        <form class="vl-toolbar" method="get"
+              action="{% url 'videos:list' %}">
+            <div class="vl-search">
+                <span class="vl-search-icon" aria-hidden="true">&#8981;</span>
+                <input
+                    class="vl-search-input"
+                    type="search"
+                    name="q"
+                    value="{{ search_query|default:'' }}"
+                    placeholder="Search videos or topics..."
+                    aria-label="Search videos"
+                >
+            </div>
+
+            <select
+                class="vl-sort-select"
+                name="sort"
+                aria-label="Sort videos"
+                onchange="this.form.requestSubmit()"
             >
-        </label>
+                <option value="newest"
+                    {% if sort_by != 'popular' %}selected{% endif %}>
+                    Recently uploaded
+                </option>
+                <option value="popular"
+                    {% if sort_by == 'popular' %}selected{% endif %}>
+                    Most popular
+                </option>
+            </select>
 
-        <select class="video-sort-select" name="sort" aria-label="Sort videos">
-            <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>
-                Recently uploaded
-            </option>
-            <option value="popular" {% if sort_by == "popular" %}selected{% endif %}>
-                Most popular
-            </option>
-        </select>
+            <button class="vl-search-btn" type="submit">
+                Search videos
+            </button>
+        </form>
 
-        <button class="video-filter-button" type="submit">Search videos</button>
-    </form>
+        <!-- Results heading -->
+        <div class="vl-results-bar">
+            <p class="vl-results-label">
+                {% if search_query %}
+                    Results for <strong>{{ search_query }}</strong>
+                {% else %}
+                    <strong>Discover</strong> videos
+                {% endif %}
+            </p>
 
-    <section class="video-grid" aria-label="Video results">
-        {% for video in videos %}
-            <article class="video-card">
-                <a class="video-card-link" href="{% url 'videos:detail' video.pk %}">
-                    <div class="video-card-thumbnail">
-                        {% if video.thumbnail %}
-                            <img
-                                src="{{ video.thumbnail.url }}"
-                                alt="{{ video.title }}"
-                                loading="lazy"
-                            >
-                        {% elif video.thumbnail_url %}
-                            <img
-                                src="{{ video.thumbnail_url }}"
-                                alt="{{ video.title }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="video-thumbnail-placeholder">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                    <rect x="3" y="4" width="18" height="16" rx="1"
-                                          stroke="currentColor" stroke-width="1.5"/>
-                                    <path d="M10 8.5L16 12L10 15.5V8.5Z"
-                                          fill="currentColor"/>
-                                </svg>
-                            </div>
-                        {% endif %}
+            {% if search_query or sort_by == 'popular' %}
+                <a class="vl-clear-link"
+                   href="{% url 'videos:list' %}">
+                    Clear filters
+                </a>
+            {% endif %}
+        </div>
 
-                        {% if video.is_premium %}
-                            <span class="video-premium-badge">Premium</span>
-                        {% endif %}
+        <!-- Video grid -->
+        {% if videos %}
+            <section class="vl-video-grid" aria-label="Video results">
+                {% for video in videos %}
+                    <article class="vl-video-card">
 
-                        {% if video.duration %}
-                            <span class="video-duration">{{ video.duration }}</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="video-card-info">
-                        <span class="video-creator-avatar" aria-hidden="true">
-                            {% if video.creator.profile.avatar_image %}
+                        <a
+                            class="vl-thumb-link"
+                            href="{% url 'videos:detail' pk=video.pk %}"
+                            aria-label="Watch {{ video.title }}"
+                        >
+                            {% if video.thumbnail_url %}
                                 <img
-                                    src="{{ video.creator.profile.avatar_image.url }}"
-                                    alt=""
+                                    class="vl-thumb"
+                                    src="{{ video.thumbnail_url }}"
+                                    alt="{{ video.title }}"
                                     loading="lazy"
-                                >
-                            {% elif video.creator.profile.avatar %}
-                                <img
-                                    src="{{ video.creator.profile.avatar }}"
-                                    alt=""
-                                    loading="lazy"
+                                    decoding="async"
                                 >
                             {% else %}
-                                {{ video.creator.username|first|upper }}
+                                <div class="vl-thumb-placeholder">
+                                    <span class="vl-play-symbol"
+                                          aria-hidden="true">&#9654;</span>
+                                </div>
                             {% endif %}
-                        </span>
 
-                        <div class="video-card-copy">
-                            <h2 class="video-card-title">{{ video.title }}</h2>
+                            <span class="vl-thumb-shade"></span>
 
-                            <span class="video-card-creator">
-                                {{ video.creator.username }}
-                            </span>
+                            {% if video.is_premium %}
+                                <span class="vl-premium-badge">Premium</span>
+                            {% else %}
+                                <span class="vl-free-badge">Free</span>
+                            {% endif %}
 
-                            <div class="video-card-meta">
-                                <span>{{ video.views|default:0 }} views</span>
-                                <span class="video-meta-separator">·</span>
-                                <span>{{ video.created_at|timesince }} ago</span>
+                            {% if video.duration %}
+                                <span class="vl-duration">
+                                    {{ video.duration }}
+                                </span>
+                            {% endif %}
+                        </a>
+
+                        <div class="vl-video-info">
+                            <div class="vl-avatar" aria-hidden="true">
+                                {{ video.creator.username|first|upper }}
+                            </div>
+
+                            <div class="vl-video-details">
+                                <h2 class="vl-video-title">
+                                    <a href="{% url 'videos:detail' pk=video.pk %}">
+                                        {{ video.title }}
+                                    </a>
+                                </h2>
+
+                                <p class="vl-creator">
+                                    {{ video.creator.get_full_name|default:video.creator.username }}
+                                </p>
+
+                                <div class="vl-video-meta">
+                                    <span>
+                                        {{ video.views|default:0 }} views
+                                    </span>
+
+                                    <span class="vl-meta-dot"
+                                          aria-hidden="true">•</span>
+
+                                    <span>
+                                        {{ video.created_at|timesince }} ago
+                                    </span>
+
+                                    {% if video.is_premium %}
+                                        <span class="vl-meta-dot"
+                                              aria-hidden="true">•</span>
+                                        <span>
+                                            KES {{ video.price|floatformat:2 }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-            </article>
-        {% empty %}
-            <div class="video-empty-state">
-                <div class="video-empty-icon">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <rect x="3" y="4" width="18" height="16" rx="1"
-                              stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M10 8.5L16 12L10 15.5V8.5Z"
-                              stroke="currentColor" stroke-width="1.5"
-                              stroke-linejoin="round"/>
-                    </svg>
-                </div>
+
+                    </article>
+                {% endfor %}
+            </section>
+
+            <!-- Pagination -->
+            {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                <nav class="vl-pagination" aria-label="Video pages">
+
+                    {% if page_obj.has_previous %}
+                        <a
+                            class="vl-page-link"
+                            href="?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if sort_by %}sort={{ sort_by|urlencode }}&amp;{% endif %}page={{ page_obj.previous_page_number }}"
+                            aria-label="Previous page"
+                        >Previous</a>
+                    {% else %}
+                        <span class="vl-page-link is-disabled">Previous</span>
+                    {% endif %}
+
+                    {% for page_number in page_obj.paginator.page_range %}
+                        {% if page_number == page_obj.number %}
+                            <span class="vl-page-link is-current"
+                                  aria-current="page">
+                                {{ page_number }}
+                            </span>
+                        {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                            <a
+                                class="vl-page-link"
+                                href="?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if sort_by %}sort={{ sort_by|urlencode }}&amp;{% endif %}page={{ page_number }}"
+                            >{{ page_number }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a
+                            class="vl-page-link"
+                            href="?{% if search_query %}q={{ search_query|urlencode }}&amp;{% endif %}{% if sort_by %}sort={{ sort_by|urlencode }}&amp;{% endif %}page={{ page_obj.next_page_number }}"
+                            aria-label="Next page"
+                        >Next</a>
+                    {% else %}
+                        <span class="vl-page-link is-disabled">Next</span>
+                    {% endif %}
+
+                </nav>
+
+                <p class="vl-page-summary">
+                    Page {{ page_obj.number }} of
+                    {{ page_obj.paginator.num_pages }}
+                </p>
+            {% endif %}
+
+        {% else %}
+
+            <!-- Empty state -->
+            <section class="vl-empty">
+                <div class="vl-empty-icon" aria-hidden="true">&#9654;</div>
 
                 {% if search_query %}
-                    <h2>No matching videos</h2>
-                    <p>
-                        We couldn't find videos matching “{{ search_query }}”.
-                        Try a different title or creator name.
+                    <h2 class="vl-empty-title">No videos found</h2>
+                    <p class="vl-empty-text">
+                        We couldn't find videos matching
+                        "{{ search_query }}". Try another search term.
                     </p>
-                    <a class="video-empty-action" href="{% url 'videos:list' %}">
-                        Browse all videos
+                    <a class="vl-empty-action"
+                       href="{% url 'videos:list' %}">
+                        Explore all videos
                     </a>
                 {% else %}
-                    <h2>Nothing to watch yet</h2>
-                    <p>
-                        Published videos will appear here. Come back soon to discover
-                        new uploads from StreamSphere creators.
+                    <h2 class="vl-empty-title">Nothing to watch yet</h2>
+                    <p class="vl-empty-text">
+                        There are no videos to display right now.
+                        Check back soon or upload the first video.
                     </p>
+
                     {% if user.is_authenticated %}
-                        <a class="video-empty-action" href="{% url 'videos:upload' %}">
-                            Upload a video
-                        </a>
-                    {% else %}
-                        <a class="video-empty-action" href="{% url 'account_login' %}">
-                            Sign in to get started
+                        <a class="vl-empty-action"
+                           href="{% url 'videos:upload' %}">
+                            Upload the first video
                         </a>
                     {% endif %}
                 {% endif %}
-            </div>
-        {% endfor %}
-    </section>
+            </section>
+        {% endif %}
 
-    {% if page_obj and page_obj.paginator.num_pages > 1 %}
-        <nav class="video-pagination" aria-label="Video pages">
-            {% if page_obj.has_previous %}
-                <a
-                    class="video-page-link"
-                    href="?q={{ search_query|urlencode }}&amp;sort={{ sort_by|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
-                    aria-label="Previous page"
-                >
-                    Previous
-                </a>
-            {% else %}
-                <span class="video-page-disabled" aria-disabled="true">Previous</span>
-            {% endif %}
-
-            {% for page_number in page_obj.paginator.page_range %}
-                {% if page_number == page_obj.number %}
-                    <span class="video-page-current" aria-current="page">
-                        {{ page_number }}
-                    </span>
-                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
-                    <a
-                        class="video-page-link"
-                        href="?q={{ search_query|urlencode }}&amp;sort={{ sort_by|urlencode }}&amp;page={{ page_number }}"
-                        aria-label="Page {{ page_number }}"
-                    >
-                        {{ page_number }}
-                    </a>
-                {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <a
-                    class="video-page-link"
-                    href="?q={{ search_query|urlencode }}&amp;sort={{ sort_by|urlencode }}&amp;page={{ page_obj.next_page_number }}"
-                    aria-label="Next page"
-                >
-                    Next
-                </a>
-            {% else %}
-                <span class="video-page-disabled" aria-disabled="true">Next</span>
-            {% endif %}
-
-            <div class="video-page-summary">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </div>
-        </nav>
-    {% endif %}
+    </div>
 </main>
 {% endblock %}

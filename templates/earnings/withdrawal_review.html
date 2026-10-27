@@ -1,71 +1,594 @@
-
 {% extends "base.html" %}
 
 {% block title %}Review Withdrawal | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-review-form{max-width:800px;margin:0 auto;padding:30px 20px 60px;color:#f5f5f5}
+.ss-review-form{
+    --accent:#ff7900;
+    --accent-light:#ffad65;
+    --bg:#0b0b0d;
+    --panel:#141416;
+    --border:#2b2b30;
+    --text:#f4f4f5;
+    --muted:#96969f;
+    max-width:1180px;
+    margin:0 auto;
+    padding:34px 24px 70px;
+    color:var(--text);
+}
 .ss-review-form *{box-sizing:border-box}
-.ss-review-form h1{font-size:clamp(26px,4vw,36px);margin:10px 0}
-.ss-review-form .muted{color:#aaa;line-height:1.7}
-.ss-review-form .panel{background:#151515;border:1px solid #303030;padding:23px;margin-top:23px}
-.ss-review-form .detail{padding:13px 0;border-bottom:1px solid #303030;display:flex;justify-content:space-between;gap:18px;overflow-wrap:anywhere}
-.ss-review-form .detail span{color:#aaa}
-.ss-review-form .detail strong{text-align:right;overflow-wrap:anywhere}
-.ss-review-form .field{margin:20px 0}
-.ss-review-form label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}
-.ss-review-form .ss-input{width:100%;padding:13px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
-.ss-review-form .errors{color:#ff9c85;font-size:13px;line-height:1.7}
-.ss-review-form .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.ss-review-form .btn{display:inline-flex;justify-content:center;padding:13px 17px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;text-decoration:none;cursor:pointer;border-radius:0}
-.ss-review-form .btn-secondary{background:transparent;color:#ff7900}
-.ss-review-form .warning{background:#211a13;border-left:3px solid #ff7900;padding:13px;color:#e1cbb0;line-height:1.7;font-size:13px}
-@media(max-width:540px){.ss-review-form{padding:22px 13px 40px}.ss-review-form .panel{padding:16px}.ss-review-form .detail{flex-direction:column;gap:5px}.ss-review-form .detail strong{text-align:left}.ss-review-form .actions .btn{width:100%}}
+.ss-review-form a{text-decoration:none}
+.ss-review-form .breadcrumb{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:27px;
+    color:#777780;
+    font-size:12px;
+}
+.ss-review-form .breadcrumb a{color:#b7b7bf}
+.ss-review-form .breadcrumb a:hover{color:var(--accent-light)}
+.ss-review-form .breadcrumb span:last-child{color:var(--accent-light)}
+.ss-review-form .eyebrow{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+.ss-review-form h1{
+    margin:10px 0 12px;
+    font-size:clamp(30px,4vw,42px);
+    font-weight:850;
+    line-height:1.15;
+    letter-spacing:-1.4px;
+}
+.ss-review-form .intro{
+    max-width:650px;
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.8;
+}
+.ss-review-form .page-header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
+}
+.ss-review-form .reference-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    max-width:100%;
+    padding:10px 12px;
+    border:1px solid #3b3025;
+    background:#21180f;
+    color:var(--accent-light);
+    font:700 11px ui-monospace,SFMono-Regular,Consolas,monospace;
+    overflow-wrap:anywhere;
+}
+.ss-review-form .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(290px,.8fr);
+    align-items:start;
+    gap:20px;
+}
+.ss-review-form .panel{
+    min-width:0;
+    background:var(--panel);
+    border:1px solid var(--border);
+}
+.ss-review-form .panel-heading{
+    padding:21px 23px;
+    border-bottom:1px solid var(--border);
+}
+.ss-review-form .panel-heading h2{
+    margin:0;
+    font-size:16px;
+    font-weight:850;
+    letter-spacing:-.3px;
+}
+.ss-review-form .panel-heading p{
+    margin:7px 0 0;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+}
+.ss-review-form .panel-body{padding:23px}
+.ss-review-form .payout-hero{
+    position:relative;
+    overflow:hidden;
+    padding:23px;
+    margin-bottom:22px;
+    background:linear-gradient(120deg,#291b10,#1a1511 75%);
+    border:1px solid #4a301c;
+}
+.ss-review-form .payout-hero:after{
+    content:"";
+    position:absolute;
+    top:-65px;
+    right:-35px;
+    width:160px;
+    height:160px;
+    border:1px solid #49301b;
+    border-radius:50%;
+    box-shadow:0 0 0 22px rgba(255,121,0,.025),
+               0 0 0 45px rgba(255,121,0,.02);
+    pointer-events:none;
+}
+.ss-review-form .payout-label{
+    position:relative;
+    z-index:1;
+    color:#cbb9a6;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+.ss-review-form .amount{
+    position:relative;
+    z-index:1;
+    color:#fff;
+    font-size:clamp(29px,4vw,39px);
+    font-weight:850;
+    letter-spacing:-1.2px;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+}
+.ss-review-form .payout-reference{
+    position:relative;
+    z-index:1;
+    margin-top:14px;
+    color:var(--accent-light);
+    font:12px ui-monospace,SFMono-Regular,Consolas,monospace;
+    overflow-wrap:anywhere;
+}
+.ss-review-form .status-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:19px;
+    padding-top:16px;
+    border-top:1px solid #4a301c;
+}
+.ss-review-form .status-label{color:#cbb9a6;font-size:11px}
+.ss-review-form .status{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 9px;
+    background:#29292e;
+    border:1px solid #3c3c42;
+    color:#dedee3;
+    font-size:10px;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+.ss-review-form .status-pending{
+    background:#302214;
+    border-color:#574025;
+    color:#ffc17b;
+}
+.ss-review-form .status-approved,
+.ss-review-form .status-processing{
+    background:#2b2116;
+    border-color:#57452c;
+    color:#ffcf91;
+}
+.ss-review-form .status-paid,
+.ss-review-form .status-completed{
+    background:#14271c;
+    border-color:#244b32;
+    color:#8bdaa3;
+}
+.ss-review-form .status-rejected,
+.ss-review-form .status-failed,
+.ss-review-form .status-reversed{
+    background:#301b1b;
+    border-color:#57302e;
+    color:#f09a90;
+}
+.ss-review-form .details{margin:0}
+.ss-review-form .detail{
+    display:grid;
+    grid-template-columns:minmax(110px,.8fr) minmax(0,1.2fr);
+    align-items:start;
+    gap:16px;
+    padding:15px 0;
+    border-bottom:1px solid #29292e;
+}
+.ss-review-form .detail:last-child{border-bottom:0}
+.ss-review-form .detail dt{
+    color:#92929c;
+    font-size:12px;
+    line-height:1.7;
+}
+.ss-review-form .detail dd{
+    margin:0;
+    color:#ececf0;
+    text-align:right;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.7;
+    overflow-wrap:anywhere;
+}
+.ss-review-form .detail .mono{
+    color:var(--accent-light);
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+.ss-review-form .notice{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:15px;
+    margin-bottom:20px;
+    background:#211a13;
+    border:1px solid #45301c;
+    color:#d9c7b5;
+    font-size:12px;
+    line-height:1.8;
+}
+.ss-review-form .notice-icon{
+    display:grid;
+    place-items:center;
+    flex:0 0 26px;
+    width:26px;
+    height:26px;
+    color:var(--accent-light);
+    background:#2b1e12;
+    border:1px solid #55391e;
+    font-weight:900;
+}
+.ss-review-form .notice strong{color:#fff0df}
+.ss-review-form .field{margin:0 0 21px}
+.ss-review-form label{
+    display:block;
+    margin-bottom:9px;
+    color:#e5e5e9;
+    font-size:12px;
+    font-weight:800;
+}
+.ss-review-form .field input,
+.ss-review-form .field select,
+.ss-review-form .field textarea{
+    display:block;
+    width:100%;
+    min-height:46px;
+    padding:12px 13px;
+    background:#0c0c0e;
+    color:var(--text);
+    border:1px solid #393940;
+    border-radius:2px;
+    font:inherit;
+    font-size:13px;
+    transition:border-color .18s ease,box-shadow .18s ease;
+}
+.ss-review-form .field textarea{min-height:100px;resize:vertical}
+.ss-review-form .field input:focus,
+.ss-review-form .field select:focus,
+.ss-review-form .field textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(255,121,0,.09);
+}
+.ss-review-form .field input[type="checkbox"],
+.ss-review-form .field input[type="radio"]{
+    display:inline-block;
+    width:auto;
+    min-height:auto;
+    accent-color:var(--accent);
+}
+.ss-review-form .field ul{
+    margin:8px 0 0;
+    padding-left:20px;
+    color:#aaaab3;
+    font-size:11px;
+    line-height:1.7;
+}
+.ss-review-form .errors,
+.ss-review-form .errorlist{
+    color:#ff9c85;
+    font-size:12px;
+    line-height:1.7;
+    margin:7px 0 0;
+}
+.ss-review-form .errorlist{padding-left:18px}
+.ss-review-form .form-errors{
+    margin-bottom:20px;
+    padding:13px 15px;
+    background:#2b1716;
+    border:1px solid #62312c;
+    color:#ffb3a9;
+    font-size:12px;
+    line-height:1.7;
+}
+.ss-review-form .actions{
+    display:flex;
+    gap:11px;
+    flex-wrap:wrap;
+    margin-top:25px;
+}
+.ss-review-form .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    min-height:46px;
+    padding:12px 17px;
+    background:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:2px;
+    color:#17100a;
+    font-size:12px;
+    font-weight:850;
+    text-align:center;
+    cursor:pointer;
+    transition:background .18s ease,border-color .18s ease;
+}
+.ss-review-form .btn:hover{
+    background:#ff9233;
+    border-color:#ff9233;
+}
+.ss-review-form .btn-secondary{
+    background:transparent;
+    border-color:#3b3b42;
+    color:#dedee4;
+}
+.ss-review-form .btn-secondary:hover{
+    background:#202024;
+    border-color:#66666f;
+    color:#fff;
+}
+.ss-review-form .btn-primary{flex:1}
+.ss-review-form .side-panel{margin-bottom:17px}
+.ss-review-form .side-panel:last-child{margin-bottom:0}
+.ss-review-form .side-body{padding:20px}
+.ss-review-form .step{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid #29292e;
+}
+.ss-review-form .step:first-child{padding-top:0}
+.ss-review-form .step:last-child{padding-bottom:0;border-bottom:0}
+.ss-review-form .step-num{
+    display:grid;
+    place-items:center;
+    flex:0 0 27px;
+    width:27px;
+    height:27px;
+    background:#24190f;
+    border:1px solid #49301b;
+    color:var(--accent-light);
+    font-size:11px;
+    font-weight:850;
+}
+.ss-review-form .step strong{
+    display:block;
+    color:#ededf0;
+    font-size:12px;
+    margin-bottom:5px;
+}
+.ss-review-form .step p{
+    margin:0;
+    color:#9999a2;
+    font-size:11px;
+    line-height:1.8;
+}
+.ss-review-form .back-link{
+    display:inline-block;
+    margin-top:25px;
+    color:#aaaab3;
+    font-size:12px;
+    font-weight:750;
+}
+.ss-review-form .back-link:hover{color:var(--accent-light)}
+@media(max-width:850px){
+    .ss-review-form{padding:28px 17px 55px}
+    .ss-review-form .layout{grid-template-columns:1fr}
+    .ss-review-form .side-column{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:15px;
+    }
+    .ss-review-form .side-panel{margin:0}
+}
+@media(max-width:600px){
+    .ss-review-form{padding:22px 13px 42px}
+    .ss-review-form .page-header{align-items:flex-start;gap:13px}
+    .ss-review-form .reference-chip{font-size:10px}
+    .ss-review-form .panel-heading{padding:18px}
+    .ss-review-form .panel-body{padding:16px}
+    .ss-review-form .payout-hero{padding:19px}
+    .ss-review-form .detail{grid-template-columns:1fr;gap:5px;padding:12px 0}
+    .ss-review-form .detail dd{text-align:left}
+    .ss-review-form .side-column{grid-template-columns:1fr}
+    .ss-review-form .actions{flex-direction:column}
+    .ss-review-form .actions .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+    .ss-review-form *{transition:none!important}
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ss-review-form">
-    <p><a href="{% url 'earnings:withdrawal_review_list' %}" style="color:#ff7900;text-decoration:none">← All withdrawal requests</a></p>
-    <h1>Review withdrawal</h1>
-    <p class="muted">Confirm the request details and verify the payout before recording it as paid.</p>
+<main class="ss-review-form">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'earnings:withdrawal_review_list' %}">Withdrawal requests</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Review request</span>
+    </nav>
 
-    <div class="panel">
-        <div class="detail"><span>Reference</span><strong>{{ withdrawal.reference }}</strong></div>
-        <div class="detail"><span>Creator</span><strong>{{ withdrawal.creator.username }}</strong></div>
-        <div class="detail"><span>Amount</span><strong>KSh {{ withdrawal.amount|floatformat:2 }}</strong></div>
-        <div class="detail"><span>Method</span><strong>{{ withdrawal.payout_method|title }}</strong></div>
-        <div class="detail"><span>Payout account</span><strong>{{ withdrawal.payout_account }}</strong></div>
-        <div class="detail"><span>Current status</span><strong>{{ withdrawal.get_status_display }}</strong></div>
-        <div class="detail"><span>Submitted</span><strong>{{ withdrawal.created_at|date:"M j, Y H:i" }}</strong></div>
+    <header class="page-header">
+        <div>
+            <div class="eyebrow">Finance / Payout verification</div>
+            <h1>Review withdrawal</h1>
+            <p class="intro">
+                Verify the creator's payout details and supporting evidence before
+                recording a review decision.
+            </p>
+        </div>
+        <div class="reference-chip">
+            REF&nbsp; {{ withdrawal.reference|default:"—" }}
+        </div>
+    </header>
 
-        <div class="warning" style="margin-top:20px">
-            Only mark this request as paid after confirming the actual payout through your payment provider. Changing the status here does not send money.
+    <div class="layout">
+        <div class="main-column">
+            <section class="panel" aria-labelledby="request-details-heading">
+                <div class="panel-heading">
+                    <h2 id="request-details-heading">Withdrawal details</h2>
+                    <p>Confirm the request information before proceeding.</p>
+                </div>
+
+                <div class="panel-body">
+                    <div class="payout-hero">
+                        <div class="payout-label">Requested payout amount</div>
+                        <div class="amount">KSh {{ withdrawal.amount|floatformat:2 }}</div>
+                        <div class="payout-reference">
+                            {{ withdrawal.reference|default:"Reference unavailable" }}
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Current request status</span>
+                            <span class="status status-{{ withdrawal.status|lower }}">
+                                {{ withdrawal.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <dl class="details">
+                        <div class="detail">
+                            <dt>Creator</dt>
+                            <dd>{{ withdrawal.creator.username }}</dd>
+                        </div>
+                        <div class="detail">
+                            <dt>Payout method</dt>
+                            <dd>{{ withdrawal.get_payout_method_display|default:withdrawal.payout_method|title }}</dd>
+                        </div>
+                        <div class="detail">
+                            <dt>Payout account</dt>
+                            <dd>{{ withdrawal.payout_account|default:"Not provided" }}</dd>
+                        </div>
+                        <div class="detail">
+                            <dt>Submitted</dt>
+                            <dd>{{ withdrawal.created_at|date:"M j, Y H:i" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+
+            <section class="panel" style="margin-top:18px" aria-labelledby="review-action-heading">
+                <div class="panel-heading">
+                    <h2 id="review-action-heading">Record review decision</h2>
+                    <p>Use the available form fields to record the outcome of your review.</p>
+                </div>
+
+                <div class="panel-body">
+                    <div class="notice">
+                        <span class="notice-icon" aria-hidden="true">!</span>
+                        <div>
+                            <strong>Verify the actual payout first.</strong>
+                            Marking a request as paid in this form does not transfer money.
+                            Confirm payment with your payment provider and retain the relevant evidence.
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="form-errors" role="alert">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            <div class="field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                    <div class="muted" style="font-size:11px;margin-top:7px">
+                                        {{ field.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in field.errors %}
+                                    <div class="errors" role="alert">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="actions">
+                            <button class="btn btn-primary" type="submit">
+                                Save review <span aria-hidden="true">→</span>
+                            </button>
+                            <a class="btn btn-secondary" href="{% url 'earnings:withdrawal_review_list' %}">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
 
-        <form method="post">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="errors">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            {% for field in form %}
-                <div class="field">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% for error in field.errors %}
-                        <div class="errors">{{ error }}</div>
-                    {% endfor %}
+        <aside class="side-column">
+            <section class="panel side-panel">
+                <div class="panel-heading">
+                    <h2>Verification checklist</h2>
+                    <p>Review these items before recording a decision.</p>
                 </div>
-            {% endfor %}
+                <div class="side-body">
+                    <div class="step">
+                        <span class="step-num">01</span>
+                        <div>
+                            <strong>Confirm the creator</strong>
+                            <p>Check the account associated with this withdrawal request.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">02</span>
+                        <div>
+                            <strong>Verify payout details</strong>
+                            <p>Check the requested amount, payout method and account details.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">03</span>
+                        <div>
+                            <strong>Check payment evidence</strong>
+                            <p>Confirm the payment independently before recording a paid status.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <div class="actions">
-                <button class="btn" type="submit">Save review</button>
-                <a class="btn btn-secondary" href="{% url 'earnings:withdrawal_review_list' %}">Cancel</a>
-            </div>
-        </form>
+            <section class="panel side-panel">
+                <div class="panel-heading">
+                    <h2>Security reminder</h2>
+                </div>
+                <div class="side-body">
+                    <p style="margin:0;color:#a1a1aa;font-size:12px;line-height:1.9">
+                        Never request a creator's M-Pesa PIN, bank password or one-time
+                        password. Keep payout evidence within approved administrative systems
+                        and follow your platform's verification procedures.
+                    </p>
+                </div>
+            </section>
+        </aside>
     </div>
-</div>
+
+    <a class="back-link" href="{% url 'earnings:withdrawal_review_list' %}">
+        ← Back to all withdrawal requests
+    </a>
+</main>
 {% endblock %}

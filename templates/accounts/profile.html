@@ -4,1711 +4,354 @@
 
 {% block extra_css %}
 <style>
-/* ==========================================
-   STREAMSPHERE PROFILE
-   Sharp corners | Charcoal | Orange
-========================================== */
 .sp-page {
-    --sp-bg: #0b0d10;
-    --sp-panel: #12151a;
-    --sp-panel-2: #191d24;
-    --sp-border: #2b3039;
-    --sp-text: #f4f6f8;
-    --sp-muted: #9ba3af;
-    --sp-orange: #ff7900;
-    --sp-orange-hover: #e86e00;
-    --sp-green: #35c98b;
-    --sp-red: #ff5b64;
-
+    --bg: #0b0d10;
+    --panel: #12151a;
+    --panel2: #191d24;
+    --line: #2b3039;
+    --text: #f4f6f8;
+    --muted: #9ba3af;
+    --orange: #ff7900;
     min-height: calc(100vh - 60px);
-    width: 100%;
-    padding: 26px 20px 48px;
-    background: var(--sp-bg);
-    color: var(--sp-text);
-    font-family: inherit;
+    padding: clamp(14px, 3vw, 30px) clamp(12px, 2.5vw, 24px) 48px;
+    background: var(--bg);
+    color: var(--text);
 }
-
-.sp-page,
-.sp-page * {
-    box-sizing: border-box;
-}
-
-.sp-page h1,
-.sp-page h2,
-.sp-page h3,
-.sp-page p {
-    margin-top: 0;
-}
-
-.sp-page h1 {
-    margin-bottom: 8px;
-    font-size: clamp(25px, 3vw, 34px);
-    font-weight: 800;
-    letter-spacing: -.8px;
-}
-
-.sp-page h2 {
-    margin-bottom: 7px;
-    font-size: 19px;
-    font-weight: 750;
-}
-
-.sp-page h3 {
-    font-size: 13px;
-    font-weight: 750;
-}
-
-.sp-page a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.sp-page button,
-.sp-page input,
-.sp-page textarea,
-.sp-page select {
-    font: inherit;
-}
-
-.sp-container {
-    width: 100%;
-    max-width: 1250px;
-    margin: 0 auto;
-    min-width: 0;
-}
-
-.sp-muted {
-    color: var(--sp-muted);
-}
-
+.sp-page, .sp-page * { box-sizing: border-box; }
+.sp-page h1, .sp-page h2, .sp-page h3, .sp-page p { margin-top: 0; }
+.sp-page a { color: inherit; text-decoration: none; }
+.sp-page button, .sp-page input, .sp-page textarea { font: inherit; }
+.sp-container { max-width: 1240px; width: 100%; margin: auto; min-width: 0; }
+.sp-muted { color: var(--muted); }
 .sp-eyebrow {
-    display: inline-block;
-    margin-bottom: 9px;
-    color: var(--sp-orange);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
+    display: block; margin-bottom: 8px; color: var(--orange);
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
     text-transform: uppercase;
 }
-
-.sp-card {
-    min-width: 0;
-    background: var(--sp-panel);
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-}
-
-.sp-card-pad {
-    padding: 23px;
-}
-
-.sp-section-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.sp-section-heading p {
-    margin-bottom: 0;
-    color: var(--sp-muted);
-    font-size: 12px;
-    line-height: 1.7;
-}
-
-/* All buttons have square corners */
+.sp-card { min-width: 0; background: var(--panel); border: 1px solid var(--line); }
 .sp-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 40px;
-    padding: 10px 15px;
-    border: 1px solid transparent;
-    border-radius: 0;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 750;
-    text-align: center;
-    transition: background .18s ease, border-color .18s ease;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 40px; padding: 10px 15px; border: 1px solid transparent;
+    cursor: pointer; font-size: 12px; font-weight: 750; text-align: center;
+    transition: background .18s, border-color .18s;
 }
+.sp-btn-primary { background: var(--orange); border-color: var(--orange); color: #111 !important; }
+.sp-btn-primary:hover { background: #e86e00; border-color: #e86e00; }
+.sp-btn-secondary { background: #20252d; border-color: #363d48; color: var(--text) !important; }
+.sp-btn-secondary:hover { background: #2a3039; border-color: #596270; }
+.sp-page :is(a, button):focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 
-.sp-btn-primary {
-    background: var(--sp-orange);
-    border-color: var(--sp-orange);
-    color: #111 !important;
-}
+.sp-messages { display: grid; gap: 9px; margin-bottom: 18px; }
+.sp-alert { padding: 13px 15px; border: 1px solid var(--line); background: var(--panel); font-size: 12px; line-height: 1.6; }
+.sp-alert-success { border-color: #245d45; color: #8be4bb; }
+.sp-alert-error { border-color: #6b3037; color: #ff9ba1; }
 
-.sp-btn-primary:hover {
-    background: var(--sp-orange-hover);
-    border-color: var(--sp-orange-hover);
-}
-
-.sp-btn-secondary {
-    background: #20252d;
-    border-color: #363d48;
-    color: var(--sp-text) !important;
-}
-
-.sp-btn-secondary:hover {
-    background: #2a3039;
-    border-color: #596270;
-}
-
-.sp-btn-danger {
-    background: #281619;
-    border-color: #633039;
-    color: #ff858b !important;
-}
-
-.sp-btn-small {
-    min-height: 32px;
-    padding: 7px 10px;
-    font-size: 11px;
-}
-
-.sp-page button:focus-visible,
-.sp-page a:focus-visible,
-.sp-page input:focus-visible,
-.sp-page textarea:focus-visible {
-    outline: 2px solid var(--sp-orange);
-    outline-offset: 3px;
-}
-
-/* Feedback messages */
-.sp-messages {
-    display: grid;
-    gap: 9px;
-    margin-bottom: 18px;
-}
-
-.sp-alert {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 13px 15px;
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-    background: var(--sp-panel);
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.sp-alert-success {
-    border-color: #245d45;
-    color: #8be4bb;
-}
-
-.sp-alert-error {
-    border-color: #6b3037;
-    color: #ff9ba1;
-}
-
-.sp-alert-info {
-    border-color: #68401f;
-    color: #ffc18b;
-}
-
-/* Cover banner */
 .sp-cover {
-    min-height: 190px;
-    overflow: hidden;
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-    background:
-        radial-gradient(ellipse at 78% 20%, rgba(255,121,0,.20), transparent 35%),
-        radial-gradient(ellipse at 15% 100%, rgba(255,121,0,.09), transparent 40%),
-        linear-gradient(125deg, #191d24, #0e1014 65%, #211a14);
+    min-height: 205px; overflow: hidden; border: 1px solid var(--line);
+    background: radial-gradient(ellipse at 78% 20%, rgba(255,121,0,.22), transparent 35%),
+    radial-gradient(ellipse at 15% 100%, rgba(255,121,0,.10), transparent 40%),
+    linear-gradient(125deg, #191d24, #0e1014 65%, #211a14);
+    background-position: center; background-size: cover;
 }
-
+.sp-cover.has-image { position: relative; }
+.sp-cover.has-image::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(8,10,13,.9), rgba(8,10,13,.48) 65%, rgba(8,10,13,.2));
+}
 .sp-cover-content {
-    display: flex;
-    align-items: flex-end;
-    min-height: 190px;
-    padding: 24px;
+    position: relative; z-index: 1; display: flex; align-items: flex-end;
+    min-height: 205px; padding: clamp(18px, 3vw, 30px);
 }
-
-.sp-cover-copy {
-    max-width: 620px;
-}
-
+.sp-cover-copy { max-width: 640px; }
 .sp-cover-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 13px;
-    padding: 7px 10px;
-    border: 1px solid rgba(255,121,0,.35);
-    border-radius: 0;
-    background: rgba(255,121,0,.09);
-    color: #ffb36e;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .5px;
+    display: inline-block; margin-bottom: 13px; padding: 7px 10px;
+    border: 1px solid rgba(255,121,0,.35); background: rgba(255,121,0,.09);
+    color: #ffb36e; font-size: 10px; font-weight: 800; letter-spacing: .5px;
 }
+.sp-cover h1 { margin: 0 0 9px; font-size: clamp(27px,4vw,40px); font-weight: 850; letter-spacing: -.8px; line-height: 1.1; }
+.sp-cover-copy p { max-width: 540px; margin: 0; color: #c1c6ce; font-size: 12px; line-height: 1.8; }
 
-.sp-cover-copy p {
-    max-width: 530px;
-    margin-bottom: 0;
-    color: #c1c6ce;
-    font-size: 12px;
-    line-height: 1.8;
-}
-
-/* Profile summary */
 .sp-profile-summary {
-    display: flex;
-    align-items: flex-end;
-    gap: 20px;
-    padding: 0 24px 22px;
+    display: flex; align-items: flex-end; gap: 20px; padding: 0 24px 22px;
+    border: 1px solid var(--line); border-top: 0; background: var(--panel);
 }
-
 .sp-avatar-wrap {
-    position: relative;
-    flex: 0 0 108px;
-    width: 108px;
-    height: 108px;
-    margin-top: -34px;
-    padding: 4px;
-    border: 1px solid var(--sp-border);
-    background: var(--sp-panel);
+    flex: 0 0 108px; width: 108px; height: 108px; margin-top: -34px;
+    padding: 4px; border: 1px solid var(--line); background: var(--panel);
     border-radius: 50%;
 }
-
 .sp-avatar {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    background: #252a32;
+    display: block; width: 100%; height: 100%; object-fit: cover;
+    border-radius: 50%; background: #252a32;
 }
-
 .sp-avatar-fallback {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: #242a32;
-    color: var(--sp-orange);
-    font-size: 35px;
-    font-weight: 800;
+    display: flex; align-items: center; justify-content: center; width: 100%;
+    height: 100%; border-radius: 50%; background: #242a32;
+    color: var(--orange); font-size: 35px; font-weight: 800;
 }
+.sp-profile-info { flex: 1; min-width: 0; padding-top: 17px; }
+.sp-profile-info h2 { margin: 0 0 5px; font-size: 22px; overflow-wrap: anywhere; }
+.sp-username { margin-bottom: 12px; color: var(--muted); font-size: 12px; }
+.sp-profile-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 11px; }
+.sp-profile-meta span { display: inline-flex; align-items: center; gap: 7px; overflow-wrap: anywhere; }
+.sp-profile-meta a:hover { color: var(--orange); }
+.sp-profile-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 2px; }
 
-/* Clickable avatar */
-.sp-avatar-view {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    overflow: hidden;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    cursor: zoom-in;
-}
-
-.sp-avatar-view .sp-avatar {
-    width: 100%;
-    height: 100%;
-}
-
-.sp-avatar-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(0,0,0,.55);
-    color: white;
-    font-size: 20px;
-    opacity: 0;
-    transition: opacity .2s ease;
-}
-
-.sp-avatar-view:hover .sp-avatar-overlay,
-.sp-avatar-view:focus-visible .sp-avatar-overlay {
-    opacity: 1;
-}
-
-.sp-profile-info {
-    flex: 1;
-    min-width: 0;
-    padding-top: 17px;
-}
-
-.sp-profile-info h2 {
-    margin-bottom: 5px;
-    font-size: 22px;
-    overflow-wrap: anywhere;
-}
-
-.sp-username {
-    margin-bottom: 12px;
-    color: var(--sp-muted);
-    font-size: 12px;
-}
-
-.sp-profile-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    color: var(--sp-muted);
-    font-size: 11px;
-}
-
-.sp-profile-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    overflow-wrap: anywhere;
-}
-
-.sp-profile-meta i {
-    color: var(--sp-orange);
-}
-
-.sp-profile-meta a:hover {
-    color: var(--sp-orange);
-}
-
-.sp-profile-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-bottom: 2px;
-}
-
-/* Statistics */
-.sp-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin: 18px 0 25px;
-}
-
-.sp-stat {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    min-width: 0;
-    padding: 17px;
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-    background: var(--sp-panel);
-}
-
+.sp-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 18px 0 25px; }
+.sp-stat { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 17px; border: 1px solid var(--line); background: var(--panel); }
 .sp-stat-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
-    border: 1px solid #4b3322;
-    border-radius: 0;
-    background: #24190f;
-    color: var(--sp-orange);
-    font-size: 15px;
+    display: flex; align-items: center; justify-content: center; flex: 0 0 40px;
+    width: 40px; height: 40px; border: 1px solid #4b3322;
+    background: #24190f; color: var(--orange); font-size: 13px; font-weight: 800;
 }
+.sp-stat-label { margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 650; }
+.sp-stat-value { font-size: 22px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
 
-.sp-stat-label {
-    margin-bottom: 5px;
-    color: var(--sp-muted);
-    font-size: 10px;
-    font-weight: 650;
-}
+.sp-content-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: start; gap: 20px; }
+.sp-main-column, .sp-side-column { display: grid; gap: 20px; min-width: 0; }
+.sp-card-pad { padding: 22px; }
+.sp-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.sp-section-heading h2 { margin: 0 0 5px; font-size: 19px; font-weight: 800; }
+.sp-section-heading p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-.sp-stat-value {
-    overflow-wrap: anywhere;
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.2;
-}
-
-/* Main content columns */
-.sp-content-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 290px;
-    align-items: start;
-    gap: 20px;
-}
-
-.sp-main-column,
-.sp-side-column {
-    display: grid;
-    gap: 20px;
-    min-width: 0;
-}
-
-/* Form styling */
-.sp-form {
-    display: grid;
-    gap: 18px;
-}
-
-.sp-form-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
-}
-
-.sp-field {
-    display: grid;
-    gap: 8px;
-    min-width: 0;
-}
-
-.sp-field label,
-.sp-field-label {
-    color: #e6e9ee;
-    font-size: 12px;
-    font-weight: 750;
-}
-
-.sp-page input:not([type="file"]):not([type="checkbox"]),
-.sp-page textarea,
-.sp-page select {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    padding: 11px 12px;
-    border: 1px solid #343a44;
-    border-radius: 0;
-    background: #0d1014;
-    color: var(--sp-text);
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.sp-page input::placeholder,
-.sp-page textarea::placeholder {
-    color: #737c89;
-    opacity: 1;
-}
-
-.sp-page input:not([type="file"]):focus,
-.sp-page textarea:focus,
-.sp-page select:focus {
-    border-color: var(--sp-orange);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255,121,0,.10);
-}
-
-.sp-page textarea {
-    min-height: 115px;
-    resize: vertical;
-}
-
-.sp-help {
-    margin: 0;
-    color: var(--sp-muted);
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-/* Avatar upload */
-.sp-avatar-upload {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border: 1px dashed #414854;
-    border-radius: 0;
-    background: #0e1116;
-}
-
-.sp-avatar-upload-preview {
-    flex: 0 0 60px;
-    width: 60px;
-    height: 60px;
-    overflow: hidden;
-    border: 2px solid #363d47;
-    border-radius: 50%;
-    background: #242a32;
-}
-
-.sp-avatar-upload-preview img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.sp-avatar-upload-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.sp-avatar-upload-content strong {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 12px;
-}
-
-.sp-avatar-upload-content p {
-    margin-bottom: 10px;
-    color: var(--sp-muted);
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-.sp-page input[type="file"].sp-avatar-input {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    color: var(--sp-muted);
-    font-size: 11px;
-}
-
-.sp-page input[type="file"]::file-selector-button {
-    margin-right: 9px;
-    padding: 8px 10px;
-    border: 1px solid #424a56;
-    border-radius: 0;
-    background: #252b34;
-    color: var(--sp-text);
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.sp-page input[type="file"]::file-selector-button:hover {
-    border-color: var(--sp-orange);
-}
-
-.sp-errors {
-    display: grid;
-    gap: 5px;
-    margin: 0;
-    padding-left: 17px;
-    color: #ff858b;
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-.sp-form-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 9px;
-    padding-top: 16px;
-    border-top: 1px solid var(--sp-border);
-}
-
-/* Sidebar profile details */
-.sp-info-list {
-    display: grid;
-}
-
-.sp-info-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 11px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--sp-border);
-}
-
-.sp-info-item:first-child {
-    padding-top: 0;
-}
-
-.sp-info-item:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-}
-
-.sp-info-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 33px;
-    width: 33px;
-    height: 33px;
-    border: 1px solid #353b45;
-    border-radius: 0;
-    background: #1b2027;
-    color: var(--sp-orange);
-    font-size: 12px;
-}
-
-.sp-info-copy {
-    flex: 1;
-    min-width: 0;
-}
-
-.sp-info-copy strong {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 11px;
-}
-
-.sp-info-copy p,
-.sp-info-copy a {
-    display: block;
-    overflow-wrap: anywhere;
-    margin-bottom: 0;
-    color: var(--sp-muted);
-    font-size: 11px;
-    line-height: 1.7;
-}
-
-.sp-info-copy a:hover {
-    color: var(--sp-orange);
-}
-
-/* Compact video library */
-.sp-video-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.sp-video-card {
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-    background: #0e1115;
-    transition: border-color .2s ease;
-}
-
-.sp-video-card:hover {
-    border-color: #80502d;
-}
-
-.sp-video-thumb {
-    position: relative;
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 0;
-    background:
-        radial-gradient(circle at 70% 30%, rgba(255,121,0,.13), transparent 40%),
-        #1a1f26;
-}
-
-.sp-video-thumb img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0;
-}
-
+.sp-video-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.sp-video-card { min-width: 0; border: 1px solid var(--line); background: #0d1014; transition: border-color .18s, transform .18s; }
+.sp-video-card:hover { border-color: #8b4b1c; transform: translateY(-2px); }
+.sp-video-thumb { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #20252d; }
+.sp-video-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+.sp-video-card:hover .sp-video-thumb img { transform: scale(1.025); }
 .sp-video-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    height: 100%;
-    color: var(--sp-orange);
-    font-size: 22px;
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    background: linear-gradient(135deg,#252a32,#111419); color: #aeb5bf; font-size: 12px;
 }
-
-.sp-video-placeholder span {
-    color: var(--sp-muted);
-    font-size: 10px;
+.sp-video-body { padding: 12px; }
+.sp-video-title {
+    display: -webkit-box; margin: 0 0 8px; overflow: hidden;
+    font-size: 13px; font-weight: 750; line-height: 1.5;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
+.sp-video-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font-size: 11px; }
+.sp-empty { padding: 35px 18px; border: 1px dashed #343a44; text-align: center; }
+.sp-empty h3 { margin: 0 0 8px; font-size: 16px; }
+.sp-empty p { max-width: 430px; margin: 0 auto 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-.sp-video-status {
-    position: absolute;
-    top: 7px;
-    left: 7px;
-    max-width: calc(100% - 14px);
-    overflow: hidden;
-    padding: 4px 6px;
-    border: 1px solid #414650;
-    border-radius: 0;
-    background: rgba(9,11,14,.92);
-    color: #f1f3f6;
-    font-size: 8px;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-transform: uppercase;
+.sp-info-list { display: grid; }
+.sp-info-item { display: flex; gap: 11px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.sp-info-item:first-child { padding-top: 0; }
+.sp-info-item:last-child { padding-bottom: 0; border-bottom: 0; }
+.sp-info-icon {
+    display: flex; align-items: center; justify-content: center; flex: 0 0 33px;
+    width: 33px; height: 33px; border: 1px solid #353b45;
+    background: #1b2027; color: var(--orange); font-size: 12px; font-weight: 800;
 }
+.sp-info-copy { flex: 1; min-width: 0; }
+.sp-info-copy strong { display: block; margin-bottom: 4px; font-size: 11px; }
+.sp-info-copy p, .sp-info-copy a { display: block; overflow-wrap: anywhere; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.sp-info-copy a:hover { color: var(--orange); }
+.sp-help { margin: 8px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-.sp-video-status-published {
-    color: #77e1ad;
+@media(max-width:1000px) {
+    .sp-content-grid { grid-template-columns: minmax(0,1fr) 250px; }
+    .sp-video-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .sp-profile-summary { flex-wrap: wrap; }
+    .sp-profile-actions { margin-left: 128px; margin-top: -6px; }
 }
-
-.sp-video-body {
-    padding: 10px;
+@media(max-width:650px) {
+    .sp-cover, .sp-cover-content { min-height: 175px; }
+    .sp-profile-summary { gap: 12px; padding: 0 15px 17px; }
+    .sp-avatar-wrap { flex-basis: 82px; width: 82px; height: 82px; margin-top: -25px; }
+    .sp-profile-info { padding-top: 13px; }
+    .sp-profile-info h2 { font-size: 18px; }
+    .sp-profile-actions { width: 100%; margin: 0; }
+    .sp-profile-actions .sp-btn { flex: 1; }
+    .sp-stats { gap: 8px; margin: 12px 0 18px; }
+    .sp-stat { display: block; padding: 12px 10px; }
+    .sp-stat-icon { width: 30px; height: 30px; margin-bottom: 9px; font-size: 11px; }
+    .sp-stat-value { font-size: 18px; }
+    .sp-stat-label { font-size: 9px; }
+    .sp-content-grid { grid-template-columns: 1fr; gap: 14px; }
+    .sp-card-pad { padding: 15px; }
+    .sp-video-grid { grid-template-columns: 1fr; gap: 10px; }
+    .sp-video-card { display: grid; grid-template-columns: 42% minmax(0,1fr); }
+    .sp-video-thumb { height: 100%; min-height: 95px; aspect-ratio: auto; }
+    .sp-video-body { align-self: center; padding: 10px; }
+    .sp-section-heading { align-items: flex-start; }
 }
-
-.sp-video-body h3 {
-    display: -webkit-box;
-    overflow: hidden;
-    margin-bottom: 7px;
-    font-size: 12px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-.sp-video-body h3 a:hover {
-    color: var(--sp-orange);
-}
-
-.sp-video-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 9px;
-    margin-bottom: 10px;
-    color: var(--sp-muted);
-    font-size: 9px;
-}
-
-.sp-video-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.sp-video-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-top: 9px;
-    border-top: 1px solid var(--sp-border);
-}
-
-.sp-video-footer small {
-    color: var(--sp-muted);
-    font-size: 9px;
-}
-
-.sp-video-footer a {
-    color: var(--sp-orange);
-    font-size: 10px;
-    font-weight: 750;
-}
-
-.sp-video-footer a:hover {
-    color: #ffb36e;
-}
-
-/* Empty state */
-.sp-empty {
-    padding: 30px 18px;
-    border: 1px dashed #343b46;
-    border-radius: 0;
-    background: #0e1115;
-    text-align: center;
-}
-
-.sp-empty-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 14px;
-    border: 1px solid #68401f;
-    border-radius: 0;
-    background: #24190f;
-    color: var(--sp-orange);
-    font-size: 19px;
-}
-
-.sp-empty h3 {
-    margin-bottom: 7px;
-    font-size: 14px;
-}
-
-.sp-empty p {
-    max-width: 350px;
-    margin: 0 auto 15px;
-    color: var(--sp-muted);
-    font-size: 11px;
-    line-height: 1.7;
-}
-
-/* Quick links */
-.sp-quick-actions {
-    display: grid;
-    gap: 8px;
-}
-
-.sp-quick-link {
-    display: flex !important;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    border: 1px solid var(--sp-border);
-    border-radius: 0;
-    background: #0e1115;
-    color: #e9edf2 !important;
-    font-size: 11px;
-    font-weight: 650;
-    transition: background .2s ease, border-color .2s ease;
-}
-
-.sp-quick-link:hover {
-    background: #1b2027;
-    border-color: #68401f;
-}
-
-.sp-quick-link > i:first-child {
-    width: 16px;
-    color: var(--sp-orange);
-    text-align: center;
-}
-
-.sp-quick-link span {
-    flex: 1;
-}
-
-.sp-link-arrow {
-    color: var(--sp-muted);
-    font-size: 9px;
-}
-
-/* Full-size profile picture viewer */
-.sp-avatar-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(0,0,0,.93);
-    cursor: zoom-out;
-}
-
-.sp-avatar-lightbox.is-open {
-    display: flex;
-}
-
-.sp-avatar-lightbox img {
-    display: block;
-    max-width: min(90vw, 700px);
-    max-height: 85vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border: 1px solid #353535;
-    border-radius: 0;
-    cursor: default;
-}
-
-.sp-avatar-lightbox-close {
-    position: absolute;
-    top: 16px;
-    right: 20px;
-    width: 44px;
-    height: 44px;
-    border: 1px solid #555;
-    border-radius: 0;
-    background: #171717;
-    color: white;
-    cursor: pointer;
-    font-size: 25px;
-}
-
-/* Responsive layout */
-@media (max-width: 1050px) {
-    .sp-content-grid {
-        grid-template-columns: minmax(0, 1fr) 260px;
-        gap: 15px;
-    }
-
-    .sp-card-pad {
-        padding: 19px;
-    }
-
-    .sp-video-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .sp-profile-summary {
-        padding-right: 18px;
-        padding-left: 18px;
-    }
-}
-
-@media (max-width: 760px) {
-    .sp-page {
-        padding: 18px 13px 32px;
-    }
-
-    .sp-profile-summary {
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 0 14px 18px;
-    }
-
-    .sp-avatar-wrap {
-        flex-basis: 88px;
-        width: 88px;
-        height: 88px;
-        margin-top: -27px;
-    }
-
-    .sp-profile-info {
-        flex: 1 1 calc(100% - 105px);
-        padding-top: 12px;
-    }
-
-    .sp-profile-info h2 {
-        font-size: 19px;
-    }
-
-    .sp-profile-actions {
-        width: 100%;
-        padding-top: 4px;
-    }
-
-    .sp-profile-actions .sp-btn {
-        flex: 1;
-    }
-
-    .sp-content-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .sp-side-column {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .sp-stats {
-        gap: 9px;
-        margin-top: 16px;
-        margin-bottom: 21px;
-    }
-
-    .sp-stat {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 9px;
-        padding: 12px;
-    }
-
-    .sp-stat-value {
-        font-size: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .sp-page {
-        padding: 14px 9px 26px;
-    }
-
-    .sp-cover,
-    .sp-cover-content {
-        min-height: 165px;
-    }
-
-    .sp-cover-content {
-        padding: 17px;
-    }
-
-    .sp-profile-summary {
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-
-    .sp-avatar-wrap {
-        flex-basis: 75px;
-        width: 75px;
-        height: 75px;
-        margin-top: -22px;
-    }
-
-    .sp-profile-info {
-        flex-basis: calc(100% - 88px);
-    }
-
-    .sp-profile-info h2 {
-        font-size: 17px;
-    }
-
-    .sp-profile-meta {
-        gap: 7px 11px;
-        font-size: 10px;
-    }
-
-    .sp-stats {
-        gap: 6px;
-    }
-
-    .sp-stat {
-        padding: 9px 7px;
-    }
-
-    .sp-stat-icon {
-        flex-basis: 30px;
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-    }
-
-    .sp-stat-label {
-        font-size: 9px;
-        line-height: 1.5;
-    }
-
-    .sp-stat-value {
-        font-size: 17px;
-    }
-
-    .sp-card-pad {
-        padding: 15px 11px;
-    }
-
-    .sp-section-heading h2 {
-        font-size: 16px;
-    }
-
-    .sp-form-row,
-    .sp-side-column {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .sp-video-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 7px;
-    }
-
-    .sp-video-body {
-        padding: 8px;
-    }
-
-    .sp-video-body h3 {
-        font-size: 11px;
-    }
-
-    .sp-video-meta {
-        font-size: 8px;
-    }
-
-    .sp-video-footer a,
-    .sp-video-footer small {
-        font-size: 9px;
-    }
-
-    .sp-avatar-upload {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .sp-avatar-upload-content {
-        width: 100%;
-    }
-
-    .sp-form-actions {
-        align-items: stretch;
-        flex-direction: column-reverse;
-    }
-
-    .sp-form-actions .sp-btn {
-        width: 100%;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .sp-page *,
-    .sp-page *::before,
-    .sp-page *::after {
-        transition: none !important;
-    }
+@media(prefers-reduced-motion:reduce) {
+    .sp-page *, .sp-page *:before, .sp-page *:after { transition: none !important; }
 }
 </style>
 {% endblock %}
 
-
 {% block content %}
 <div class="sp-page">
-    <div class="sp-container">
+  <div class="sp-container">
 
-        <!-- Feedback messages -->
-        {% if messages %}
-        <div class="sp-messages" role="status" aria-live="polite">
-            {% for message in messages %}
-            <div class="sp-alert
-                {% if message.tags == 'success' %}sp-alert-success
-                {% elif message.tags == 'error' %}sp-alert-error
-                {% else %}sp-alert-info{% endif %}">
-                <i class="fas
-                    {% if message.tags == 'success' %}fa-check-circle
-                    {% elif message.tags == 'error' %}fa-exclamation-circle
-                    {% else %}fa-info-circle{% endif %}"></i>
-                <span>{{ message }}</span>
-            </div>
-            {% endfor %}
+    {% if messages %}
+      <div class="sp-messages" aria-live="polite">
+        {% for message in messages %}
+          <div class="sp-alert {% if message.tags == 'success' %}sp-alert-success{% elif message.tags == 'error' %}sp-alert-error{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# Use the real cover URL saved in Profile.cover_image, when present. #}
+    <section class="sp-cover{% if profile.cover_image %} has-image{% endif %}"
+      {% if profile.cover_image %}style="background-image:url('{{ profile.cover_image|escape }}')"{% endif %}>
+      <div class="sp-cover-content">
+        <div class="sp-cover-copy">
+          <span class="sp-cover-badge">STREAMSPHERE · CREATOR PROFILE</span>
+          <h1>Your space. Your story.</h1>
+          <p>Manage your creator identity, share your videos, and let the StreamSphere community discover what you make.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="sp-profile-summary" aria-label="Profile summary">
+      <div class="sp-avatar-wrap">
+        {% if profile.avatar_image %}
+          <img class="sp-avatar"
+               src="{{ profile.avatar_image.url }}"
+               alt="{{ profile_user.username }}'s profile photo">
+        {% elif profile.avatar %}
+          <img class="sp-avatar"
+               src="{{ profile.avatar }}"
+               alt="{{ profile_user.username }}'s profile photo">
+        {% else %}
+          <div class="sp-avatar-fallback" aria-label="Default profile avatar">
+            {{ profile_user.username|first|upper }}
+          </div>
         {% endif %}
-
-        <!-- Cover -->
-        <section class="sp-cover">
-            <div class="sp-cover-content">
-                <div class="sp-cover-copy">
-                    <div class="sp-cover-badge">
-                        <i class="fas fa-user-circle"></i>
-                        YOUR CREATOR SPACE
-                    </div>
-
-                    <h1>My Profile</h1>
-
-                    <p>
-                        Manage your profile, update your picture, and keep
-                        track of your StreamSphere content in one place.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Profile identity -->
-        <section class="sp-profile-summary">
-
-            <div class="sp-avatar-wrap">
-                {% if profile.avatar %}
-                <button
-                    type="button"
-                    class="sp-avatar-view"
-                    onclick="spOpenAvatar(this.querySelector('img').src)"
-                    aria-label="View profile picture">
-
-                    <img
-                        class="sp-avatar"
-                        src="{{ profile.avatar }}"
-                        alt="{{ profile_user.username }}'s profile picture">
-
-                    <span class="sp-avatar-overlay">
-                        <i class="fas fa-search-plus"></i>
-                    </span>
-                </button>
-                {% else %}
-                <div class="sp-avatar-fallback">
-                    {{ profile_user.username|first|upper }}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="sp-profile-info">
-                <h2>
-                    {% if profile_user.get_full_name %}
-                        {{ profile_user.get_full_name }}
-                    {% else %}
-                        {{ profile_user.username }}
-                    {% endif %}
-                </h2>
-
-                <p class="sp-username">@{{ profile_user.username }}</p>
-
-                <div class="sp-profile-meta">
-                    {% if profile.location %}
-                    <span>
-                        <i class="fas fa-map-marker-alt"></i>
-                        {{ profile.location }}
-                    </span>
-                    {% endif %}
-
-                    {% if profile.website %}
-                    <span>
-                        <i class="fas fa-link"></i>
-                        <a href="{{ profile.website }}"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            Website
-                        </a>
-                    </span>
-                    {% endif %}
-
-                    <span>
-                        <i class="fas fa-calendar-alt"></i>
-                        Joined {{ profile_user.date_joined|date:"M Y" }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="sp-profile-actions">
-                <a href="#edit-profile" class="sp-btn sp-btn-primary">
-                    <i class="fas fa-pen"></i>
-                    Edit profile
-                </a>
-
-                <a href="#my-videos" class="sp-btn sp-btn-secondary">
-                    <i class="fas fa-play-circle"></i>
-                    My videos
-                </a>
-            </div>
-        </section>
-
-        <!-- Statistics -->
-        <section class="sp-stats" aria-label="Profile statistics">
-            <div class="sp-stat">
-                <div class="sp-stat-icon">
-                    <i class="fas fa-photo-video"></i>
-                </div>
-                <div>
-                    <div class="sp-stat-label">Published videos</div>
-                    <div class="sp-stat-value">{{ video_count|default:0 }}</div>
-                </div>
-            </div>
-
-            <div class="sp-stat">
-                <div class="sp-stat-icon">
-                    <i class="fas fa-eye"></i>
-                </div>
-                <div>
-                    <div class="sp-stat-label">Total views</div>
-                    <div class="sp-stat-value">{{ total_views|default:0 }}</div>
-                </div>
-            </div>
-
-            <div class="sp-stat">
-                <div class="sp-stat-icon">
-                    <i class="fas fa-video"></i>
-                </div>
-                <div>
-                    <div class="sp-stat-label">All videos</div>
-                    <div class="sp-stat-value">{{ videos|length }}</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main content -->
-        <div class="sp-content-grid">
-
-            <main class="sp-main-column">
-
-                <!-- Edit profile -->
-                <section class="sp-card sp-card-pad" id="edit-profile">
-                    <div class="sp-section-heading">
-                        <div>
-                            <span class="sp-eyebrow">Personal details</span>
-                            <h2>Edit your profile</h2>
-                            <p>
-                                Change your profile picture and personal
-                                information.
-                            </p>
-                        </div>
-                    </div>
-
-                    <form method="post"
-                          enctype="multipart/form-data"
-                          class="sp-form">
-
-                        {% csrf_token %}
-
-                        {% if form.non_field_errors %}
-                        <div class="sp-alert sp-alert-error">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <div>{{ form.non_field_errors }}</div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Profile picture upload -->
-                        <div class="sp-field">
-                            <span class="sp-field-label">Profile picture</span>
-
-                            <div class="sp-avatar-upload">
-                                <div class="sp-avatar-upload-preview">
-                                    {% if profile.avatar %}
-                                    <img
-                                        src="{{ profile.avatar }}"
-                                        alt="Current profile picture">
-                                    {% else %}
-                                    <div class="sp-avatar-fallback">
-                                        {{ profile_user.username|first|upper }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-
-                                <div class="sp-avatar-upload-content">
-                                    <strong>Choose a new picture</strong>
-                                    <p>
-                                        JPEG, PNG, WEBP or GIF.
-                                        Maximum size: 5 MB.
-                                    </p>
-
-                                    {{ form.avatar_upload }}
-
-                                    {% if form.avatar_upload.errors %}
-                                    <ul class="sp-errors">
-                                        {% for error in form.avatar_upload.errors %}
-                                        <li>{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bio -->
-                        <div class="sp-field">
-                            <label for="{{ form.bio.id_for_label }}">
-                                About me
-                            </label>
-
-                            {{ form.bio }}
-
-                            {% if form.bio.errors %}
-                            <ul class="sp-errors">
-                                {% for error in form.bio.errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </div>
-
-                        <!-- Location and website -->
-                        <div class="sp-form-row">
-                            <div class="sp-field">
-                                <label for="{{ form.location.id_for_label }}">
-                                    Location
-                                </label>
-
-                                {{ form.location }}
-
-                                {% if form.location.errors %}
-                                <ul class="sp-errors">
-                                    {% for error in form.location.errors %}
-                                    <li>{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% endif %}
-                            </div>
-
-                            <div class="sp-field">
-                                <label for="{{ form.website.id_for_label }}">
-                                    Website
-                                </label>
-
-                                {{ form.website }}
-
-                                {% if form.website.errors %}
-                                <ul class="sp-errors">
-                                    {% for error in form.website.errors %}
-                                    <li>{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="sp-form-actions">
-                            <button type="reset"
-                                    class="sp-btn sp-btn-secondary">
-                                <i class="fas fa-undo"></i>
-                                Reset fields
-                            </button>
-
-                            <button type="submit"
-                                    class="sp-btn sp-btn-primary">
-                                <i class="fas fa-save"></i>
-                                Save changes
-                            </button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- Video library -->
-                <section class="sp-card sp-card-pad" id="my-videos">
-                    <div class="sp-section-heading">
-                        <div>
-                            <span class="sp-eyebrow">Your content</span>
-                            <h2>My video library</h2>
-                            <p>
-                                Your uploaded videos and their current status.
-                            </p>
-                        </div>
-
-                        <span class="sp-btn sp-btn-secondary sp-btn-small">
-                            {{ videos|length }} total
-                        </span>
-                    </div>
-
-                    {% if videos %}
-                    <div class="sp-video-grid">
-                        {% for video in videos %}
-                        <article class="sp-video-card">
-
-                            <a href="{% url 'videos:detail' video.pk %}"
-                               class="sp-video-thumb"
-                               aria-label="View {{ video.title }}">
-
-                                {% if video.thumbnail_url %}
-                                <img
-                                    src="{{ video.thumbnail_url }}"
-                                    alt="{{ video.title }} thumbnail"
-                                    loading="lazy"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-
-                                <div class="sp-video-placeholder"
-                                     style="display:none;">
-                                    <i class="fas fa-image"></i>
-                                    <span>Preview unavailable</span>
-                                </div>
-                                {% else %}
-                                <div class="sp-video-placeholder">
-                                    <i class="fas fa-play-circle"></i>
-                                    <span>No thumbnail available</span>
-                                </div>
-                                {% endif %}
-
-                                <span class="sp-video-status
-                                    {% if video.status == 'published' %}sp-video-status-published{% endif %}">
-                                    {{ video.get_status_display|default:video.status }}
-                                </span>
-                            </a>
-
-                            <div class="sp-video-body">
-                                <h3>
-                                    <a href="{% url 'videos:detail' video.pk %}">
-                                        {{ video.title|default:"Untitled video" }}
-                                    </a>
-                                </h3>
-
-                                <div class="sp-video-meta">
-                                    <span>
-                                        <i class="fas fa-eye"></i>
-                                        {{ video.views|default:0 }}
-                                    </span>
-
-                                    <span>
-                                        <i class="far fa-calendar"></i>
-                                        {{ video.created_at|date:"M d, Y" }}
-                                    </span>
-                                </div>
-
-                                <div class="sp-video-footer">
-                                    <small>
-                                        {{ video.get_status_display|default:video.status }}
-                                    </small>
-
-                                    <a href="{% url 'videos:detail' video.pk %}">
-                                        View <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                        {% endfor %}
-                    </div>
-
-                    {% else %}
-                    <div class="sp-empty">
-                        <div class="sp-empty-icon">
-                            <i class="fas fa-film"></i>
-                        </div>
-
-                        <h3>Your video library is empty</h3>
-
-                        <p>
-                            Your uploaded videos will appear here.
-                            Start sharing your content with the community.
-                        </p>
-
-                        <a href="{% url 'videos:upload' %}"
-                           class="sp-btn sp-btn-primary">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            Upload a video
-                        </a>
-                    </div>
-                    {% endif %}
-                </section>
-
-            </main>
-
-            <!-- Sidebar -->
-            <aside class="sp-side-column">
-
-                <!-- Account details -->
-                <section class="sp-card sp-card-pad">
-                    <div class="sp-section-heading">
-                        <div>
-                            <span class="sp-eyebrow">Account</span>
-                            <h2>Profile details</h2>
-                        </div>
-                    </div>
-
-                    <div class="sp-info-list">
-                        <div class="sp-info-item">
-                            <div class="sp-info-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="sp-info-copy">
-                                <strong>Username</strong>
-                                <p>@{{ profile_user.username }}</p>
-                            </div>
-                        </div>
-
-                        <div class="sp-info-item">
-                            <div class="sp-info-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="sp-info-copy">
-                                <strong>Email address</strong>
-                                <p>
-                                    {{ profile_user.email|default:"No email added" }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="sp-info-item">
-                            <div class="sp-info-icon">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="sp-info-copy">
-                                <strong>Member since</strong>
-                                <p>
-                                    {{ profile_user.date_joined|date:"F d, Y" }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="sp-info-item">
-                            <div class="sp-info-icon">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="sp-info-copy">
-                                <strong>Website</strong>
-
-                                {% if profile.website %}
-                                <a href="{{ profile.website }}"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    {{ profile.website }}
-                                </a>
-                                {% else %}
-                                <p>No website added yet.</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Quick actions -->
-                <section class="sp-card sp-card-pad">
-                    <div class="sp-section-heading">
-                        <div>
-                            <span class="sp-eyebrow">Shortcuts</span>
-                            <h2>Quick actions</h2>
-                        </div>
-                    </div>
-
-                    <nav class="sp-quick-actions"
-                         aria-label="Profile shortcuts">
-
-                        <a class="sp-quick-link" href="#edit-profile">
-                            <i class="fas fa-user-edit"></i>
-                            <span>Edit profile</span>
-                            <i class="fas fa-chevron-right sp-link-arrow"></i>
-                        </a>
-
-                        <a class="sp-quick-link"
-                           href="{% url 'videos:upload' %}">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Upload a video</span>
-                            <i class="fas fa-chevron-right sp-link-arrow"></i>
-                        </a>
-
-                        <a class="sp-quick-link" href="#my-videos">
-                            <i class="fas fa-play-circle"></i>
-                            <span>My videos</span>
-                            <i class="fas fa-chevron-right sp-link-arrow"></i>
-                        </a>
-                    </nav>
-                </section>
-
-                <!-- Creator tip -->
-                <section class="sp-card sp-card-pad">
-                    <div class="sp-section-heading">
-                        <div>
-                            <span class="sp-eyebrow">Creator tip</span>
-                            <h2>Make your profile count</h2>
-                        </div>
-                    </div>
-
-                    <div class="sp-info-item">
-                        <div class="sp-info-icon">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <div class="sp-info-copy">
-                            <strong>Keep it up to date</strong>
-                            <p>
-                                Use a clear profile picture, write a short bio,
-                                and add your website to help viewers learn
-                                more about you.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-            </aside>
+      </div>
+
+      <div class="sp-profile-info">
+        <h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+        <p class="sp-username">@{{ profile_user.username }}</p>
+        <div class="sp-profile-meta">
+          {% if profile.location %}<span>{{ profile.location }}</span>{% endif %}
+          {% if profile_user.date_joined %}<span>Member since {{ profile_user.date_joined|date:"M Y" }}</span>{% endif %}
+          {% if profile.website %}
+            <span><a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer">{{ profile.website }}</a></span>
+          {% endif %}
         </div>
+      </div>
+
+      <div class="sp-profile-actions">
+        {% if request.user == profile_user %}
+          <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Edit profile</a>
+                  {% else %}
+          <a class="sp-btn sp-btn-primary" href="{% url 'chat:start' username=profile_user.username %}">Message</a>
+          <a class="sp-btn sp-btn-secondary" href="{% url 'streaming:list' %}">Watch Streams</a>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="sp-stats" aria-label="Profile statistics">
+      <div class="sp-stat">
+        <div class="sp-stat-icon">V</div>
+        <div><div class="sp-stat-label">Videos</div><div class="sp-stat-value">{{ video_count|default:"0" }}</div></div>
+      </div>
+      <div class="sp-stat">
+        <div class="sp-stat-icon">F</div>
+        <div><div class="sp-stat-label">Followers</div><div class="sp-stat-value">{{ profile.followers.count|default:0 }}</div></div>
+      </div>
+      <div class="sp-stat">
+        <div class="sp-stat-icon">+</div>
+        <div><div class="sp-stat-label">Following</div><div class="sp-stat-value">{{ profile.following.count|default:0 }}</div></div>
+      </div>
+    </section>
+
+    <div class="sp-content-grid">
+      <main class="sp-main-column">
+        <section class="sp-card sp-card-pad">
+          <div class="sp-section-heading">
+            <div>
+              <span class="sp-eyebrow">Your library</span>
+              <h2>Videos</h2>
+              <p>Videos uploaded to this StreamSphere account.</p>
+            </div>
+            <span class="sp-muted">{{ video_count|default:"0" }} total</span>
+          </div>
+
+          <div class="sp-video-grid">
+            {% for video in videos %}
+              <a class="sp-video-card" href="{% url 'videos:detail' video.pk %}">
+                <div class="sp-video-thumb">
+                  {% if video.thumbnail %}
+                    {# If thumbnail is a file/ImageField, .url is correct. #}
+                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                  {% elif video.thumbnail_url %}
+                    <img src="{{ video.thumbnail_url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                  {% else %}
+                    <div class="sp-video-placeholder">Video thumbnail</div>
+                  {% endif %}
+                </div>
+                <div class="sp-video-body">
+                  <h3 class="sp-video-title">{{ video.title|default:"Untitled video" }}</h3>
+                  <div class="sp-video-meta">
+                    {% if video.created_at %}<span>{{ video.created_at|date:"M j, Y" }}</span>{% endif %}
+                    <span>{{ video.views|default:0 }} views</span>
+                  </div>
+                </div>
+              </a>
+            {% empty %}
+              <div class="sp-empty">
+                <h3>No videos yet</h3>
+                <p>Uploaded videos will appear here when they are available.</p>
+                {% if request.user == profile_user %}
+                  <a class="sp-btn sp-btn-secondary" href="{% url 'home' %}">Explore StreamSphere</a>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      </main>
+
+      <aside class="sp-side-column">
+        <section class="sp-card sp-card-pad">
+          <div class="sp-section-heading">
+            <div><span class="sp-eyebrow">Profile details</span><h2>About</h2></div>
+          </div>
+
+          <div class="sp-info-list">
+            <div class="sp-info-item">
+              <div class="sp-info-icon">U</div>
+              <div class="sp-info-copy"><strong>Username</strong><p>@{{ profile_user.username }}</p></div>
+            </div>
+            <div class="sp-info-item">
+              <div class="sp-info-icon">B</div>
+              <div class="sp-info-copy">
+                <strong>Bio</strong>
+                <p>{% if profile.bio %}{{ profile.bio|linebreaksbr }}{% else %}No bio added yet.{% endif %}</p>
+              </div>
+            </div>
+            {% if profile.location %}
+              <div class="sp-info-item">
+                <div class="sp-info-icon">L</div>
+                <div class="sp-info-copy"><strong>Location</strong><p>{{ profile.location }}</p></div>
+              </div>
+            {% endif %}
+            {% if profile.website %}
+              <div class="sp-info-item">
+                <div class="sp-info-icon">W</div>
+                <div class="sp-info-copy"><strong>Website</strong><a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer">{{ profile.website }}</a></div>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        {% if request.user == profile_user %}
+        <section class="sp-card sp-card-pad">
+          <span class="sp-eyebrow">Make it yours</span>
+          <h2>Keep your profile fresh</h2>
+          <p class="sp-help">A clear profile photo, useful bio, and current details help people connect with your content.</p>
+          <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Update profile</a>
+        </section>
+        {% endif %}
+      </aside>
     </div>
+  </div>
 </div>
-
-<!-- Full-size avatar viewer -->
-<div class="sp-avatar-lightbox"
-     id="spAvatarLightbox"
-     role="dialog"
-     aria-modal="true"
-     aria-label="Profile picture preview"
-     onclick="spCloseAvatar()">
-
-    <button type="button"
-            class="sp-avatar-lightbox-close"
-            aria-label="Close picture"
-            onclick="event.stopPropagation(); spCloseAvatar();">
-        &times;
-    </button>
-
-    <img id="spAvatarLightboxImage"
-         src=""
-         alt="Full-size profile picture"
-         onclick="event.stopPropagation();">
-</div>
-
-<script>
-(function () {
-    const lightbox = document.getElementById("spAvatarLightbox");
-    const lightboxImage = document.getElementById("spAvatarLightboxImage");
-
-    let previousOverflow = "";
-
-    window.spOpenAvatar = function (url) {
-        if (!url || !lightbox || !lightboxImage) return;
-
-        previousOverflow = document.body.style.overflow;
-        lightboxImage.src = url;
-        lightbox.classList.add("is-open");
-        document.body.style.overflow = "hidden";
-    };
-
-    window.spCloseAvatar = function () {
-        if (!lightbox || !lightboxImage) return;
-
-        lightbox.classList.remove("is-open");
-        lightboxImage.src = "";
-        document.body.style.overflow = previousOverflow;
-    };
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" &&
-            lightbox &&
-            lightbox.classList.contains("is-open")) {
-            window.spCloseAvatar();
-        }
-    });
-})();
-</script>
 {% endblock %}

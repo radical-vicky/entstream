@@ -1,70 +1,489 @@
-
 {% extends "base.html" %}
 
 {% block title %}Request Withdrawal | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-withdraw{max-width:760px;margin:0 auto;padding:32px 20px 60px;color:#f5f5f5}
+.ss-withdraw{
+    --orange:#ff7900;
+    --orange-light:#ffad65;
+    --bg:#0b0b0d;
+    --panel:#141416;
+    --border:#2b2b30;
+    --text:#f4f4f5;
+    --muted:#96969f;
+    --green:#76d7a0;
+    max-width:1100px;
+    margin:0 auto;
+    padding:38px 24px 72px;
+    color:var(--text);
+}
 .ss-withdraw *{box-sizing:border-box}
-.ss-withdraw .eyebrow{font-size:12px;letter-spacing:2px;color:#ff7900;font-weight:800;text-transform:uppercase}
-.ss-withdraw h1{font-size:clamp(27px,4vw,36px);margin:10px 0}
-.ss-withdraw .intro{color:#aaa;line-height:1.7}
-.ss-withdraw .panel{margin-top:23px;padding:24px;background:#151515;border:1px solid #303030}
-.ss-withdraw .available{padding:17px;background:#211a13;border-left:3px solid #ff7900;margin-bottom:24px}
-.ss-withdraw .available span{display:block;color:#bbb;font-size:13px;margin-bottom:7px}
-.ss-withdraw .available strong{font-size:28px}
-.ss-withdraw .field{margin-bottom:20px}
-.ss-withdraw label{display:block;margin-bottom:8px;font-size:14px;font-weight:750}
-.ss-withdraw .ss-input{display:block;width:100%;padding:13px 14px;background:#0b0b0b;color:#f5f5f5;border:1px solid #3b3b3b;border-radius:0;font:inherit}
-.ss-withdraw .ss-input:focus{outline:none;border-color:#ff7900}
-.ss-withdraw .errors,.ss-withdraw .errorlist{color:#ff9c85;font-size:13px;line-height:1.7}
-.ss-withdraw .btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 17px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:850;text-decoration:none;border-radius:0;cursor:pointer}
-.ss-withdraw .btn-secondary{background:transparent;color:#ff7900}
-.ss-withdraw .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.ss-withdraw .note{color:#aaa;font-size:12px;line-height:1.8;margin-top:20px}
-@media(max-width:540px){.ss-withdraw{padding:22px 13px 40px}.ss-withdraw .panel{padding:17px}.ss-withdraw .actions .btn{width:100%}}
+.ss-withdraw a{text-decoration:none}
+.ss-withdraw .eyebrow{
+    color:var(--orange);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+.ss-withdraw .page-heading{
+    font-size:clamp(30px,4vw,43px);
+    line-height:1.12;
+    letter-spacing:-1.5px;
+    font-weight:850;
+    margin:12px 0;
+}
+.ss-withdraw .intro{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.8;
+    max-width:560px;
+    margin:0;
+}
+.ss-withdraw .breadcrumb{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:9px;
+    color:#777780;
+    font-size:12px;
+    margin-bottom:28px;
+}
+.ss-withdraw .breadcrumb a{color:#b5b5bd}
+.ss-withdraw .breadcrumb a:hover{color:var(--orange-light)}
+.ss-withdraw .breadcrumb span:last-child{color:var(--orange-light)}
+.ss-withdraw .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(250px,.8fr);
+    gap:22px;
+    align-items:start;
+    margin-top:30px;
+}
+.ss-withdraw .panel{
+    min-width:0;
+    background:var(--panel);
+    border:1px solid var(--border);
+}
+.ss-withdraw .panel-heading{
+    padding:22px 24px;
+    border-bottom:1px solid var(--border);
+}
+.ss-withdraw .panel-heading h2{
+    margin:0;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:-.3px;
+}
+.ss-withdraw .panel-heading p{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.7;
+    margin:7px 0 0;
+}
+.ss-withdraw .panel-body{padding:24px}
+.ss-withdraw .available{
+    position:relative;
+    overflow:hidden;
+    padding:23px;
+    margin-bottom:27px;
+    background:linear-gradient(120deg,#24190f,#19130f 65%,#171313);
+    border:1px solid #49301b;
+}
+.ss-withdraw .available:after{
+    content:"";
+    position:absolute;
+    top:-55px;
+    right:-35px;
+    width:150px;
+    height:150px;
+    border:1px solid #49301b;
+    border-radius:50%;
+    box-shadow:0 0 0 22px rgba(255,121,0,.025),
+               0 0 0 45px rgba(255,121,0,.02);
+    pointer-events:none;
+}
+.ss-withdraw .available-label{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:#c9b7a4;
+    font-size:12px;
+    font-weight:650;
+    margin-bottom:17px;
+}
+.ss-withdraw .balance-dot{
+    width:7px;
+    height:7px;
+    background:var(--orange);
+    border-radius:50%;
+}
+.ss-withdraw .available strong{
+    position:relative;
+    z-index:1;
+    display:block;
+    font-size:clamp(27px,4vw,37px);
+    font-weight:850;
+    letter-spacing:-1px;
+    overflow-wrap:anywhere;
+}
+.ss-withdraw .available-foot{
+    position:relative;
+    z-index:1;
+    color:#a89b8d;
+    font-size:11px;
+    line-height:1.7;
+    margin-top:12px;
+}
+.ss-withdraw .section-label{
+    display:block;
+    color:#dedee2;
+    font-size:12px;
+    font-weight:800;
+    margin-bottom:17px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+.ss-withdraw .field{margin-bottom:22px}
+.ss-withdraw label{
+    display:block;
+    margin-bottom:9px;
+    color:#e7e7eb;
+    font-size:12px;
+    font-weight:750;
+}
+.ss-withdraw .helptext,
+.ss-withdraw .help-text{
+    display:block;
+    color:#888891;
+    font-size:11px;
+    line-height:1.7;
+    margin-top:7px;
+}
+.ss-withdraw .field input,
+.ss-withdraw .field select,
+.ss-withdraw .field textarea,
+.ss-withdraw .ss-input{
+    display:block;
+    width:100%;
+    min-height:47px;
+    padding:12px 14px;
+    background:#0c0c0e;
+    color:var(--text);
+    border:1px solid #37373e;
+    border-radius:2px;
+    font:inherit;
+    font-size:13px;
+    transition:border-color .18s ease,box-shadow .18s ease;
+}
+.ss-withdraw .field textarea{min-height:105px;resize:vertical}
+.ss-withdraw .field input::placeholder,
+.ss-withdraw .field textarea::placeholder{color:#65656e}
+.ss-withdraw .field input:focus,
+.ss-withdraw .field select:focus,
+.ss-withdraw .field textarea:focus,
+.ss-withdraw .ss-input:focus{
+    outline:none;
+    border-color:var(--orange);
+    box-shadow:0 0 0 3px rgba(255,121,0,.09);
+}
+.ss-withdraw .field input[type="checkbox"],
+.ss-withdraw .field input[type="radio"]{
+    display:inline-block;
+    width:auto;
+    min-height:auto;
+    accent-color:var(--orange);
+}
+.ss-withdraw .errors,
+.ss-withdraw .errorlist{
+    color:#ff9b8f;
+    font-size:12px;
+    line-height:1.7;
+    margin:7px 0 0;
+}
+.ss-withdraw .errorlist{padding-left:18px}
+.ss-withdraw .form-errors{
+    padding:13px 15px;
+    margin-bottom:22px;
+    background:#2b1716;
+    border:1px solid #62312c;
+    color:#ffb3a9;
+    font-size:12px;
+    line-height:1.7;
+}
+.ss-withdraw .actions{
+    display:flex;
+    gap:11px;
+    margin-top:27px;
+}
+.ss-withdraw .btn{
+    min-height:47px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:13px 18px;
+    background:var(--orange);
+    color:#17100a;
+    border:1px solid var(--orange);
+    border-radius:2px;
+    font-size:12px;
+    font-weight:850;
+    text-align:center;
+    cursor:pointer;
+    transition:background .18s ease,border-color .18s ease;
+}
+.ss-withdraw .btn:hover{
+    background:#ff9233;
+    border-color:#ff9233;
+}
+.ss-withdraw .btn-primary{flex:1}
+.ss-withdraw .btn-secondary{
+    background:transparent;
+    color:#d5d5dc;
+    border-color:#393940;
+}
+.ss-withdraw .btn-secondary:hover{
+    color:#fff;
+    border-color:#66666f;
+    background:#202024;
+}
+.ss-withdraw .security-panel{
+    padding:20px;
+    margin-bottom:16px;
+    background:#121214;
+    border:1px solid var(--border);
+}
+.ss-withdraw .security-heading{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+    font-size:13px;
+    font-weight:800;
+}
+.ss-withdraw .security-icon{
+    display:grid;
+    place-items:center;
+    width:31px;
+    height:31px;
+    flex:0 0 31px;
+    color:var(--orange-light);
+    background:#281a10;
+    border:1px solid #4a301c;
+    font-size:13px;
+    font-weight:900;
+}
+.ss-withdraw .security-panel p{
+    margin:0;
+    color:#a1a1aa;
+    font-size:12px;
+    line-height:1.8;
+}
+.ss-withdraw .security-panel strong{color:#f0e1d2}
+.ss-withdraw .steps{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+.ss-withdraw .steps li{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 0;
+    border-bottom:1px solid #29292e;
+}
+.ss-withdraw .steps li:last-child{border-bottom:0;padding-bottom:0}
+.ss-withdraw .step-number{
+    display:grid;
+    place-items:center;
+    flex:0 0 26px;
+    width:26px;
+    height:26px;
+    background:#21170f;
+    border:1px solid #49301b;
+    color:var(--orange-light);
+    font-size:11px;
+    font-weight:850;
+}
+.ss-withdraw .step-copy strong{
+    display:block;
+    font-size:12px;
+    font-weight:750;
+    margin-bottom:5px;
+}
+.ss-withdraw .step-copy span{
+    display:block;
+    color:#909099;
+    font-size:11px;
+    line-height:1.7;
+}
+.ss-withdraw .note{
+    margin:18px 0 0;
+    color:#888891;
+    font-size:11px;
+    line-height:1.8;
+}
+.ss-withdraw .back-link{
+    display:inline-block;
+    margin-top:24px;
+    color:#aaaab3;
+    font-size:12px;
+    font-weight:750;
+}
+.ss-withdraw .back-link:hover{color:var(--orange-light)}
+@media(max-width:800px){
+    .ss-withdraw .layout{grid-template-columns:1fr}
+    .ss-withdraw .side-column{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:14px;
+    }
+    .ss-withdraw .security-panel{margin-bottom:0}
+}
+@media(max-width:560px){
+    .ss-withdraw{padding:24px 13px 45px}
+    .ss-withdraw .layout{gap:15px;margin-top:23px}
+    .ss-withdraw .panel-heading{padding:18px}
+    .ss-withdraw .panel-body{padding:16px}
+    .ss-withdraw .available{padding:19px;margin-bottom:23px}
+    .ss-withdraw .side-column{grid-template-columns:1fr}
+    .ss-withdraw .actions{flex-direction:column}
+    .ss-withdraw .actions .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+    .ss-withdraw *{transition:none!important}
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ss-withdraw">
-    <div class="eyebrow">Creator payouts</div>
-    <h1>Request a withdrawal</h1>
-    <p class="intro">Submit your payout details for review. Your balance is reserved while the request is pending.</p>
+<main class="ss-withdraw">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'earnings:dashboard' %}">Earnings</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Request withdrawal</span>
+    </nav>
 
-    <div class="panel">
-        <div class="available">
-            <span>Available balance</span>
-            <strong>KSh {{ balance.available_balance|floatformat:2 }}</strong>
-        </div>
+    <header>
+        <div class="eyebrow">Creator payouts</div>
+        <h1 class="page-heading">Request a withdrawal</h1>
+        <p class="intro">
+            Request a payout from your available creator earnings.
+            Review your details carefully before submitting.
+        </p>
+    </header>
 
-        <form method="post">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="errors">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            {% for field in form %}
-                <div class="field">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% for error in field.errors %}
-                        <div class="errors">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-
-            <div class="actions">
-                <button class="btn" type="submit">Submit withdrawal request</button>
-                <a class="btn btn-secondary" href="{% url 'earnings:dashboard' %}">Cancel</a>
+    <div class="layout">
+        <section class="panel" aria-labelledby="withdrawal-form-title">
+            <div class="panel-heading">
+                <h2 id="withdrawal-form-title">Payout details</h2>
+                <p>Enter the information requested below to submit your payout request.</p>
             </div>
 
-            <p class="note">
-                Check your payout details carefully. Never enter your M-Pesa PIN, bank password, or one-time password in this form. Payouts require a separate verified payment process.
-            </p>
-        </form>
+            <div class="panel-body">
+                <div class="available">
+                    <div class="available-label">
+                        <span class="balance-dot" aria-hidden="true"></span>
+                        Available to withdraw
+                    </div>
+                    <strong>KSh {{ balance.available_balance|floatformat:2 }}</strong>
+                    <p class="available-foot">
+                        Your eligible balance is shown above. The amount you can withdraw
+                        depends on your account's available funds and payout rules.
+                    </p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="form-errors" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="helptext">{{ field.help_text }}</div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="errors" role="alert">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">
+                            Submit withdrawal request <span aria-hidden="true">→</span>
+                        </button>
+                        <a class="btn btn-secondary" href="{% url 'earnings:dashboard' %}">
+                            Cancel
+                        </a>
+                    </div>
+
+                    <p class="note">
+                        By submitting, you are requesting a payout for review.
+                        Do not enter your M-Pesa PIN, bank password, or one-time password.
+                        A legitimate payout form should never ask for these secrets.
+                    </p>
+                </form>
+            </div>
+        </section>
+
+        <aside class="side-column">
+            <section class="security-panel">
+                <div class="security-heading">
+                    <span class="security-icon" aria-hidden="true">!</span>
+                    Protect your account
+                </div>
+                <p>
+                    <strong>Never share your PIN or OTP.</strong>
+                    Only provide the payout details required by the form.
+                    Contact support if a payment request seems suspicious.
+                </p>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <h2>What happens next?</h2>
+                    <p>Your request follows your platform's payout review process.</p>
+                </div>
+                <div class="panel-body">
+                    <ol class="steps">
+                        <li>
+                            <span class="step-number">01</span>
+                            <div class="step-copy">
+                                <strong>Submit request</strong>
+                                <span>Enter your payout details and submit the form.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">02</span>
+                            <div class="step-copy">
+                                <strong>Review</strong>
+                                <span>Your request is reviewed according to platform rules.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">03</span>
+                            <div class="step-copy">
+                                <strong>Track status</strong>
+                                <span>Check your earnings dashboard for the latest recorded status.</span>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+        </aside>
     </div>
-</div>
+
+    <a class="back-link" href="{% url 'earnings:dashboard' %}">← Back to earnings</a>
+</main>
 {% endblock %}
+

@@ -1,225 +1,555 @@
-
 {% extends "base.html" %}
 
-{% block title %}Chat - StreamSphere{% endblock %}
+{% block title %}Chat | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-conversation-page {
+.ss-conversation {
     --orange: #ff7900;
     --bg: #0b0b0d;
-    --panel: #141417;
-    --border: #303035;
-    --text: #f4f4f5;
-    --muted: #a1a1aa;
+    --panel: #111114;
+    --border: #29292f;
+    --text: #f5f5f7;
+    --muted: #92929e;
     min-height: calc(100vh - 60px);
-    padding: 20px 12px 30px;
-    background: var(--bg);
+    padding: 20px 16px 30px;
     color: var(--text);
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,121,0,.055), transparent 42%),
+        var(--bg);
 }
+
+.ss-conversation *,
+.ss-conversation *::before,
+.ss-conversation *::after {
+    box-sizing: border-box;
+}
+
 .ss-conversation-wrap {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 1000px;
-    height: min(780px, calc(100vh - 110px));
+    height: min(820px, calc(100dvh - 115px));
     min-height: 480px;
     margin: 0 auto;
+    overflow: hidden;
     border: 1px solid var(--border);
     background: var(--panel);
+    box-shadow: 0 20px 65px rgba(0,0,0,.22);
 }
+
 .ss-conversation-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 15px 18px;
+    gap: 13px;
+    min-height: 78px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
+    background: rgba(19,19,23,.96);
 }
+
 .ss-conversation-back {
-    color: var(--orange);
-    font-size: 13px;
-    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 20px;
     text-decoration: none;
+    transition: border-color .18s ease, color .18s ease;
 }
+
+.ss-conversation-back:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+}
+
 .ss-conversation-avatar {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
+    width: 45px;
+    height: 45px;
+    flex: 0 0 45px;
+    border: 1px solid #373139;
     border-radius: 50%;
-    background: #29292e;
-    color: var(--orange);
+    background: linear-gradient(145deg, #292329, #17171b);
+    color: #ff9a43;
+    font-size: 16px;
     font-weight: 900;
 }
-.ss-conversation-user { flex: 1; min-width: 0; }
+
+.ss-conversation-user {
+    flex: 1;
+    min-width: 0;
+}
+
 .ss-conversation-user h1 {
     margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--text);
     font-size: 15px;
     font-weight: 850;
-    overflow-wrap: anywhere;
+    letter-spacing: -.015em;
 }
+
 .ss-conversation-user p {
-    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 5px 0 0;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
 }
+
+.ss-conversation-user p::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6d727b;
+    content: "";
+}
+
+.ss-conversation-label {
+    padding: 6px 9px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.ss-conversation-alert {
+    flex: 0 0 auto;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,121,0,.055);
+    color: #ffd3ad;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.ss-conversation-alert ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
 .ss-conversation-messages {
     display: flex;
-    flex: 1;
+    flex: 1 1 auto;
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
+    gap: 17px;
+    min-height: 0;
+    padding: 24px clamp(12px, 4vw, 34px);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-color: #3b3b42 transparent;
+    scrollbar-width: thin;
+    background:
+        radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.018), transparent 45%),
+        #0e0e11;
 }
-.ss-message-row { display: flex; justify-content: flex-start; }
-.ss-message-row.own { justify-content: flex-end; }
+
+.ss-message-row {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.ss-message-row.own {
+    justify-content: flex-end;
+}
+
 .ss-message-bubble {
-    max-width: min(75%, 600px);
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    background: #202024;
+    width: fit-content;
+    max-width: min(78%, 620px);
+    min-width: 90px;
+    padding: 12px 15px 10px;
+    border: 1px solid #303037;
+    background: #19191e;
+    color: var(--text);
     overflow-wrap: anywhere;
 }
+
 .ss-message-row.own .ss-message-bubble {
-    border-color: #9a4a08;
-    background: #452308;
+    border-color: rgba(255,121,0,.38);
+    background: linear-gradient(145deg, #46260f, #321b0b);
 }
+
 .ss-message-sender {
-    margin-bottom: 6px;
-    color: var(--orange);
+    margin-bottom: 7px;
+    color: #ffad67;
     font-size: 11px;
     font-weight: 850;
 }
+
 .ss-message-body {
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.65;
+    color: #f0f0f3;
+    font-size: 13px;
+    line-height: 1.75;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
+
 .ss-message-time {
-    margin-top: 8px;
-    color: #b0b0b7;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 9px;
+    color: #aaaab4;
     font-size: 10px;
-    text-align: right;
+    line-height: 1.4;
 }
+
 .ss-message-attachment {
-    display: inline-block;
-    margin-top: 8px;
-    color: var(--orange);
-    font-size: 13px;
+    display: block;
+    max-width: 100%;
+    margin-top: 10px;
+    color: #ffad67;
+    font-size: 12px;
+    font-weight: 750;
     overflow-wrap: anywhere;
 }
+
 .ss-message-attachment img {
     display: block;
     max-width: 100%;
-    max-height: 280px;
-    margin-top: 8px;
+    max-height: 320px;
+    margin: 0 0 7px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: #09090b;
     object-fit: contain;
 }
-.ss-message-delete {
+
+/* NEW: Styles for the video player embedded inside the chat */
+/* Find this in your CSS block */
+/* UPDATE: Constrain video so it stays inside the bubble */
+.ss-message-video {
     display: block;
-    margin-top: 8px;
+    width: 100%;
+    max-width: min(100%, 480px); /* Prevents it from getting too wide on desktop */
+    max-height: 320px;
+    margin: 10px 0 7px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: #09090b;
+    border-radius: 4px;
+    outline: none;
+    object-fit: contain; /* Ensures the video doesn't stretch weirdly */
+}
+
+.ss-message-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(0,0,0,.14);
+}
+
+.ss-message-file-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 36px;
+    flex: 0 0 32px;
+    border: 1px solid rgba(255,255,255,.15);
+    color: var(--orange);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.ss-message-file span {
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.ss-message-delete {
+    display: inline-block;
+    margin-top: 9px;
     padding: 0;
     border: 0;
     background: transparent;
     color: #fca5a5;
-    font-size: 11px;
+    font-size: 10px;
     cursor: pointer;
 }
+
+.ss-message-delete:hover {
+    color: #fecaca;
+    text-decoration: underline;
+}
+
 .ss-conversation-empty {
+    max-width: 330px;
     margin: auto;
-    color: var(--muted);
+    padding: 24px 12px;
     text-align: center;
-    line-height: 1.7;
 }
+
+.ss-conversation-empty-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 17px;
+    border: 1px solid rgba(255,121,0,.25);
+    background: rgba(255,121,0,.07);
+    color: var(--orange);
+    font-size: 22px;
+    font-weight: 850;
+}
+
+.ss-conversation-empty h2 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    font-weight: 850;
+}
+
+.ss-conversation-empty p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
 .ss-conversation-composer {
-    padding: 15px;
+    flex: 0 0 auto;
+    padding: 15px 18px 17px;
     border-top: 1px solid var(--border);
-    background: #101012;
+    background: #121215;
 }
+
+.ss-composer-field {
+    position: relative;
+}
+
 .ss-conversation-composer textarea,
 .ss-conversation-composer input[type="file"] {
-    box-sizing: border-box;
     display: block;
     width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 0;
+    min-width: 0;
+    border: 1px solid #303037;
     outline: none;
-    background: #09090b;
+    background: #0b0b0e;
     color: var(--text);
     font: inherit;
-    font-size: 14px;
+    font-size: 13px;
 }
+
 .ss-conversation-composer textarea {
-    min-height: 65px;
-    max-height: 160px;
+    min-height: 74px;
+    max-height: 170px;
+    padding: 13px 14px;
     resize: vertical;
+    line-height: 1.65;
 }
+
+.ss-conversation-composer textarea::placeholder {
+    color: #777782;
+}
+
+.ss-conversation-composer input[type="file"] {
+    padding: 10px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
 .ss-conversation-composer textarea:focus,
 .ss-conversation-composer input[type="file"]:focus {
-    border-color: var(--orange);
+    border-color: rgba(255,121,0,.8);
+    box-shadow: 0 0 0 3px rgba(255,121,0,.06);
 }
+
+.ss-conversation-composer input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 7px 10px;
+    border: 1px solid #38383f;
+    background: #202025;
+    color: var(--text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ss-composer-attachment {
+    margin-top: 10px;
+}
+
 .ss-composer-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-top: 10px;
+    gap: 14px;
+    margin-top: 12px;
 }
-.ss-composer-hint { color: var(--muted); font-size: 11px; }
+
+.ss-composer-hint {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
 .ss-send-btn {
-    min-height: 42px;
-    padding: 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 108px;
+    min-height: 43px;
+    padding: 0 19px;
     border: 1px solid var(--orange);
-    border-radius: 0;
     background: var(--orange);
-    color: #111;
-    font-size: 13px;
+    color: #15100b;
+    font-size: 12px;
     font-weight: 900;
     cursor: pointer;
+    transition: background .18s ease, transform .18s ease;
 }
-.ss-send-btn:hover { background: #ff922e; }
-.ss-chat-alert {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border);
-    color: #fecaca;
-    font-size: 13px;
+
+.ss-send-btn:hover {
+    background: #ff922e;
 }
-@media (max-width: 520px) {
-    .ss-conversation-page { padding: 8px 0; }
+
+.ss-send-btn:active {
+    transform: translateY(1px);
+}
+
+.ss-send-btn:focus-visible,
+.ss-conversation-back:focus-visible,
+.ss-message-delete:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .ss-conversation {
+        padding: 8px 0;
+    }
+
     .ss-conversation-wrap {
-        height: calc(100dvh - 80px);
-        min-height: 420px;
+        height: calc(100dvh - 82px);
+        min-height: 400px;
         border-right: 0;
         border-left: 0;
     }
-    .ss-conversation-messages { padding: 13px 10px; }
-    .ss-message-bubble { max-width: 88%; }
-    .ss-conversation-composer { padding: 10px; }
-    .ss-composer-hint { max-width: 55%; line-height: 1.5; }
+
+    .ss-conversation-header {
+        min-height: 68px;
+        gap: 10px;
+        padding: 11px 12px;
+    }
+
+    .ss-conversation-avatar {
+        width: 39px;
+        height: 39px;
+        flex-basis: 39px;
+        font-size: 14px;
+    }
+
+    .ss-conversation-user h1 {
+        font-size: 13px;
+    }
+
+    .ss-conversation-label {
+        display: none;
+    }
+
+    .ss-conversation-messages {
+        gap: 13px;
+        padding: 18px 10px;
+    }
+
+    .ss-message-bubble {
+        max-width: 88%;
+        padding: 11px 12px 9px;
+    }
+
+    .ss-message-body {
+        font-size: 12px;
+    }
+
+    .ss-message-attachment img {
+        max-height: 240px;
+    }
+
+    .ss-message-video {
+        max-height: 240px;
+    }
+
+    .ss-conversation-composer {
+        padding: 11px 10px 12px;
+    }
+
+    .ss-conversation-composer textarea {
+        min-height: 60px;
+    }
+
+    .ss-composer-bottom {
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .ss-composer-hint {
+        max-width: 62%;
+        font-size: 9px;
+    }
+
+    .ss-send-btn {
+        min-width: 88px;
+        min-height: 41px;
+        padding: 0 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .ss-conversation-user p {
+        font-size: 10px;
+    }
+
+    .ss-composer-hint {
+        max-width: 55%;
+    }
+
+    .ss-send-btn {
+        min-width: 78px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-send-btn,
+    .ss-conversation-back {
+        transition: none;
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="ss-conversation-page">
-    <section class="ss-conversation-wrap">
+<main class="ss-conversation">
+    <section class="ss-conversation-wrap" aria-label="Conversation">
 
         <header class="ss-conversation-header">
-            <a class="ss-conversation-back"
-               href="{% url 'chat:inbox' %}"
-               aria-label="Back to messages">←</a>
+            <a
+                class="ss-conversation-back"
+                href="{% url 'chat:inbox' %}"
+                aria-label="Back to messages"
+                title="Back to messages"
+            >←</a>
 
-            <div class="ss-conversation-avatar">
+            <div class="ss-conversation-avatar" aria-hidden="true">
                 {% if recipient %}
-                    {{ recipient.username|first|upper }}
+                    {{ recipient.username|first|upper|default:"?" }}
                 {% else %}
-                    S
+                    {{ conversation.subject|first|upper|default:"S" }}
                 {% endif %}
             </div>
 
@@ -231,22 +561,38 @@
                         {{ conversation.subject|default:"Conversation" }}
                     {% endif %}
                 </h1>
-                <p>StreamSphere messages</p>
+                <p>StreamSphere private messages</p>
             </div>
+
+            <span class="ss-conversation-label">Messages</span>
         </header>
 
         {% if messages %}
             {% for message in messages %}
-                <div class="ss-chat-alert" role="status">
+                <div class="ss-conversation-alert" role="status">
                     {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
 
-        <div class="ss-conversation-messages" id="ssConversationMessages">
+        {% if form.non_field_errors %}
+            <div class="ss-conversation-alert" role="alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div
+            class="ss-conversation-messages"
+            id="ssConversationMessages"
+            role="log"
+            aria-label="Message history"
+            aria-live="polite"
+            aria-relevant="additions"
+        >
             {% for message in chat_messages %}
                 <div class="ss-message-row {% if message.sender_id == request.user.id %}own{% endif %}">
                     <article class="ss-message-bubble">
+
                         {% if message.sender_id != request.user.id %}
                             <div class="ss-message-sender">
                                 {{ message.sender.get_full_name|default:message.sender.username }}
@@ -258,78 +604,114 @@
                         {% endif %}
 
                         {% if message.attachment %}
-                            {% with file_url=message.attachment.url %}
-                            {% if message.attachment.name|lower|slice:"-4:" == ".jpg" or message.attachment.name|lower|slice:"-5:" == ".jpeg" or message.attachment.name|lower|slice:"-4:" == ".png" or message.attachment.name|lower|slice:"-5:" == ".webp" or message.attachment.name|lower|slice:"-4:" == ".gif" %}
-                                <a class="ss-message-attachment"
-                                   href="{{ file_url }}" target="_blank"
-                                   rel="noopener noreferrer">
-                                    <img src="{{ file_url }}" alt="Message attachment">
-                                    Open image
-                                </a>
-                            {% else %}
-                                <a class="ss-message-attachment"
-                                   href="{{ file_url }}" target="_blank"
-                                   rel="noopener noreferrer">
-                                    Open attachment
-                                </a>
-                            {% endif %}
+                            {% with file_url=message.attachment.url file_name=message.attachment.name|lower %}
+                                
+                                {# 1. Check for Images #}
+                                {% if file_name|slice:"-4:" == ".jpg" or file_name|slice:"-5:" == ".jpeg" or file_name|slice:"-4:" == ".png" or file_name|slice:"-5:" == ".webp" or file_name|slice:"-4:" == ".gif" %}
+                                    <a
+                                        class="ss-message-attachment"
+                                        href="{{ file_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <img src="{{ file_url }}" alt="Image attachment" loading="lazy">
+                                        View full image
+                                    </a>
+
+                                {# 2. Check for Videos #}
+                                {% elif file_name|slice:"-4:" == ".mp4" or file_name|slice:"-5:" == ".webm" or file_name|slice:"-4:" == ".mov" or file_name|slice:"-4:" == ".ogg" %}
+                                    <video class="ss-message-video" controls playsinline preload="metadata">
+                                        <source src="{{ file_url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+
+                                {# 3. Everything else (PDFs, Docx, etc.) #}
+                                {% else %}
+                                    <a
+                                        class="ss-message-attachment ss-message-file"
+                                        href="{{ file_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <span class="ss-message-file-mark">FILE</span>
+                                        <span>Open attachment</span>
+                                    </a>
+                                {% endif %}
                             {% endwith %}
                         {% endif %}
 
                         <div class="ss-message-time">
-                            {{ message.created_at|date:"M j, Y · H:i" }}
+                            <span>{{ message.created_at|date:"M j, Y · H:i" }}</span>
                             {% if message.sender_id == request.user.id and message.is_read %}
-                                · Read
+                                <span>· Read</span>
                             {% endif %}
                         </div>
 
                         {% if message.sender_id == request.user.id %}
-                            <form method="post"
-                                  action="{% url 'chat:delete_message' message.pk %}">
+                            <form
+                                method="post"
+                                action="{% url 'chat:delete_message' message.pk %}"
+                            >
                                 {% csrf_token %}
-                                <button type="submit" class="ss-message-delete"
-                                        onclick="return confirm('Delete this message?')">
+                                <button
+                                    type="submit"
+                                    class="ss-message-delete"
+                                    onclick="return confirm('Delete this message?')"
+                                >
                                     Delete message
                                 </button>
                             </form>
                         {% endif %}
+
                     </article>
                 </div>
             {% empty %}
                 <div class="ss-conversation-empty">
-                    <p>No messages yet.</p>
-                    <p>Send a message to start the conversation.</p>
+                    <div class="ss-conversation-empty-mark" aria-hidden="true">S</div>
+                    <h2>Start the conversation</h2>
+                    <p>
+                        Send the first message and start connecting on StreamSphere.
+                    </p>
                 </div>
             {% endfor %}
         </div>
 
-        <form class="ss-conversation-composer"
-              method="post"
-              enctype="multipart/form-data"
-              id="ssMessageForm">
+        <form
+            class="ss-conversation-composer"
+            method="post"
+            enctype="multipart/form-data"
+            id="ssMessageForm"
+        >
             {% csrf_token %}
 
-            {% if form.non_field_errors %}
-                <div class="ss-chat-alert">{{ form.non_field_errors }}</div>
+            {% if form.body.errors %}
+                <div class="ss-conversation-alert" role="alert">
+                    {{ form.body.errors }}
+                </div>
             {% endif %}
 
-            {{ form.body }}
-            {% for error in form.body.errors %}
-                <div class="ss-chat-alert">{{ error }}</div>
-            {% endfor %}
+            <div class="ss-composer-field">
+                {{ form.body }}
+            </div>
 
-            <div style="margin-top:10px">
+            {% if form.attachment.errors %}
+                <div class="ss-conversation-alert" role="alert">
+                    {{ form.attachment.errors }}
+                </div>
+            {% endif %}
+
+            <div class="ss-composer-attachment">
                 {{ form.attachment }}
-                {% for error in form.attachment.errors %}
-                    <div class="ss-chat-alert">{{ error }}</div>
-                {% endfor %}
             </div>
 
             <div class="ss-composer-bottom">
                 <span class="ss-composer-hint">
-                    Keep messages respectful. Attachments up to 15 MB.
+                    Be respectful. Press Enter to send; Shift + Enter for a new line.
                 </span>
-                <button class="ss-send-btn" type="submit">Send</button>
+
+                <button class="ss-send-btn" type="submit">
+                    Send <span aria-hidden="true">→</span>
+                </button>
             </div>
         </form>
 
@@ -342,18 +724,44 @@
     const form = document.getElementById("ssMessageForm");
     const bodyInput = document.getElementById("id_body");
 
-    if (messageArea) {
-        messageArea.scrollTop = messageArea.scrollHeight;
+    function scrollToLatestMessage() {
+        if (messageArea) {
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
     }
 
+    scrollToLatestMessage();
+
     if (bodyInput) {
+        bodyInput.setAttribute("placeholder", "Write your message...");
+        bodyInput.setAttribute("aria-label", "Write your message");
+        bodyInput.setAttribute("rows", "2");
+
         bodyInput.addEventListener("keydown", function (event) {
-            if (event.key === "Enter" && !event.shiftKey) {
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.isComposing
+            ) {
                 event.preventDefault();
 
                 if (bodyInput.value.trim() && form) {
-                    form.requestSubmit();
+                    if (typeof form.requestSubmit === "function") {
+                        form.requestSubmit();
+                    } else {
+                        form.submit();
+                    }
                 }
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", function () {
+            const sendButton = form.querySelector(".ss-send-btn");
+            if (sendButton) {
+                sendButton.disabled = true;
+                sendButton.textContent = "Sending...";
             }
         });
     }

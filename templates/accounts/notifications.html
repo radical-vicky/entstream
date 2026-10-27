@@ -1,213 +1,391 @@
-```html
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Notifications - StreamSphere{% endblock %}
+{% block title %}Notifications | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --nt-bg: #0b0d10;
+        --nt-panel: #111419;
+        --nt-panel-hover: #171b21;
+        --nt-border: #292e36;
+        --nt-text: #f2f4f7;
+        --nt-muted: #9299a5;
+        --nt-orange: #ff7a1a;
+        --nt-orange-soft: rgba(255, 122, 26, .12);
+        --nt-danger: #f06464;
+    }
+
+    .nt-page, .nt-page * { box-sizing: border-box; }
+
+    .nt-page {
+        width: min(100% - 40px, 1060px);
+        margin: 0 auto;
+        padding: 34px 0 64px;
+        color: var(--nt-text);
+    }
+
+    .nt-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--nt-border);
+    }
+
+    .nt-eyebrow {
+        margin: 0 0 8px;
+        color: var(--nt-orange);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    .nt-title {
+        margin: 0;
+        font-size: clamp(27px, 4vw, 38px);
+        font-weight: 800;
+        letter-spacing: -.04em;
+        line-height: 1.1;
+    }
+
+    .nt-subtitle {
+        margin: 10px 0 0;
+        color: var(--nt-muted);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .nt-header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .nt-button {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border: 1px solid var(--nt-border);
+        border-radius: 0;
+        background: #171a20;
+        color: var(--nt-text);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 750;
+        text-decoration: none;
+        cursor: pointer;
+        transition: border-color .18s ease, background .18s ease;
+    }
+
+    .nt-button:hover { border-color: var(--nt-orange); background: var(--nt-orange-soft); }
+    .nt-button-primary { border-color: var(--nt-orange); background: var(--nt-orange); color: #15110d; }
+    .nt-button-primary:hover { background: #ff9145; color: #15110d; }
+    .nt-button:disabled { opacity: .55; cursor: wait; }
+
+    .nt-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px 0;
+    }
+
+    .nt-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .nt-tab {
+        display: inline-flex;
+        min-height: 35px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid transparent;
+        border-radius: 0;
+        color: var(--nt-muted);
+        font-size: 12px;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+    .nt-tab:hover, .nt-tab.is-active {
+        border-color: var(--nt-border);
+        background: var(--nt-panel);
+        color: var(--nt-text);
+    }
+
+    .nt-tab.is-active { box-shadow: inset 0 -2px var(--nt-orange); }
+
+    .nt-count {
+        display: inline-flex;
+        min-width: 21px;
+        height: 21px;
+        align-items: center;
+        justify-content: center;
+        margin-left: 7px;
+        padding: 0 5px;
+        background: var(--nt-orange-soft);
+        color: var(--nt-orange);
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .nt-list {
+        border: 1px solid var(--nt-border);
+        background: var(--nt-panel);
+    }
+
+    .nt-item {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 15px;
+        align-items: start;
+        padding: 19px;
+        border-bottom: 1px solid var(--nt-border);
+        transition: background .15s ease;
+    }
+
+    .nt-item:last-child { border-bottom: 0; }
+    .nt-item:hover { background: var(--nt-panel-hover); }
+    .nt-item.is-unread { background: linear-gradient(90deg, var(--nt-orange-soft), transparent 58%); }
+
+    .nt-avatar {
+        display: flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 1px solid #3a3030;
+        border-radius: 0;
+        background: #202329;
+        color: var(--nt-orange);
+        font-size: 14px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .nt-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .nt-item-content { min-width: 0; }
+    .nt-message {
+        margin: 0;
+        color: #e6e8ec;
+        font-size: 14px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .nt-message a { color: var(--nt-text); font-weight: 800; text-decoration: underline; text-decoration-color: var(--nt-orange); text-underline-offset: 3px; }
+    .nt-message a:hover { color: var(--nt-orange); }
+
+    .nt-time { display: block; margin-top: 7px; color: var(--nt-muted); font-size: 11px; }
+    .nt-unread-dot { width: 7px; height: 7px; margin-top: 7px; background: var(--nt-orange); }
+    .nt-item-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .nt-text-button { padding: 5px 0; border: 0; background: transparent; color: var(--nt-muted); font: inherit; font-size: 11px; cursor: pointer; }
+    .nt-text-button:hover { color: var(--nt-orange); }
+    .nt-delete:hover { color: var(--nt-danger); }
+
+    .nt-empty {
+        padding: 58px 20px;
+        text-align: center;
+    }
+
+    .nt-empty-title { margin: 0; font-size: 19px; font-weight: 800; }
+    .nt-empty-copy { max-width: 400px; margin: 10px auto 0; color: var(--nt-muted); font-size: 13px; line-height: 1.7; }
+
+    .nt-pagination { display: flex; justify-content: center; gap: 8px; padding-top: 22px; }
+    .nt-feedback { min-height: 20px; margin: 12px 0 0; color: var(--nt-muted); font-size: 12px; }
+    .nt-feedback.is-error { color: var(--nt-danger); }
+    .nt-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 640px) {
+        .nt-page { width: min(100% - 24px, 1060px); padding-top: 24px; }
+        .nt-header { align-items: flex-start; flex-direction: column; }
+        .nt-header-actions { width: 100%; }
+        .nt-header-actions .nt-button { flex: 1; }
+        .nt-toolbar { align-items: flex-start; flex-direction: column; }
+        .nt-item { grid-template-columns: 36px minmax(0, 1fr); gap: 11px; padding: 15px 12px; }
+        .nt-avatar { width: 36px; height: 36px; }
+        .nt-item-actions { grid-column: 2; justify-content: flex-start; }
+        .nt-unread-dot { grid-column: 1; grid-row: 1; justify-self: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nt-page *, .nt-page *::before, .nt-page *::after { transition: none !important; scroll-behavior: auto !important; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-[#0b0b0d] text-white px-4 py-8 sm:px-6">
-    <div class="mx-auto max-w-3xl">
+<main class="nt-page">
+    <header class="nt-header">
+        <div>
+            <p class="nt-eyebrow">Your activity</p>
+            <h1 class="nt-title">Notifications</h1>
+            <p class="nt-subtitle">Stay up to date with activity from your StreamSphere community.</p>
+        </div>
 
-        <!-- Header -->
-        <div class="mb-8 flex items-center justify-between gap-4">
-            <div>
-                <p class="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-[#ff7900]">
-                    StreamSphere
-                </p>
-                <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
-                    Notifications
-                </h1>
-                <p class="mt-2 text-sm text-gray-400">
-                    Stay updated with activity from your community.
-                </p>
-            </div>
-
+        <div class="nt-header-actions">
             {% if unread_count %}
-            <form method="post" action="{% url 'accounts:notifications_read_all' %}">
-                {% csrf_token %}
-                <button
-                    type="submit"
-                    class="shrink-0 rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-gray-300 transition hover:border-[#ff7900]/50 hover:text-[#ff7900]"
-                >
-                    Mark all read
-                </button>
-            </form>
+                <form method="post" action="{% url 'accounts:notifications_mark_all_read' %}" data-nt-ajax-form>
+                    {% csrf_token %}
+                    <button class="nt-button nt-button-primary" type="submit">Mark all as read</button>
+                </form>
             {% endif %}
+            <a class="nt-button" href="{% url 'home' %}">Back to home</a>
         </div>
+    </header>
 
-        <!-- Summary -->
-        <div class="mb-6 flex items-center justify-between">
-            <span class="text-sm text-gray-400">
-                Your activity
-            </span>
-
-            {% if unread_count %}
-            <span class="rounded-full bg-[#ff7900]/15 px-3 py-1 text-xs font-bold text-[#ff7900]">
-                {{ unread_count }} unread
-            </span>
-            {% else %}
-            <span class="text-xs text-gray-500">All caught up</span>
-            {% endif %}
-        </div>
-
-        <!-- Notifications -->
-        {% if notifications %}
-        <div class="divide-y divide-white/[0.07]">
-            {% for notification in notifications %}
-            <div class="group flex gap-4 py-5 {% if not notification.is_read %}bg-white/[0.025] px-3{% endif %}">
-
-                <!-- Actor avatar -->
-                <div class="relative h-12 w-12 shrink-0">
-                    {% if notification.actor.profile.avatar_image %}
-                        <img
-                            src="{{ notification.actor.profile.avatar_image.url }}"
-                            alt="{{ notification.actor.username }}"
-                            class="h-12 w-12 rounded-full object-cover"
-                        >
-                    {% elif notification.actor.profile.avatar %}
-                        <img
-                            src="{{ notification.actor.profile.avatar }}"
-                            alt="{{ notification.actor.username }}"
-                            class="h-12 w-12 rounded-full object-cover"
-                        >
-                    {% else %}
-                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#ff7900]/15 font-bold text-[#ff7900]">
-                            {{ notification.actor.username|first|upper }}
-                        </div>
-                    {% endif %}
-
-                    {% if not notification.is_read %}
-                    <span class="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#0b0b0d] bg-[#ff7900]"></span>
-                    {% endif %}
-                </div>
-
-                <!-- Notification content -->
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm leading-6 text-gray-200">
-                        <span class="font-bold text-white">
-                            {{ notification.actor.username }}
-                        </span>
-
-                        {% if notification.notification_type == "like" %}
-                            liked your video.
-                        {% elif notification.notification_type == "comment" %}
-                            commented on your video.
-                        {% elif notification.notification_type == "follow" %}
-                            started following you.
-                        {% else %}
-                            interacted with your account.
-                        {% endif %}
-                    </p>
-
-                    {% if notification.video %}
-                    <p class="mt-1 truncate text-sm text-gray-400">
-                        {{ notification.video.title }}
-                    </p>
-                    {% elif notification.comment %}
-                    <p class="mt-1 break-words text-sm text-gray-400">
-                        {{ notification.comment.text|truncatechars:120 }}
-                    </p>
-                    {% endif %}
-
-                    <div class="mt-3 flex flex-wrap items-center gap-4">
-                        <span class="text-xs text-gray-500">
-                            {{ notification.created_at|timesince }} ago
-                        </span>
-
-                        {% if notification.video %}
-                        <a
-                            href="{% url 'videos:detail' notification.video.pk %}"
-                            class="text-xs font-semibold text-[#ff7900] transition hover:text-orange-300"
-                        >
-                            Watch video
-                        </a>
-                        {% endif %}
-
-                        {% if not notification.is_read %}
-                        <form
-                            method="post"
-                            action="{% url 'accounts:notification_read' notification.pk %}"
-                        >
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{% url 'accounts:notifications' %}">
-                            <button
-                                type="submit"
-                                class="text-xs font-medium text-gray-400 transition hover:text-white"
-                            >
-                                Mark as read
-                            </button>
-                        </form>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div class="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-5">
-            {% if page_obj.has_previous %}
-            <a
-                href="?page={{ page_obj.previous_page_number }}"
-                class="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-300 transition hover:border-[#ff7900]/50 hover:text-[#ff7900]"
-            >
-                Previous
+    <div class="nt-toolbar">
+        <nav class="nt-tabs" aria-label="Notification filters">
+            <a class="nt-tab {% if not request.GET.filter or request.GET.filter == 'all' %}is-active{% endif %}"
+               href="{% url 'accounts:notifications' %}">All</a>
+            <a class="nt-tab {% if request.GET.filter == 'unread' %}is-active{% endif %}"
+               href="{% url 'accounts:notifications' %}?filter=unread">
+                Unread <span class="nt-count">{{ unread_count|default:0 }}</span>
             </a>
-            {% else %}
-            <span class="px-4 py-2 text-sm text-gray-600">Previous</span>
-            {% endif %}
-
-            <span class="text-xs text-gray-500">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-
-            {% if page_obj.has_next %}
-            <a
-                href="?page={{ page_obj.next_page_number }}"
-                class="rounded-full border border-white/10 px-4 py-2 text-sm text-gray-300 transition hover:border-[#ff7900]/50 hover:text-[#ff7900]"
-            >
-                Next
-            </a>
-            {% else %}
-            <span class="px-4 py-2 text-sm text-gray-600">Next</span>
-            {% endif %}
-        </div>
-        {% endif %}
-
-        {% else %}
-        <!-- Empty state -->
-        <div class="py-20 text-center">
-            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.04]">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-7 w-7 text-[#ff7900]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="1.6"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                </svg>
-            </div>
-
-            <h2 class="text-xl font-bold">You're all caught up</h2>
-            <p class="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-400">
-                When someone likes or comments on your videos, or follows you, you'll see it here.
-            </p>
-
-            <a
-                href="{% url 'videos:list' %}"
-                class="mt-6 inline-flex rounded-full bg-[#ff7900] px-6 py-3 text-sm font-bold text-black transition hover:bg-orange-400"
-            >
-                Explore videos
-            </a>
-        </div>
-        {% endif %}
-
+        </nav>
+        <span class="nt-subtitle">{{ notifications|length }} shown</span>
     </div>
-</div>
+
+    <div id="ntFeedback" class="nt-feedback" role="status" aria-live="polite"></div>
+
+    <section class="nt-list" aria-label="Your notifications" id="ntList">
+        {% for notification in notifications %}
+            <article class="nt-item {% if not notification.is_read %}is-unread{% endif %}"
+                     id="notification-{{ notification.pk }}"
+                     data-notification-id="{{ notification.pk }}">
+                <div class="nt-avatar" aria-hidden="true">
+                    {% if notification.actor.profile.avatar_image %}
+                        <img src="{{ notification.actor.profile.avatar_image.url }}" alt="" loading="lazy">
+                    {% elif notification.actor.profile.avatar %}
+                        <img src="{{ notification.actor.profile.avatar }}" alt="" loading="lazy">
+                    {% else %}
+                        {{ notification.actor.username|first|default:"S" }}
+                    {% endif %}
+                </div>
+
+                <div class="nt-item-content">
+                    <p class="nt-message">
+                        {% if notification.actor %}
+                            <strong>{{ notification.actor.username }}</strong>
+                        {% endif %}
+                        {{ notification.message }}
+                        {% if notification.target_url %}
+                            <a href="{{ notification.target_url }}" class="nt-open-link">View</a>
+                        {% endif %}
+                    </p>
+                    <time class="nt-time" datetime="{{ notification.created_at|date:'c' }}">
+                        {{ notification.created_at|date:"M j, Y · g:i A" }}
+                    </time>
+                </div>
+
+                {% if not notification.is_read %}
+                    <span class="nt-unread-dot" title="Unread notification" aria-label="Unread"></span>
+                {% endif %}
+
+                <div class="nt-item-actions">
+                    {% if not notification.is_read %}
+                        <form method="post"
+                              action="{% url 'accounts:notification_mark_read' notification.pk %}"
+                              data-nt-ajax-form>
+                            {% csrf_token %}
+                            <button class="nt-text-button" type="submit">Mark as read</button>
+                        </form>
+                    {% endif %}
+                    <form method="post"
+                          action="{% url 'accounts:notification_delete' notification.pk %}"
+                          data-nt-ajax-form
+                          data-nt-delete="true">
+                        {% csrf_token %}
+                        <button class="nt-text-button nt-delete" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+        {% empty %}
+            <div class="nt-empty" id="ntEmpty">
+                <h2 class="nt-empty-title">You're all caught up</h2>
+                <p class="nt-empty-copy">When someone interacts with you or your content, notifications will appear here.</p>
+            </div>
+        {% endfor %}
+    </section>
+
+    {% if is_paginated %}
+        <nav class="nt-pagination" aria-label="Pagination">
+            {% if page_obj.has_previous %}
+                <a class="nt-button" href="?page={{ page_obj.previous_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">Previous</a>
+            {% endif %}
+            <span class="nt-button" aria-current="page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a class="nt-button" href="?page={{ page_obj.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}">Next</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+</main>
+
+<script>
+(() => {
+    const list = document.getElementById("ntList");
+    const feedback = document.getElementById("ntFeedback");
+    if (!list) return;
+
+    function showFeedback(text, isError = false) {
+        feedback.textContent = text;
+        feedback.classList.toggle("is-error", isError);
+    }
+
+    list.addEventListener("submit", async (event) => {
+        const form = event.target.closest("form[data-nt-ajax-form]");
+        if (!form) return;
+
+        event.preventDefault();
+        const button = form.querySelector("button[type='submit']");
+        if (button) button.disabled = true;
+
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.ok) throw new Error("This action could not be completed.");
+            if (!contentType.includes("application/json")) {
+                throw new Error("The Django view must return a JSON response for AJAX requests.");
+            }
+
+            const data = await response.json();
+            if (data.success === false) throw new Error(data.error || "This action could not be completed.");
+
+            const item = form.closest(".nt-item");
+            if (form.dataset.ntDelete === "true") {
+                if (item) item.remove();
+                if (!list.querySelector(".nt-item")) {
+                    list.innerHTML = '<div class="nt-empty" id="ntEmpty"><h2 class="nt-empty-title">You’re all caught up</h2><p class="nt-empty-copy">When someone interacts with you or your content, notifications will appear here.</p></div>';
+                }
+                showFeedback("Notification deleted.");
+            } else if (item) {
+                item.classList.remove("is-unread");
+                const dot = item.querySelector(".nt-unread-dot");
+                if (dot) dot.remove();
+                const markForm = item.querySelector("form[action*='mark_read']");
+                if (markForm) markForm.remove();
+                showFeedback(data.message || "Notification updated.");
+            } else {
+                showFeedback(data.message || "Notifications updated.");
+                if (data.redirect_url) window.location.href = data.redirect_url;
+            }
+        } catch (error) {
+            showFeedback(error.message || "Something went wrong.", true);
+        } finally {
+            if (button && button.isConnected) button.disabled = false;
+        }
+    });
+})();
+</script>
 {% endblock %}

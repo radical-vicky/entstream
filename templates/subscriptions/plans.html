@@ -5,98 +5,839 @@
 
 {% block extra_css %}
 <style>
-.ss-plans{max-width:1150px;margin:0 auto;padding:38px 22px 65px;color:#f5f5f5}
-.ss-plans *{box-sizing:border-box}
-.ss-plans .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ff7900;text-transform:uppercase}
-.ss-plans h1{font-size:clamp(30px,5vw,44px);margin:10px 0}
-.ss-plans .intro{color:#aaa;line-height:1.8;max-width:700px}
-.ss-plans .heading{text-align:center;margin-bottom:35px}
-.ss-plans .plans-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:30px}
-.ss-plans .plan-card{background:#151515;border:1px solid #333;padding:25px;display:flex;flex-direction:column;min-width:0}
-.ss-plans .plan-card.featured{border-color:#ff7900}
-.ss-plans .plan-card h2{font-size:22px;margin:0 0 12px;overflow-wrap:anywhere}
-.ss-plans .plan-description{color:#aaa;line-height:1.7;min-height:55px}
-.ss-plans .price{font-size:36px;font-weight:850;margin:20px 0 4px;overflow-wrap:anywhere}
-.ss-plans .period{color:#999;font-size:13px}
-.ss-plans .plan-duration{border-top:1px solid #303030;margin-top:20px;padding-top:18px;color:#bbb;font-size:14px}
-.ss-plans .btn{display:block;width:100%;margin-top:24px;text-align:center;padding:13px 14px;background:#ff7900;color:#111;font-weight:850;border:1px solid #ff7900;border-radius:0;text-decoration:none;cursor:pointer}
-.ss-plans button.btn{font:inherit;font-weight:850}
-.ss-plans .btn-secondary{background:transparent;color:#ff7900}
-.ss-plans .notice{padding:14px;background:#201a14;border-left:3px solid #ff7900;margin:18px 0;line-height:1.7;color:#e4d3be}
-.ss-plans .empty{border:1px dashed #444;padding:35px;text-align:center;color:#aaa}
-.ss-plans .current{display:inline-block;background:#2a2115;color:#ffbd75;font-size:11px;font-weight:800;padding:6px 8px;text-transform:uppercase;margin-bottom:15px}
-@media(max-width:850px){.ss-plans .plans-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.ss-plans{padding:25px 13px 45px}.ss-plans .plans-grid{grid-template-columns:1fr}.ss-plans .plan-card{padding:21px}.ss-plans .plan-description{min-height:0}}
+/* =========================================================
+   STREAMSPHERE — SUBSCRIPTION PLANS
+   Premium charcoal / orange responsive design
+   ========================================================= */
+
+.ss-plans {
+    --sp-bg: #0b0b0c;
+    --sp-surface: #111113;
+    --sp-card: #151517;
+    --sp-border: #2a2a2e;
+    --sp-muted: #9b9ba3;
+    --sp-text: #f5f5f7;
+    --sp-orange: #ff7900;
+    --sp-orange-light: #ffad66;
+    --sp-radius: 3px;
+
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 54px 26px 88px;
+    color: var(--sp-text);
+    font-family: inherit;
+}
+
+.ss-plans *,
+.ss-plans *::before,
+.ss-plans *::after {
+    box-sizing: border-box;
+}
+
+.ss-plans a {
+    color: inherit;
+}
+
+.ss-plans button,
+.ss-plans a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ss-plans .sp-heading {
+    max-width: 780px;
+    margin: 0 auto 38px;
+    text-align: center;
+}
+
+.ss-plans .sp-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    color: var(--sp-orange);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+.ss-plans .sp-eyebrow::before,
+.ss-plans .sp-eyebrow::after {
+    width: 22px;
+    height: 1px;
+    background: var(--sp-orange);
+    content: "";
+}
+
+.ss-plans .sp-heading h1 {
+    margin: 0;
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 850;
+    letter-spacing: -2px;
+    line-height: 1.08;
+}
+
+.ss-plans .sp-heading h1 span {
+    color: var(--sp-orange);
+}
+
+.ss-plans .sp-intro {
+    max-width: 620px;
+    margin: 19px auto 0;
+    color: var(--sp-muted);
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+/* Reassurance row */
+
+.ss-plans .sp-assurances {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin: 25px 0 0;
+}
+
+.ss-plans .sp-assurance {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #c9c9ce;
+    font-size: 12px;
+}
+
+.ss-plans .sp-assurance-mark {
+    display: inline-grid;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border: 1px solid #51402f;
+    color: var(--sp-orange-light);
+    font-size: 11px;
+    font-weight: 900;
+}
+
+/* Notices */
+
+.ss-plans .sp-notices {
+    display: grid;
+    gap: 12px;
+    margin: 30px 0;
+}
+
+.ss-plans .sp-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 17px 19px;
+    border: 1px solid #44301e;
+    border-left: 3px solid var(--sp-orange);
+    background: #17130f;
+    color: #e9dfd5;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.ss-plans .sp-notice-icon {
+    flex: 0 0 22px;
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border: 1px solid #65401e;
+    color: var(--sp-orange-light);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.ss-plans .sp-notice-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.ss-plans .sp-notice a {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--sp-orange-light);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.ss-plans .sp-notice a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* Plan section */
+
+.ss-plans .sp-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 18px;
+    margin: 44px 0 20px;
+}
+
+.ss-plans .sp-section-heading h2 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.ss-plans .sp-section-heading p {
+    margin: 7px 0 0;
+    color: var(--sp-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.ss-plans .sp-plan-count {
+    flex-shrink: 0;
+    padding: 8px 11px;
+    border: 1px solid var(--sp-border);
+    color: #c5c5cb;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+/* Cards */
+
+.ss-plans .sp-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 18px;
+}
+
+.ss-plans .sp-plan-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 28px 25px 25px;
+    overflow: hidden;
+    border: 1px solid var(--sp-border);
+    border-radius: var(--sp-radius);
+    background: linear-gradient(155deg, #18181b 0%, #111113 75%);
+    transition:
+        border-color 180ms ease,
+        transform 180ms ease,
+        background 180ms ease;
+}
+
+.ss-plans .sp-plan-card:hover {
+    transform: translateY(-4px);
+    border-color: #59504a;
+    background: linear-gradient(155deg, #1c1a18 0%, #111113 75%);
+}
+
+.ss-plans .sp-plan-card.sp-featured {
+    border-color: var(--sp-orange);
+    background:
+        linear-gradient(155deg, rgba(255, 121, 0, 0.09), transparent 45%),
+        #141416;
+}
+
+.ss-plans .sp-plan-card.sp-featured::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: var(--sp-orange);
+    content: "";
+}
+
+.ss-plans .sp-plan-labels {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-height: 26px;
+    margin-bottom: 17px;
+}
+
+.ss-plans .sp-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 8px;
+    border: 1px solid #38383d;
+    background: #1c1c1f;
+    color: #c8c8cf;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 1px;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+.ss-plans .sp-label-popular {
+    border-color: #7b451c;
+    background: #291b11;
+    color: #ffb16b;
+}
+
+.ss-plans .sp-label-current {
+    border-color: #3d614a;
+    background: #142219;
+    color: #a8e0b9;
+}
+
+.ss-plans .sp-plan-card h3 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 850;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+    overflow-wrap: anywhere;
+}
+
+.ss-plans .sp-plan-description {
+    min-height: 70px;
+    margin: 12px 0 0;
+    color: var(--sp-muted);
+    font-size: 13px;
+    line-height: 1.85;
+    overflow-wrap: anywhere;
+}
+
+.ss-plans .sp-price-area {
+    margin-top: 25px;
+    padding: 21px 0 19px;
+    border-top: 1px solid #2b2b2f;
+    border-bottom: 1px solid #2b2b2f;
+}
+
+.ss-plans .sp-price-caption {
+    margin-bottom: 9px;
+    color: #aaaab2;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+}
+
+.ss-plans .sp-price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 5px;
+    color: #fff;
+    font-size: clamp(27px, 3vw, 38px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.ss-plans .sp-featured .sp-price {
+    color: var(--sp-orange-light);
+}
+
+.ss-plans .sp-price-period {
+    margin-top: 7px;
+    color: #96969e;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.ss-plans .sp-duration {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 19px;
+    color: #e1e1e6;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ss-plans .sp-duration-icon {
+    display: grid;
+    flex: 0 0 29px;
+    width: 29px;
+    height: 29px;
+    place-items: center;
+    border: 1px solid #38383d;
+    background: #1d1d20;
+    color: var(--sp-orange-light);
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.ss-plans .sp-plan-bottom {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 26px;
+}
+
+.ss-plans .sp-plan-note {
+    margin: 0;
+    color: #92929a;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+/* Buttons */
+
+.ss-plans .sp-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 49px;
+    margin-top: auto;
+    padding: 13px 16px;
+    border: 1px solid var(--sp-orange);
+    border-radius: var(--sp-radius);
+    background: var(--sp-orange);
+    color: #17100a;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.ss-plans .sp-btn:hover {
+    transform: translateY(-1px);
+    border-color: #ff9b43;
+    background: #ff9b43;
+    color: #17100a;
+}
+
+.ss-plans .sp-btn:focus-visible,
+.ss-plans a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+}
+
+.ss-plans .sp-btn-secondary {
+    border-color: #4a4037;
+    background: transparent;
+    color: #ffb16b;
+}
+
+.ss-plans .sp-btn-secondary:hover {
+    border-color: var(--sp-orange);
+    background: #28190e;
+    color: #ffc18b;
+}
+
+.ss-plans .sp-btn-arrow {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 180ms ease;
+}
+
+.ss-plans .sp-btn:hover .sp-btn-arrow {
+    transform: translateX(3px);
+}
+
+.ss-plans .sp-card-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.ss-plans .sp-card-form .sp-btn {
+    margin-top: auto;
+}
+
+/* Empty state */
+
+.ss-plans .sp-empty {
+    padding: 48px 24px;
+    border: 1px dashed #3a3a40;
+    background: #111113;
+    text-align: center;
+}
+
+.ss-plans .sp-empty-mark {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 18px;
+    place-items: center;
+    border: 1px solid #4a3828;
+    color: var(--sp-orange);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.ss-plans .sp-empty h3 {
+    margin: 0;
+    font-size: 21px;
+}
+
+.ss-plans .sp-empty p {
+    max-width: 440px;
+    margin: 10px auto 0;
+    color: var(--sp-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* Footer reassurance */
+
+.ss-plans .sp-footer {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 54px;
+    padding-top: 28px;
+    border-top: 1px solid var(--sp-border);
+}
+
+.ss-plans .sp-footer-item {
+    padding: 4px 12px;
+    text-align: center;
+}
+
+.ss-plans .sp-footer-item strong {
+    display: block;
+    color: #e9e9ed;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.ss-plans .sp-footer-item p {
+    margin: 7px 0 0;
+    color: var(--sp-muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+/* Responsive */
+
+@media (min-width: 1100px) {
+    .ss-plans .sp-plans-grid {
+        gap: 22px;
+    }
+
+    .ss-plans .sp-plan-card {
+        padding: 32px 29px 28px;
+    }
+}
+
+@media (max-width: 900px) {
+    .ss-plans {
+        padding: 43px 22px 65px;
+    }
+
+    .ss-plans .sp-plans-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ss-plans .sp-plan-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+
+    .ss-plans .sp-plan-card:last-child:nth-child(odd) .sp-plan-description {
+        min-height: 0;
+    }
+
+    .ss-plans .sp-price {
+        font-size: clamp(28px, 5vw, 37px);
+    }
+}
+
+@media (max-width: 580px) {
+    .ss-plans {
+        padding: 32px 15px 52px;
+    }
+
+    .ss-plans .sp-heading {
+        margin-bottom: 29px;
+    }
+
+    .ss-plans .sp-heading h1 {
+        font-size: clamp(34px, 10vw, 44px);
+        letter-spacing: -1.5px;
+    }
+
+    .ss-plans .sp-intro {
+        font-size: 13px;
+        line-height: 1.85;
+    }
+
+    .ss-plans .sp-assurances {
+        gap: 12px 15px;
+    }
+
+    .ss-plans .sp-assurance {
+        font-size: 11px;
+    }
+
+    .ss-plans .sp-section-heading {
+        align-items: flex-start;
+        margin-top: 34px;
+    }
+
+    .ss-plans .sp-section-heading h2 {
+        font-size: 20px;
+    }
+
+    .ss-plans .sp-plan-count {
+        padding: 7px;
+        font-size: 10px;
+    }
+
+    .ss-plans .sp-plans-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .ss-plans .sp-plan-card,
+    .ss-plans .sp-plan-card:last-child:nth-child(odd) {
+        grid-column: auto;
+        padding: 24px 21px 21px;
+    }
+
+    .ss-plans .sp-plan-description {
+        min-height: 0;
+    }
+
+    .ss-plans .sp-price {
+        font-size: 35px;
+    }
+
+    .ss-plans .sp-footer {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        margin-top: 37px;
+    }
+
+    .ss-plans .sp-footer-item {
+        padding: 0 5px;
+    }
+
+    .ss-plans .sp-notice {
+        padding: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-plans *,
+    .ss-plans *::before,
+    .ss-plans *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ss-plans">
-    <div class="heading">
-        <div class="eyebrow">Support creators. Get more.</div>
-        <h1>Choose your plan</h1>
-        <p class="intro" style="margin:0 auto">
-            Find a subscription that fits how you watch StreamSphere. Your access begins after payment is verified.
+<main class="ss-plans">
+
+    <header class="sp-heading">
+        <div class="sp-eyebrow">Your StreamSphere experience</div>
+
+        <h1>
+            Find your <span>perfect plan.</span>
+        </h1>
+
+        <p class="sp-intro">
+            Choose the subscription that works for you.
+            Discover streams, support creators, and enjoy StreamSphere
+            with a plan that fits your needs.
         </p>
-    </div>
+
+        <div class="sp-assurances">
+            <div class="sp-assurance">
+                <span class="sp-assurance-mark" aria-hidden="true">✓</span>
+                Clear subscription duration
+            </div>
+
+            <div class="sp-assurance">
+                <span class="sp-assurance-mark" aria-hidden="true">✓</span>
+                Secure sign-in
+            </div>
+
+            <div class="sp-assurance">
+                <span class="sp-assurance-mark" aria-hidden="true">✓</span>
+                Subscription status tracking
+            </div>
+        </div>
+    </header>
 
     {% if messages %}
-        {% for message in messages %}
-            <div class="notice">{{ message }}</div>
-        {% endfor %}
+        <section class="sp-notices" aria-label="Notifications">
+            {% for message in messages %}
+                <div class="sp-notice" role="status">
+                    <span class="sp-notice-icon" aria-hidden="true">i</span>
+                    <div class="sp-notice-content">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
     {% endif %}
 
     {% if active_subscription %}
-        <div class="notice">
-            You currently have the <strong>{{ active_subscription.plan.name }}</strong> plan.
-            It expires on {{ active_subscription.expires_at|date:"M j, Y" }}.
-            <a href="{% url 'subscriptions:my_subscriptions' %}" style="color:#ff7900;font-weight:800">Manage subscription →</a>
-        </div>
-    {% endif %}
+        <section class="sp-notices" aria-label="Current subscription">
+            <div class="sp-notice">
+                <span class="sp-notice-icon" aria-hidden="true">✓</span>
 
-    {% if plans %}
-        <div class="plans-grid">
-            {% for plan in plans %}
-                <article class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
-                    {% if active_subscription and active_subscription.plan_id == plan.id %}
-                        <span class="current">Your current plan</span>
-                    {% endif %}
+                <div class="sp-notice-content">
+                    <strong>
+                        You're subscribed to {{ active_subscription.plan.name }}.
+                    </strong>
 
-                    <h2>{{ plan.name }}</h2>
-
-                    <p class="plan-description">
-                        {% if plan.description %}
-                            {{ plan.description }}
-                        {% else %}
-                            Access StreamSphere with this subscription option.
-                        {% endif %}
-                    </p>
-
-                    <div class="price">{{ plan.price|floatformat:2 }}</div>
-                    <div class="period">Price per subscription period</div>
-
-                    <div class="plan-duration">
-                        Valid for {{ plan.duration_days }} day{{ plan.duration_days|pluralize }}
+                    <div>
+                        Your subscription expires on
+                        <strong>{{ active_subscription.expires_at|date:"M j, Y" }}</strong>.
                     </div>
 
-                    {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'subscriptions:subscribe' plan.id %}">
-                            {% csrf_token %}
-                            <button class="btn" type="submit">Continue to subscription</button>
-                        </form>
-                    {% else %}
-                        <a class="btn" href="{% url 'account_login' %}?next={% url 'subscriptions:plans' %}">
-                            Sign in to subscribe
-                        </a>
-                    {% endif %}
-                </article>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="empty">
-            <h2>No plans are available yet.</h2>
-            <p>An administrator can add subscription plans through Django admin.</p>
-        </div>
+                    <a href="{% url 'subscriptions:my_subscriptions' %}">
+                        Manage your subscription
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </div>
+        </section>
     {% endif %}
-</div>
+
+    <section aria-labelledby="sp-plans-title">
+        <div class="sp-section-heading">
+            <div>
+                <h2 id="sp-plans-title">Choose your subscription</h2>
+                <p>Compare the available plans and select the one for you.</p>
+            </div>
+
+            {% if plans %}
+                <span class="sp-plan-count">
+                    {{ plans|length }} available
+                </span>
+            {% endif %}
+        </div>
+
+        {% if plans %}
+            <div class="sp-plans-grid">
+                {% for plan in plans %}
+                    <article class="sp-plan-card {% if forloop.counter == 2 %}sp-featured{% endif %}">
+
+                        <div class="sp-plan-labels">
+                            {% if active_subscription and active_subscription.plan_id == plan.id %}
+                                <span class="sp-label sp-label-current">
+                                    Current plan
+                                </span>
+                            {% elif forloop.counter == 2 %}
+                                <span class="sp-label sp-label-popular">
+                                    Featured plan
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <h3>{{ plan.name }}</h3>
+
+                        <p class="sp-plan-description">
+                            {% if plan.description %}
+                                {{ plan.description }}
+                            {% else %}
+                                Access StreamSphere with this subscription option.
+                            {% endif %}
+                        </p>
+
+                        <div class="sp-price-area">
+                            <div class="sp-price-caption">Subscription price</div>
+
+                            <div class="sp-price">
+                                {{ plan.price|floatformat:2 }}
+                            </div>
+
+                            <div class="sp-price-period">
+                                For {{ plan.duration_days }} day{{ plan.duration_days|pluralize }}
+                            </div>
+                        </div>
+
+                        <div class="sp-duration">
+                            <span class="sp-duration-icon" aria-hidden="true">D</span>
+                            <span>
+                                {{ plan.duration_days }} day{{ plan.duration_days|pluralize }}
+                                of subscription access
+                            </span>
+                        </div>
+
+                        <div class="sp-plan-bottom">
+                            {% if user.is_authenticated %}
+                                <form
+                                    class="sp-card-form"
+                                    method="post"
+                                    action="{% url 'subscriptions:subscribe' plan.id %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        class="sp-btn {% if not forloop.counter == 2 %}sp-btn-secondary{% endif %}"
+                                        type="submit"
+                                    >
+                                        Continue to subscription
+                                        <span class="sp-btn-arrow" aria-hidden="true">→</span>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a
+                                    class="sp-btn {% if not forloop.counter == 2 %}sp-btn-secondary{% endif %}"
+                                    href="{% url 'account_login' %}?next={% url 'subscriptions:plans' %}"
+                                >
+                                    Sign in to subscribe
+                                    <span class="sp-btn-arrow" aria-hidden="true">→</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="sp-empty">
+            
+
+                <h3>No subscription plans yet</h3>
+
+                <p>
+                    Subscription options will appear here when they become
+                    available. Please check back later.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <footer class="sp-footer" aria-label="Subscription information">
+        <div class="sp-footer-item">
+            <strong>Choose with confidence</strong>
+            <p>Review each plan's price and duration before continuing.</p>
+        </div>
+
+        <div class="sp-footer-item">
+            <strong>Track your subscription</strong>
+            <p>Visit your subscription page to review your current access.</p>
+        </div>
+
+        <div class="sp-footer-item">
+            <strong>Need to sign in?</strong>
+            <p>Sign in to continue to the subscription process.</p>
+        </div>
+    </footer>
+
+</main>
 {% endblock %}

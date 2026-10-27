@@ -13,4 +13,5 @@ urlpatterns = [
     path("<int:pk>/purchase/", views.purchase_video, name="purchase"),
     path("<int:pk>/watch/", views.watch_video, name="watch"),
     path("<int:pk>/", views.video_detail, name="detail"),
+    path("my-videos/", views.my_videos, name="my_videos"),
 ]

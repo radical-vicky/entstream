@@ -258,6 +258,16 @@ def delete_comment(request, comment_id):
     return redirect("videos:detail", pk=video_id)
 
 
+
+import logging
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+logger = logging.getLogger(__name__)
+
+
 @login_required
 def upload_video(request):
     if request.method == "POST":
@@ -276,17 +286,19 @@ def upload_video(request):
                     request,
                     "Your video has been uploaded and published successfully.",
                 )
-                return redirect(
-                    "videos:detail",
-                    pk=video.pk,
-                )
+                return redirect("videos:detail", pk=video.pk)
 
             messages.success(
                 request,
                 "Your video has been saved as a draft.",
             )
-
             return redirect("accounts:profile")
+
+        logger.warning("Video upload validation errors: %s", form.errors)
+        messages.error(
+            request,
+            "The video could not be uploaded. Please correct the errors below.",
+        )
     else:
         form = VideoUploadForm()
 
@@ -387,3 +399,22 @@ def watch_video(request, pk):
         )
 
     return redirect(media_url)
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Video
+
+
+@login_required
+def my_videos(request):
+    videos = Video.objects.filter(
+        uploader=request.user
+    ).order_by("-id")
+
+    return render(
+        request,
+        "videos/video_list.html",
+        {"videos": videos},
+    )

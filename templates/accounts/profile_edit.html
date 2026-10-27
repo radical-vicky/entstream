@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sp-edit-page {
+        --sp-panel: #0d1117;
+        --sp-bg: #080b10;
+        --sp-border: #30363d;
+        --sp-text: #e6edf3;
+        --sp-muted: #8b949e;
+        --sp-orange: #f0883e;
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 32px 20px 60px;
+        color: var(--sp-text);
+    }
+
+    .sp-edit-page * {
+        box-sizing: border-box;
+    }
+
+    .sp-edit-card {
+        padding: 28px;
+        background: var(--sp-panel);
+        border: 1px solid var(--sp-border);
+    }
+
+    .sp-edit-header {
+        margin-bottom: 28px;
+    }
+
+    .sp-edit-header h1 {
+        margin: 0 0 8px;
+        font-size: clamp(25px, 3vw, 32px);
+    }
+
+    .sp-edit-header p {
+        margin: 0;
+        color: var(--sp-muted);
+        line-height: 1.6;
+    }
+
+    .sp-edit-messages {
+        margin-bottom: 18px;
+    }
+
+    .sp-edit-message {
+        margin-bottom: 8px;
+        padding: 12px 14px;
+        background: #171d26;
+        border: 1px solid var(--sp-border);
+        line-height: 1.5;
+    }
+
+    .sp-edit-message.error {
+        border-left: 3px solid #f85149;
+    }
+
+    .sp-edit-message.success {
+        border-left: 3px solid #3fb950;
+    }
+
+    .sp-edit-avatar-area {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 20px;
+        margin-bottom: 28px;
+        background: var(--sp-bg);
+        border: 1px solid var(--sp-border);
+    }
+
+    .sp-edit-avatar-preview {
+        width: 104px;
+        height: 104px;
+        flex: 0 0 104px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #171d26;
+        border: 1px solid var(--sp-border);
+        color: var(--sp-orange);
+        font-size: 34px;
+        font-weight: 800;
+    }
+
+    .sp-edit-avatar-preview img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .sp-edit-avatar-copy h2 {
+        margin: 0 0 7px;
+        font-size: 17px;
+    }
+
+    .sp-edit-avatar-copy p {
+        margin: 0;
+        color: var(--sp-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .sp-edit-field {
+        margin-bottom: 21px;
+    }
+
+    .sp-edit-field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .sp-edit-field input,
+    .sp-edit-field textarea {
+        display: block;
+        width: 100%;
+        padding: 12px 13px;
+        background: var(--sp-bg);
+        color: var(--sp-text);
+        border: 1px solid var(--sp-border);
+        border-radius: 0;
+        font: inherit;
+        font-size: 14px;
+    }
+
+    .sp-edit-field input {
+        min-height: 45px;
+    }
+
+    .sp-edit-field input[type="file"] {
+        padding: 10px;
+    }
+
+    .sp-edit-field input[type="file"]::file-selector-button {
+        padding: 8px 11px;
+        margin-right: 12px;
+        background: #202833;
+        color: var(--sp-text);
+        border: 1px solid var(--sp-border);
+        border-radius: 0;
+        cursor: pointer;
+    }
+
+    .sp-edit-field textarea {
+        min-height: 125px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .sp-edit-field input:focus,
+    .sp-edit-field textarea:focus {
+        outline: 1px solid var(--sp-orange);
+        border-color: var(--sp-orange);
+    }
+
+    .sp-edit-help {
+        display: block;
+        margin-top: 7px;
+        color: var(--sp-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .sp-edit-divider {
+        height: 1px;
+        margin: 27px 0;
+        background: var(--sp-border);
+        border: 0;
+    }
+
+    .sp-edit-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .sp-edit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 11px 17px;
+        border: 1px solid var(--sp-border);
+        border-radius: 0;
+        text-decoration: none;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .sp-edit-btn-primary {
+        background: var(--sp-orange);
+        color: #101010;
+        border-color: var(--sp-orange);
+    }
+
+    .sp-edit-btn-primary:hover {
+        background: #ff9b50;
+        border-color: #ff9b50;
+    }
+
+    .sp-edit-btn-secondary {
+        background: #161b22;
+        color: var(--sp-text);
+    }
+
+    .sp-edit-btn-secondary:hover {
+        background: #202833;
+    }
+
+    @media (max-width: 600px) {
+        .sp-edit-page {
+            padding: 20px 12px 40px;
+        }
+
+        .sp-edit-card {
+            padding: 19px;
+        }
+
+        .sp-edit-avatar-area {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .sp-edit-actions {
+            flex-direction: column;
+        }
+
+        .sp-edit-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="sp-edit-page">
+    {% if messages %}
+        <div class="sp-edit-messages" aria-live="polite">
+            {% for message in messages %}
+                <div class="sp-edit-message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="sp-edit-card">
+        <header class="sp-edit-header">
+            <h1>Edit your profile</h1>
+            <p>Update your StreamSphere identity and the information other people see.</p>
+        </header>
+
+        <form method="post"
+              action="{% url 'accounts:profile_edit' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="sp-edit-avatar-area">
+                <div class="sp-edit-avatar-preview" id="avatarPreview">
+                    {% if profile.avatar_image %}
+                        <img src="{{ profile.avatar_image.url }}"
+                             alt="Current profile avatar"
+                             id="avatarPreviewImage">
+                    {% elif profile.avatar %}
+                        <img src="{{ profile.avatar }}"
+                             alt="Current profile avatar"
+                             id="avatarPreviewImage">
+                    {% else %}
+                        <span id="avatarInitial">
+                            {{ account_user.username|first|upper }}
+                        </span>
+                        <img src=""
+                             alt="Avatar preview"
+                             id="avatarPreviewImage"
+                             hidden>
+                    {% endif %}
+                </div>
+
+                <div class="sp-edit-avatar-copy">
+                    <h2>Profile photo</h2>
+                    <p>Upload a clear image for your avatar. Your image will be stored through Cloudinary.</p>
+                </div>
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="{{ form.avatar_upload.id_for_label }}">Upload avatar</label>
+                {{ form.avatar_upload }}
+                <span class="sp-edit-help">
+                    Choose an image file from your device. Leave this blank to keep your current uploaded avatar.
+                </span>
+            </div>
+
+            <hr class="sp-edit-divider">
+
+            <div class="sp-edit-field">
+                <label for="username">Username *</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value="{{ account_user.username }}"
+                    maxlength="150"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="first_name">First name</label>
+                <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    value="{{ account_user.first_name }}"
+                    autocomplete="given-name"
+                >
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="last_name">Last name</label>
+                <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    value="{{ account_user.last_name }}"
+                    autocomplete="family-name"
+                >
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="email">Email address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ account_user.email }}"
+                    autocomplete="email"
+                >
+            </div>
+
+            <hr class="sp-edit-divider">
+
+            <div class="sp-edit-field">
+                <label for="bio">Bio</label>
+                <textarea
+                    id="bio"
+                    name="bio"
+                    maxlength="500"
+                    placeholder="Tell people a little about yourself..."
+                >{{ profile.bio }}</textarea>
+                <span class="sp-edit-help">Maximum 500 characters.</span>
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="location">Location</label>
+                <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value="{{ profile.location }}"
+                    maxlength="100"
+                    placeholder="Your city or location"
+                >
+            </div>
+
+            <div class="sp-edit-field">
+                <label for="website">Website</label>
+                <input
+                    type="url"
+                    id="website"
+                    name="website"
+                    value="{{ profile.website }}"
+                    placeholder="https://example.com"
+                >
+            </div>
+
+            <div class="sp-edit-actions">
+                <button class="sp-edit-btn sp-edit-btn-primary" type="submit">
+                    Save changes
+                </button>
+                <a class="sp-edit-btn sp-edit-btn-secondary"
+                   href="{% url 'accounts:profile' %}">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    (() => {
+        // CHANGED: The field ID is now "id_avatar_upload" based on how Django renders form fields.
+        const input = document.getElementById("id_avatar_upload");
+        const preview = document.getElementById("avatarPreviewImage");
+        const initial = document.getElementById("avatarInitial");
+
+        if (!input || !preview) return;
+
+        let currentObjectUrl = null;
+
+        input.addEventListener("change", () => {
+            const file = input.files && input.files[0];
+
+            if (!file) return;
+
+            if (!file.type.startsWith("image/")) {
+                input.value = "";
+                return;
+            }
+
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+            }
+
+            currentObjectUrl = URL.createObjectURL(file);
+            preview.src = currentObjectUrl;
+            preview.hidden = false;
+
+            if (initial) {
+                initial.hidden = true;
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+            }
+        });
+    })();
+</script>
+{% endblock %}

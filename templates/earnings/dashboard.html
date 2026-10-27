@@ -1,164 +1,491 @@
-
 {% extends "base.html" %}
 
 {% block title %}Creator Earnings | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-.ss-earn{max-width:1200px;margin:0 auto;padding:30px 20px 60px;color:#f4f4f4}
+.ss-earn{
+    --accent:#ff7900;
+    --accent-light:#ffad65;
+    --bg:#0b0b0d;
+    --panel:#131316;
+    --panel-hover:#19191d;
+    --border:#2a2a30;
+    --text:#f4f4f5;
+    --muted:#92929d;
+    --green:#66d69a;
+    --red:#ff827b;
+    max-width:1440px;
+    margin:0 auto;
+    padding:34px 24px 70px;
+    color:var(--text);
+    font-family:inherit;
+}
 .ss-earn *{box-sizing:border-box}
 .ss-earn a{text-decoration:none}
-.ss-earn .eyebrow{color:#ff7900;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.ss-earn h1{font-size:clamp(28px,4vw,40px);margin:9px 0}
-.ss-earn .intro{color:#aaa;line-height:1.7}
-.ss-earn .topline{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
-.ss-earn .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;background:#ff7900;color:#111;border:1px solid #ff7900;font-weight:800;border-radius:0}
-.ss-earn .btn-secondary{background:transparent;color:#ff7900}
-.ss-earn .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 34px}
-.ss-earn .stat{background:#151515;border:1px solid #303030;padding:19px;min-width:0}
-.ss-earn .stat span{display:block;font-size:13px;color:#aaa;margin-bottom:11px}
-.ss-earn .stat strong{font-size:clamp(20px,2.7vw,29px);overflow-wrap:anywhere}
-.ss-earn .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 0 14px}
-.ss-earn .section-head h2{font-size:21px;margin:0}
-.ss-earn .table-wrap{overflow-x:auto;border:1px solid #303030}
-.ss-earn table{width:100%;border-collapse:collapse;min-width:680px;background:#151515}
-.ss-earn th,.ss-earn td{text-align:left;padding:14px 15px;border-bottom:1px solid #303030;font-size:13px}
-.ss-earn th{color:#aaa;background:#101010;font-weight:700}
-.ss-earn td{color:#eee}
-.ss-earn .ref{font-family:monospace;color:#ffad65}
-.ss-earn .status{display:inline-block;padding:5px 7px;background:#292929;color:#ddd;font-size:11px;text-transform:uppercase;font-weight:800}
-.ss-earn .status-completed,.ss-earn .status-paid{background:#142b1d;color:#8bdaa3}
-.ss-earn .status-pending,.ss-earn .status-approved,.ss-earn .status-processing{background:#33240f;color:#ffc17b}
-.ss-earn .status-failed,.ss-earn .status-rejected,.ss-earn .status-reversed{background:#321b19;color:#f09a90}
-.ss-earn .empty{padding:25px;background:#151515;color:#aaa;border:1px dashed #444}
-.ss-earn .pagination{display:flex;justify-content:center;align-items:center;gap:15px;padding:18px;color:#aaa}
-.ss-earn .pagination a{color:#ff7900;font-weight:800}
-.ss-earn .notice{padding:13px 15px;margin:18px 0;background:#201a14;border-left:3px solid #ff7900;color:#e6d2b9;line-height:1.7}
-@media(max-width:900px){.ss-earn .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.ss-earn{padding:22px 12px 40px}.ss-earn .stats{gap:9px}.ss-earn .stat{padding:13px}.ss-earn .topline .btn{width:100%}}
+.ss-earn button,.ss-earn a{transition:background .2s ease,border-color .2s ease,color .2s ease}
+.ss-earn .eyebrow{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+.ss-earn h1{
+    font-size:clamp(30px,4vw,42px);
+    font-weight:850;
+    letter-spacing:-1.5px;
+    line-height:1.15;
+    margin:10px 0 12px;
+}
+.ss-earn h2{font-size:19px;font-weight:800;letter-spacing:-.3px;margin:0}
+.ss-earn p{margin:0}
+.ss-earn .muted{color:var(--muted)}
+.ss-earn .intro{font-size:14px;line-height:1.8;color:#a1a1aa;max-width:560px}
+.ss-earn .topline{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+    margin-bottom:30px;
+}
+.ss-earn .btn{
+    min-height:46px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:12px 18px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#15100b;
+    font-size:13px;
+    font-weight:850;
+    border-radius:3px;
+}
+.ss-earn .btn:hover{background:#ff9233;border-color:#ff9233}
+.ss-earn .btn-secondary{background:transparent;color:var(--text);border-color:#393940}
+.ss-earn .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.ss-earn .stats{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:15px;
+    margin:0 0 28px;
+}
+.ss-earn .stat{
+    min-width:0;
+    min-height:155px;
+    padding:21px;
+    background:linear-gradient(145deg,#171719,#111113);
+    border:1px solid var(--border);
+    position:relative;
+    overflow:hidden;
+}
+.ss-earn .stat:before{
+    content:"";
+    position:absolute;
+    top:0;left:0;
+    width:42px;height:2px;
+    background:var(--accent);
+}
+.ss-earn .stat-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:23px;
+}
+.ss-earn .stat-label{font-size:12px;color:#aaa;font-weight:650}
+.ss-earn .stat-mark{
+    width:32px;height:32px;
+    display:grid;place-items:center;
+    border:1px solid #38312a;
+    color:var(--accent-light);
+    background:#21170f;
+    font-size:15px;font-weight:800;
+}
+.ss-earn .stat strong{
+    display:block;
+    font-size:clamp(20px,2.2vw,29px);
+    font-weight:850;
+    letter-spacing:-.7px;
+    overflow-wrap:anywhere;
+    line-height:1.25;
+}
+.ss-earn .stat-foot{font-size:11px;color:#777;margin-top:10px;line-height:1.5}
+.ss-earn .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    margin-top:22px;
+}
+.ss-earn .panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+    padding:21px 22px;
+    border-bottom:1px solid var(--border);
+}
+.ss-earn .panel-subtitle{font-size:12px;color:var(--muted);margin-top:6px}
+.ss-earn .count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:29px;
+    min-height:25px;
+    padding:4px 8px;
+    background:#242428;
+    color:#ddd;
+    font-size:11px;
+    font-weight:800;
+}
+.ss-earn .notice{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:15px 17px;
+    margin:0 0 24px;
+    background:#1b1712;
+    border:1px solid #3b2a1b;
+    color:#d9c7b5;
+    font-size:12px;
+    line-height:1.8;
+}
+.ss-earn .notice-mark{
+    flex:0 0 24px;
+    width:24px;height:24px;
+    display:grid;place-items:center;
+    border:1px solid #65401e;
+    color:var(--accent-light);
+    font-weight:900;
+}
+.ss-earn .notice strong{color:#fff0df}
+.ss-earn .table-wrap{width:100%;overflow-x:auto}
+.ss-earn table{
+    width:100%;
+    border-collapse:collapse;
+    text-align:left;
+    min-width:760px;
+}
+.ss-earn th{
+    padding:14px 18px;
+    background:#101012;
+    color:#8f8f99;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+.ss-earn td{
+    padding:16px 18px;
+    border-top:1px solid #252529;
+    color:#e6e6e9;
+    font-size:12px;
+    vertical-align:middle;
+}
+.ss-earn tbody tr{transition:background .15s ease}
+.ss-earn tbody tr:hover{background:var(--panel-hover)}
+.ss-earn .ref{
+    color:var(--accent-light);
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    font-size:11px;
+    white-space:nowrap;
+}
+.ss-earn .amount{font-weight:800;white-space:nowrap}
+.ss-earn .status{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 8px;
+    border:1px solid #37373d;
+    background:#222226;
+    color:#d4d4d8;
+    font-size:9px;
+    font-weight:850;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    white-space:nowrap;
+}
+.ss-earn .status-completed,
+.ss-earn .status-paid{
+    background:#14271c;
+    border-color:#244b32;
+    color:#8bdaa3;
+}
+.ss-earn .status-pending,
+.ss-earn .status-approved,
+.ss-earn .status-processing{
+    background:#302214;
+    border-color:#574025;
+    color:#ffc17b;
+}
+.ss-earn .status-failed,
+.ss-earn .status-rejected,
+.ss-earn .status-reversed{
+    background:#301b1b;
+    border-color:#57302e;
+    color:#f09a90;
+}
+.ss-earn .empty{
+    padding:42px 20px;
+    text-align:center;
+    background:#121214;
+    color:var(--muted);
+}
+.ss-earn .empty-title{font-size:14px;color:#eee;font-weight:800;margin-bottom:8px}
+.ss-earn .empty-copy{font-size:12px;line-height:1.7;max-width:380px;margin:0 auto}
+.ss-earn .empty-action{margin-top:18px}
+.ss-earn .pagination{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    padding:18px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+    font-size:12px;
+}
+.ss-earn .pagination a{color:var(--accent-light);font-weight:800}
+.ss-earn .pagination a:hover{color:#fff}
+.ss-earn .panel-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:14px 20px;
+    border-top:1px solid var(--border);
+    color:#777;
+    font-size:11px;
+}
+.ss-earn .section-link{font-size:12px;font-weight:800;color:var(--accent-light)}
+.ss-earn .section-link:hover{color:#fff}
+.ss-earn .withdrawal-method{color:#c9c9d0}
+.ss-earn .history-date{white-space:nowrap;color:#aaa}
+.ss-earn .table-note{font-size:11px;color:#777;line-height:1.7}
+.ss-earn .notice-list{margin:0;padding-left:17px}
+.ss-earn .notice-list li+li{margin-top:3px}
+
+@media(max-width:1050px){
+    .ss-earn .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+    .ss-earn{padding:23px 13px 45px}
+    .ss-earn .topline{align-items:stretch;gap:18px;margin-bottom:23px}
+    .ss-earn .topline .btn{width:100%}
+    .ss-earn .stats{gap:10px;margin-bottom:20px}
+    .ss-earn .stat{padding:14px;min-height:135px}
+    .ss-earn .stat-top{align-items:flex-start;gap:6px;margin-bottom:20px}
+    .ss-earn .stat-label{font-size:11px;line-height:1.5}
+    .ss-earn .stat-mark{width:27px;height:27px;flex:0 0 27px;font-size:12px}
+    .ss-earn .stat strong{font-size:clamp(17px,4.5vw,23px)}
+    .ss-earn .stat-foot{font-size:10px}
+    .ss-earn .panel{margin-top:16px}
+    .ss-earn .panel-head{padding:17px 14px}
+    .ss-earn .notice{padding:12px;margin-bottom:18px}
+    .ss-earn .panel-footer{padding:13px 14px}
+    .ss-earn .section-link{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+    .ss-earn *{transition:none!important}
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ss-earn">
-    <div class="topline">
+<main class="ss-earn">
+    <header class="topline">
         <div>
-            <div class="eyebrow">Creator centre</div>
+            <div class="eyebrow">Creator centre / Finance</div>
             <h1>Your earnings</h1>
-            <p class="intro">Track credited earnings, available funds, and withdrawal requests.</p>
+            <p class="intro">A clear overview of your creator revenue, available balance, transaction history and payout requests.</p>
         </div>
-        <a class="btn" href="{% url 'earnings:withdraw' %}">Request withdrawal</a>
-    </div>
+        <a class="btn" href="{% url 'earnings:withdraw' %}">
+            Request withdrawal <span aria-hidden="true">→</span>
+        </a>
+    </header>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="notice">{{ message }}</div>
+            <div class="notice" role="status">
+                <span class="notice-mark" aria-hidden="true">i</span>
+                <div>{{ message }}</div>
+            </div>
         {% endfor %}
     {% endif %}
 
-    <div class="stats">
-        <div class="stat">
-            <span>Available balance</span>
+    <section class="stats" aria-label="Earnings overview">
+        <article class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Available balance</span>
+                <span class="stat-mark" aria-hidden="true">KSh</span>
+            </div>
             <strong>KSh {{ balance.available_balance|floatformat:2 }}</strong>
-        </div>
-        <div class="stat">
-            <span>Pending balance</span>
+            <p class="stat-foot">Funds currently available for withdrawal</p>
+        </article>
+
+        <article class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Pending balance</span>
+                <span class="stat-mark" aria-hidden="true">…</span>
+            </div>
             <strong>KSh {{ balance.pending_balance|floatformat:2 }}</strong>
-        </div>
-        <div class="stat">
-            <span>Total earned</span>
+            <p class="stat-foot">Earnings awaiting confirmation or processing</p>
+        </article>
+
+        <article class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Total earned</span>
+                <span class="stat-mark" aria-hidden="true">+</span>
+            </div>
             <strong>KSh {{ balance.total_earned|floatformat:2 }}</strong>
-        </div>
-        <div class="stat">
-            <span>Total paid out</span>
+            <p class="stat-foot">Total earnings recorded on your account</p>
+        </article>
+
+        <article class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Total paid out</span>
+                <span class="stat-mark" aria-hidden="true">↗</span>
+            </div>
             <strong>KSh {{ balance.total_paid_out|floatformat:2 }}</strong>
+            <p class="stat-foot">Payments recorded as paid</p>
+        </article>
+    </section>
+
+    <aside class="notice">
+        <span class="notice-mark" aria-hidden="true">!</span>
+        <div>
+            <strong>Keep your earnings secure.</strong>
+            <ul class="notice-list">
+                <li>Only verified, completed transactions should be credited to your earnings.</li>
+                <li>Withdrawal requests are reviewed before payout. Check your request status below.</li>
+            </ul>
         </div>
-    </div>
+    </aside>
 
-    <div class="notice">
-        Only verified, completed transactions should be credited to your earnings. Withdrawal requests are reviewed before payout.
-    </div>
+    <section class="panel" aria-labelledby="transactions-title">
+        <div class="panel-head">
+            <div>
+                <h2 id="transactions-title">Transaction history</h2>
+                <p class="panel-subtitle">Review earnings and account transactions.</p>
+            </div>
+            <span class="count">{{ page_obj.paginator.count }} records</span>
+        </div>
 
-    <div class="section-head">
-        <h2>Transaction history</h2>
-        <span style="color:#999;font-size:13px">{{ page_obj.paginator.count }} records</span>
-    </div>
-
-    {% if transactions %}
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in transactions %}
+        {% if transactions %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
                         <tr>
-                            <td class="ref">{{ item.reference }}</td>
-                            <td>{{ item.get_transaction_type_display }}</td>
-                            <td>{{ item.description|default:"—"|truncatechars:70 }}</td>
-                            <td>KSh {{ item.amount|floatformat:2 }}</td>
-                            <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
-                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
+                            <th>Reference</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for item in transactions %}
+                            <tr>
+                                <td class="ref">{{ item.reference|default:"—" }}</td>
+                                <td>{{ item.get_transaction_type_display }}</td>
+                                <td>{{ item.description|default:"—"|truncatechars:70 }}</td>
+                                <td class="amount">KSh {{ item.amount|floatformat:2 }}</td>
+                                <td>
+                                    <span class="status status-{{ item.status|lower }}">
+                                        {{ item.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="history-date">{{ item.created_at|date:"M j, Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        {% if page_obj.has_other_pages %}
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
-                {% endif %}
-                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">Next →</a>
-                {% endif %}
+            {% if page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Transaction pages">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+                    {% endif %}
+                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+
+            <div class="panel-footer">
+                <span>Transaction records are displayed in your account currency.</span>
+                <span class="table-note">Swipe horizontally on small screens to view all columns.</span>
+            </div>
+        {% else %}
+            <div class="empty">
+                <div class="empty-title">No transactions yet</div>
+                <p class="empty-copy">Your earnings activity will appear here once transactions have been recorded on your account.</p>
+                <div class="empty-action">
+                    <a class="btn btn-secondary" href="{% url 'videos:list' %}">Explore videos</a>
+                </div>
             </div>
         {% endif %}
-    {% else %}
-        <div class="empty">No earning transactions have been recorded yet.</div>
-    {% endif %}
+    </section>
 
-    <div class="section-head">
-        <h2>Recent withdrawals</h2>
-        <a href="{% url 'earnings:withdraw' %}" style="color:#ff7900;font-weight:800">Request payout →</a>
-    </div>
-
-    {% if withdrawals %}
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Method</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Requested</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in withdrawals %}
-                        <tr>
-                            <td class="ref">{{ item.reference }}</td>
-                            <td>{{ item.get_payout_method_display|default:item.payout_method|title }}</td>
-                            <td>KSh {{ item.amount|floatformat:2 }}</td>
-                            <td><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></td>
-                            <td>{{ item.created_at|date:"M j, Y H:i" }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <section class="panel" aria-labelledby="withdrawals-title">
+        <div class="panel-head">
+            <div>
+                <h2 id="withdrawals-title">Withdrawal requests</h2>
+                <p class="panel-subtitle">Track the progress of your payout requests.</p>
+            </div>
+            <a class="section-link" href="{% url 'earnings:withdraw' %}">Request payout →</a>
         </div>
-    {% else %}
-        <div class="empty">You haven't requested a withdrawal yet.</div>
-    {% endif %}
-</div>
+
+        {% if withdrawals %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Method</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in withdrawals %}
+                            <tr>
+                                <td class="ref">{{ item.reference|default:"—" }}</td>
+                                <td class="withdrawal-method">{{ item.get_payout_method_display|default:item.payout_method|title }}</td>
+                                <td class="amount">KSh {{ item.amount|floatformat:2 }}</td>
+                                <td>
+                                    <span class="status status-{{ item.status|lower }}">
+                                        {{ item.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="history-date">{{ item.created_at|date:"M j, Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <span>Withdrawal status reflects the latest recorded request state.</span>
+                <a class="section-link" href="{% url 'earnings:withdraw' %}">Make another request →</a>
+            </div>
+        {% else %}
+            <div class="empty">
+                <div class="empty-title">No withdrawal requests</div>
+                <p class="empty-copy">When you request a payout, its reference, amount, method and status will appear here.</p>
+                <div class="empty-action">
+                    <a class="btn" href="{% url 'earnings:withdraw' %}">Request your first payout →</a>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+</main>
 {% endblock %}

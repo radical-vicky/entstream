@@ -1,4 +1,3 @@
-
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -14,7 +13,7 @@ User = get_user_model()
 
 @login_required
 def inbox(request):
-    conversations = (
+    conversations_qs = (
         Conversation.objects
         .filter(participants=request.user)
         .annotate(
@@ -30,11 +29,35 @@ def inbox(request):
     )
 
     query = request.GET.get("q", "").strip()
+    user_results = None
+
     if query:
-        conversations = conversations.filter(
+        # Filter existing conversations
+        conversations_qs = conversations_qs.filter(
             Q(subject__icontains=query)
             | Q(participants__username__icontains=query)
+            | Q(participants__first_name__icontains=query)
+            | Q(participants__last_name__icontains=query)
         ).distinct()
+
+        # Search for NEW users to start a conversation with
+        user_results = (
+            User.objects.filter(
+                Q(username__icontains=query)
+                | Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+            )
+            .exclude(pk=request.user.pk)
+            .exclude(pk__in=request.user.chat_conversations.values_list("participants__pk", flat=True))
+            .distinct()[:5]
+        )
+
+    # Convert to list so we can attach dynamic attributes
+    conversations = list(conversations_qs)
+
+    # Attach the 'other_user' to each conversation for the template
+    for conv in conversations:
+        conv.other_user = conv.other_participant(request.user)
 
     return render(
         request,
@@ -42,6 +65,7 @@ def inbox(request):
         {
             "conversations": conversations,
             "query": query,
+            "user_results": user_results,
         },
     )
 

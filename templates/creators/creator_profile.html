@@ -6,699 +6,1036 @@
 
 {% block extra_css %}
 <style>
-:root {
-    --cp-bg: #080808;
-    --cp-panel: #111111;
-    --cp-panel-hover: #181818;
-    --cp-border: #292929;
-    --cp-text: #f5f5f5;
-    --cp-muted: #a0a0a0;
-    --cp-orange: #ff7900;
-    --cp-orange-light: #ff9a3d;
-}
-
-.cp-page {
-    width: min(1440px, 100%);
-    margin: 0 auto;
-    padding: 28px 24px 60px;
-    color: var(--cp-text);
-}
-
-.cp-cover {
-    height: 210px;
-    position: relative;
-    overflow: hidden;
-    background:
-        radial-gradient(ellipse at 80% 20%, #632900 0%, transparent 42%),
-        linear-gradient(120deg, #17110c, #090909 60%, #241004);
-    border: 1px solid var(--cp-border);
-}
-
-.cp-cover::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, #ff790012, transparent);
-    pointer-events: none;
-}
-
-.cp-cover-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-}
-
-.cp-profile-panel {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    padding: 24px;
-    background: var(--cp-panel);
-    border: 1px solid var(--cp-border);
-    border-top: 0;
-}
-
-.cp-avatar {
-    flex: 0 0 auto;
-    width: 112px;
-    height: 112px;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-    border: 3px solid var(--cp-orange);
-    background: #242424;
-    color: var(--cp-orange-light);
-    font-size: 38px;
-    font-weight: 800;
-}
-
-.cp-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cp-identity {
-    flex: 1;
-    min-width: 0;
-}
-
-.cp-name-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.cp-name {
-    margin: 0;
-    font-size: clamp(24px, 3vw, 34px);
-    line-height: 1.2;
-    overflow-wrap: anywhere;
-}
-
-.cp-verified {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 21px;
-    height: 21px;
-    background: var(--cp-orange);
-    color: #111;
-    font-size: 13px;
-    font-weight: 900;
-}
-
-.cp-handle {
-    margin: 7px 0 0;
-    color: var(--cp-muted);
-    font-size: 14px;
-}
-
-.cp-bio {
-    margin: 12px 0 0;
-    max-width: 700px;
-    color: #d0d0d0;
-    line-height: 1.7;
-    overflow-wrap: anywhere;
-    white-space: pre-line;
-}
-
-.cp-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-left: auto;
-}
-
-.cp-button {
-    min-height: 42px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20px;
-    border: 1px solid var(--cp-border);
-    background: #1b1b1b;
-    color: var(--cp-text);
-    font: inherit;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .18s, border-color .18s;
-}
-
-.cp-button:hover {
-    border-color: var(--cp-orange);
-    background: #242424;
-}
-
-.cp-button-primary {
-    border-color: var(--cp-orange);
-    background: var(--cp-orange);
-    color: #111;
-}
-
-.cp-button-primary:hover {
-    background: var(--cp-orange-light);
-    color: #111;
-}
-
-.cp-button:focus-visible,
-.cp-tab:focus-visible {
-    outline: 2px solid var(--cp-orange-light);
-    outline-offset: 3px;
-}
-
-.cp-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 18px;
-    border: 1px solid var(--cp-border);
-    background: var(--cp-panel);
-}
-
-.cp-stat {
-    padding: 20px;
-    text-align: center;
-    border-right: 1px solid var(--cp-border);
-}
-
-.cp-stat:last-child {
-    border-right: 0;
-}
-
-.cp-stat-number {
-    display: block;
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--cp-orange-light);
-}
-
-.cp-stat-label {
-    display: block;
-    margin-top: 5px;
-    color: var(--cp-muted);
-    font-size: 13px;
-}
-
-.cp-content {
-    margin-top: 30px;
-}
-
-.cp-section-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 18px;
-}
-
-.cp-section-heading h2 {
-    margin: 0;
-    font-size: 23px;
-}
-
-.cp-section-heading p {
-    margin: 5px 0 0;
-    color: var(--cp-muted);
-    font-size: 13px;
-}
-
-.cp-video-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
-}
-
-.cp-video-card {
-    min-width: 0;
-    overflow: hidden;
-    background: var(--cp-panel);
-    border: 1px solid var(--cp-border);
-    transition: border-color .18s, transform .18s;
-}
-
-.cp-video-card:hover {
-    border-color: #7a400f;
-    transform: translateY(-2px);
-}
-
-.cp-thumbnail {
-    position: relative;
-    display: block;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #202020;
-}
-
-.cp-thumbnail img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    transition: transform .25s;
-}
-
-.cp-video-card:hover .cp-thumbnail img {
-    transform: scale(1.035);
-}
-
-.cp-thumbnail-placeholder {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #24160b, #101010);
-    color: var(--cp-orange);
-    font-size: 30px;
-    font-weight: 800;
-}
-
-.cp-duration {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-    padding: 4px 6px;
-    background: #000d;
-    color: #fff;
-    font-size: 11px;
-}
-
-.cp-video-info {
-    padding: 13px;
-}
-
-.cp-video-title {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0;
-    color: var(--cp-text);
-    font-size: 15px;
-    line-height: 1.5;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-.cp-video-title a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.cp-video-title a:hover {
-    color: var(--cp-orange-light);
-}
-
-.cp-video-meta {
-    margin-top: 8px;
-    color: var(--cp-muted);
-    font-size: 12px;
-    line-height: 1.7;
-}
-
-.cp-video-creator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    color: #d4d4d4;
-    font-size: 12px;
-}
-
-.cp-mini-avatar {
-    width: 26px;
-    height: 26px;
-    display: grid;
-    flex: 0 0 auto;
-    place-items: center;
-    overflow: hidden;
-    border: 1px solid #393939;
-    border-radius: 50%;
-    background: #252525;
-    color: var(--cp-orange-light);
-    font-weight: 800;
-}
-
-.cp-mini-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cp-empty {
-    padding: 48px 20px;
-    border: 1px dashed #383838;
-    background: var(--cp-panel);
-    text-align: center;
-}
-
-.cp-empty h3 {
-    margin: 0 0 8px;
-    font-size: 20px;
-}
-
-.cp-empty p {
-    margin: 0;
-    color: var(--cp-muted);
-    line-height: 1.6;
-}
-
-.cp-empty-action {
-    margin-top: 18px;
-}
-
-.cp-pagination {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 28px;
-}
-
-.cp-pagination a,
-.cp-pagination span {
-    min-width: 40px;
-    min-height: 40px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0 12px;
-    border: 1px solid var(--cp-border);
-    background: var(--cp-panel);
-    color: var(--cp-text);
-    text-decoration: none;
-}
-
-.cp-pagination .current {
-    border-color: var(--cp-orange);
-    background: var(--cp-orange);
-    color: #111;
-}
-
-.cp-alert {
-    margin-bottom: 16px;
-    padding: 12px 15px;
-    border: 1px solid var(--cp-border);
-    background: var(--cp-panel);
-    color: var(--cp-text);
-}
-
-@media (max-width: 1100px) {
-    .cp-video-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    :root {
+        --cp-bg: #0b0b0d;
+        --cp-panel: #121215;
+        --cp-panel-hover: #19191e;
+        --cp-border: #29292f;
+        --cp-text: #f5f5f7;
+        --cp-muted: #96969f;
+        --cp-orange: #ff7900;
+        --cp-orange-light: #ff9638;
     }
 
-    .cp-profile-panel {
-        flex-wrap: wrap;
-    }
+    .cp-page, .cp-page * { box-sizing: border-box; }
 
-    .cp-actions {
-        margin-left: 134px;
-    }
-}
-
-@media (max-width: 760px) {
     .cp-page {
-        padding: 16px 12px 40px;
+        min-height: 100vh;
+        padding: 26px 24px 60px;
+        background: var(--cp-bg);
+        color: var(--cp-text);
     }
+
+    .cp-container {
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+
+    .cp-breadcrumbs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 22px;
+        color: var(--cp-muted);
+        font-size: 12px;
+    }
+
+    .cp-breadcrumbs a {
+        color: var(--cp-muted);
+        text-decoration: none;
+    }
+
+    .cp-breadcrumbs a:hover { color: var(--cp-orange); }
 
     .cp-cover {
-        height: 145px;
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        border: 1px solid var(--cp-border);
+        border-radius: 12px 12px 0 0;
+        background:
+            radial-gradient(circle at 80% 20%, rgba(255,121,0,.22), transparent 32%),
+            radial-gradient(circle at 20% 100%, rgba(255,121,0,.12), transparent 40%),
+            linear-gradient(135deg, #252529, #101013 60%, #1a120c);
+    }
+
+    .cp-cover-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cp-cover-label {
+        position: absolute;
+        right: 18px;
+        bottom: 16px;
+        padding: 7px 11px;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 6px;
+        background: rgba(0,0,0,.6);
+        color: #fff;
+        font-size: 10px;
+        letter-spacing: .7px;
+        text-transform: uppercase;
     }
 
     .cp-profile-panel {
-        align-items: flex-start;
-        gap: 14px;
-        padding: 18px 14px;
+        margin-bottom: 30px;
+        padding: 0 30px 25px;
+        border: 1px solid var(--cp-border);
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        background: var(--cp-panel);
+    }
+
+    .cp-profile-top {
+        display: flex;
+        align-items: flex-end;
+        gap: 22px;
+        min-width: 0;
+    }
+
+    /* Main avatar is a true circle: equal width and height. */
+    .cp-avatar-wrap {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 116px;
+        width: 116px;
+        height: 116px;
+        margin-top: -58px;
+        overflow: hidden;
+        border: 5px solid var(--cp-panel);
+        border-radius: 50%;
+        background: #25252b;
     }
 
     .cp-avatar {
-        width: 76px;
-        height: 76px;
-        font-size: 28px;
-    }
-
-    .cp-name {
-        font-size: 23px;
-    }
-
-    .cp-actions {
+        display: block;
         width: 100%;
-        margin-left: 0;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
     }
 
-    .cp-actions form {
+    .cp-avatar-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff7900, #9c3c00);
+        color: #fff;
+        font-size: 38px;
+        font-weight: 800;
+    }
+
+    .cp-profile-info {
         flex: 1;
+        min-width: 0;
+        padding: 18px 0 0;
     }
 
-    .cp-actions .cp-button {
-        width: 100%;
+    .cp-name-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 7px;
     }
+
+    .cp-display-name {
+        margin: 0;
+        color: var(--cp-text);
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 800;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+
+    .cp-verified {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--cp-orange);
+        color: #111;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .cp-username {
+        margin: 0;
+        color: var(--cp-muted);
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .cp-profile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 9px;
+        margin-left: auto;
+        padding-bottom: 4px;
+    }
+
+    .cp-profile-actions form { margin: 0; }
+
+    .cp-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid var(--cp-border);
+        border-radius: 7px;
+        background: #1a1a1f;
+        color: var(--cp-text);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .cp-btn:hover {
+        border-color: #55555e;
+        background: #222228;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .cp-btn-primary {
+        border-color: var(--cp-orange);
+        background: var(--cp-orange);
+        color: #111;
+    }
+
+    .cp-btn-primary:hover {
+        border-color: var(--cp-orange-light);
+        background: var(--cp-orange-light);
+        color: #111;
+    }
+
+    .cp-btn svg, .cp-meta-item svg, .cp-upload-link svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .cp-btn-following {
+        background: #222228;
+        color: #fff;
+    }
+
+    .cp-btn-following:hover {
+        border-color: #e35454;
+        color: #ff7777;
+    }
+
+    .cp-bio {
+        max-width: 760px;
+        margin: 20px 0;
+        color: #c7c7ce;
+        font-size: 14px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+        white-space: pre-line;
+    }
+
+    .cp-bio-empty {
+        color: var(--cp-muted);
+        font-style: italic;
+    }
+
+    .cp-profile-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 23px;
+        color: var(--cp-muted);
+        font-size: 12px;
+    }
+
+    .cp-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .cp-meta-item svg { stroke: var(--cp-orange); }
 
     .cp-stats {
-        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid var(--cp-border);
     }
 
     .cp-stat {
-        padding: 15px 6px;
+        min-width: 0;
+        padding: 15px 17px;
+        border: 1px solid var(--cp-border);
+        border-radius: 8px;
+        background: #0e0e11;
     }
 
-    .cp-stat-number {
-        font-size: 20px;
+    .cp-stat-value {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--cp-text);
+        font-size: 22px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
     }
 
     .cp-stat-label {
+        color: var(--cp-muted);
         font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .5px;
+        text-transform: uppercase;
     }
+
+    .cp-videos-section { margin-top: 34px; }
+
+    .cp-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .cp-section-title {
+        margin: 0;
+        color: var(--cp-text);
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .cp-section-title span {
+        margin-left: 8px;
+        color: var(--cp-muted);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .cp-upload-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--cp-orange);
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .cp-upload-link:hover { color: var(--cp-orange-light); }
 
     .cp-video-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 23px 18px;
     }
 
-    .cp-video-info {
-        padding: 10px;
+    .cp-video-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--cp-border);
+        border-radius: 9px;
+        background: var(--cp-panel);
+        transition: border-color .2s ease, transform .2s ease;
     }
+
+    .cp-video-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255,121,0,.6);
+    }
+
+    .cp-video-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .cp-thumbnail {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: #202025;
+    }
+
+    .cp-thumbnail img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .3s ease;
+    }
+
+    .cp-video-card:hover .cp-thumbnail img { transform: scale(1.04); }
+
+    .cp-thumbnail-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background:
+            radial-gradient(circle at 75% 20%, rgba(255,121,0,.2), transparent 35%),
+            linear-gradient(135deg, #29292f, #101013);
+    }
+
+    .cp-thumbnail-placeholder svg {
+        width: 38px;
+        height: 38px;
+        fill: none;
+        stroke: #aaa;
+        stroke-width: 1.4;
+    }
+
+    .cp-duration, .cp-premium-label {
+        position: absolute;
+        padding: 5px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .cp-duration {
+        right: 8px;
+        bottom: 8px;
+        background: rgba(0,0,0,.85);
+        color: #fff;
+    }
+
+    .cp-premium-label {
+        top: 8px;
+        left: 8px;
+        background: var(--cp-orange);
+        color: #111;
+        text-transform: uppercase;
+    }
+
+    .cp-video-content { padding: 13px; }
 
     .cp-video-title {
+        display: -webkit-box;
+        min-height: 42px;
+        margin: 0 0 11px;
+        overflow: hidden;
+        color: var(--cp-text);
         font-size: 13px;
+        font-weight: 700;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
     }
 
-    .cp-section-heading h2 {
-        font-size: 20px;
+    .cp-video-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        color: var(--cp-muted);
+        font-size: 10px;
     }
-}
 
-@media (max-width: 380px) {
-    .cp-profile-panel {
+    .cp-meta-dot { color: #55555e; }
+
+    .cp-card-creator {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 0;
+        margin-top: 13px;
+        padding-top: 11px;
+        border-top: 1px solid #25252b;
+    }
+
+    /* Small creator avatar is also a perfect circle. */
+    .cp-small-avatar {
+        display: flex;
+        flex: 0 0 30px;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        overflow: hidden;
+        border: 1px solid #383840;
+        border-radius: 50%;
+        background: #25252b;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .cp-small-avatar img {
         display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
-    .cp-avatar {
-        margin-bottom: 14px;
+    .cp-card-creator-name {
+        min-width: 0;
+        overflow: hidden;
+        color: #c6c6ce;
+        font-size: 11px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .cp-video-grid {
-        grid-template-columns: 1fr;
+    .cp-empty {
+        padding: 58px 20px;
+        border: 1px dashed #383840;
+        border-radius: 11px;
+        background: #101013;
+        text-align: center;
     }
-}
+
+    .cp-empty-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 18px;
+        border: 1px solid rgba(255,121,0,.25);
+        border-radius: 50%;
+        background: rgba(255,121,0,.08);
+    }
+
+    .cp-empty-icon svg {
+        width: 27px;
+        height: 27px;
+        fill: none;
+        stroke: var(--cp-orange);
+        stroke-width: 1.6;
+    }
+
+    .cp-empty h3 {
+        margin: 0 0 8px;
+        color: var(--cp-text);
+        font-size: 18px;
+    }
+
+    .cp-empty p {
+        max-width: 420px;
+        margin: 0 auto 20px;
+        color: var(--cp-muted);
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .cp-pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 32px;
+    }
+
+    .cp-page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--cp-border);
+        border-radius: 7px;
+        background: var(--cp-panel);
+        color: #d5d5dc;
+        font-size: 12px;
+        text-decoration: none;
+    }
+
+    .cp-page-link:hover {
+        border-color: var(--cp-orange);
+        color: var(--cp-orange);
+    }
+
+    .cp-page-link.active {
+        border-color: var(--cp-orange);
+        background: var(--cp-orange);
+        color: #111;
+        font-weight: 800;
+    }
+
+    .cp-page-link.disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+
+    @media (max-width: 1200px) {
+        .cp-video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .cp-cover { height: 220px; }
+    }
+
+    @media (max-width: 900px) {
+        .cp-page { padding: 20px 16px 45px; }
+        .cp-profile-panel { padding-right: 22px; padding-left: 22px; }
+
+        .cp-profile-top {
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cp-profile-info { padding-top: 8px; }
+
+        .cp-profile-actions {
+            width: 100%;
+            margin-left: 0;
+            padding-top: 8px;
+        }
+
+        .cp-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+        .cp-page { padding: 16px 12px 35px; }
+        .cp-breadcrumbs { margin-bottom: 15px; }
+        .cp-cover { height: 150px; }
+
+        .cp-profile-panel {
+            margin-bottom: 24px;
+            padding: 0 14px 17px;
+        }
+
+        .cp-profile-top { gap: 12px; }
+
+        .cp-avatar-wrap {
+            flex-basis: 82px;
+            width: 82px;
+            height: 82px;
+            margin-top: -41px;
+            border-width: 4px;
+        }
+
+        .cp-avatar-fallback { font-size: 29px; }
+
+        .cp-profile-info {
+            flex: 1 1 calc(100% - 100px);
+            padding-top: 7px;
+        }
+
+        .cp-display-name { font-size: 21px; }
+        .cp-verified { width: 17px; height: 17px; font-size: 10px; }
+        .cp-username { font-size: 12px; }
+
+        .cp-profile-actions { gap: 8px; padding-top: 4px; }
+
+        .cp-btn {
+            min-height: 40px;
+            padding: 0 11px;
+            font-size: 11px;
+        }
+
+        .cp-bio { margin: 17px 0; font-size: 13px; }
+
+        .cp-profile-meta {
+            gap: 12px;
+            margin-bottom: 17px;
+            font-size: 11px;
+        }
+
+        .cp-stats { gap: 8px; padding-top: 15px; }
+
+        .cp-stat { padding: 12px 9px; }
+        .cp-stat-value { font-size: 18px; }
+        .cp-stat-label { font-size: 9px; letter-spacing: .2px; }
+
+        .cp-videos-section { margin-top: 26px; }
+        .cp-section-heading { margin-bottom: 15px; }
+        .cp-section-title { font-size: 18px; }
+        .cp-section-title span { font-size: 11px; }
+
+        .cp-video-grid { gap: 12px; }
+        .cp-video-content { padding: 9px; }
+        .cp-video-title { min-height: 39px; font-size: 12px; }
+        .cp-video-meta { gap: 4px; font-size: 9px; }
+        .cp-card-creator { gap: 7px; margin-top: 10px; padding-top: 9px; }
+
+        .cp-small-avatar {
+            flex-basis: 26px;
+            width: 26px;
+            height: 26px;
+            font-size: 10px;
+        }
+
+        .cp-card-creator-name { font-size: 10px; }
+        .cp-empty { padding: 40px 16px; }
+    }
+
+    @media (max-width: 360px) {
+        .cp-video-grid { grid-template-columns: 1fr; }
+        .cp-profile-actions { flex-direction: column; align-items: stretch; }
+        .cp-profile-actions form, .cp-profile-actions .cp-btn { width: 100%; }
+        .cp-stats { grid-template-columns: 1fr; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <main class="cp-page">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="cp-alert" role="status">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+    <div class="cp-container">
 
-    <div class="cp-cover">
-        {% if creator.profile.cover_image %}
-            <img
-                class="cp-cover-image"
-                src="{{ creator.profile.cover_image.url }}"
-                alt=""
-            >
-        {% endif %}
-    </div>
+        <nav class="cp-breadcrumbs" aria-label="Breadcrumb">
+            <a href="{% url 'home' %}">Home</a>
+            <span>/</span>
+            <a href="{% url 'videos:list' %}">Videos</a>
+            <span>/</span>
+            <span>{{ creator.username }}</span>
+        </nav>
 
-    <section class="cp-profile-panel" aria-label="Creator profile">
-        <div class="cp-avatar">
-            {% if creator.profile.avatar_image %}
+        <section class="cp-cover" aria-label="Creator cover">
+            {% if creator.profile.cover_image %}
                 <img
-                    src="{{ creator.profile.avatar_image.url }}"
-                    alt="{{ creator.username }} profile picture"
+                    class="cp-cover-image"
+                    src="{{ creator.profile.cover_image.url }}"
+                    alt=""
                 >
-            {% elif creator.profile.avatar %}
-                <img
-                    src="{{ creator.profile.avatar }}"
-                    alt="{{ creator.username }} profile picture"
-                >
-            {% else %}
-                {{ creator.username|first|upper }}
             {% endif %}
-        </div>
+            <span class="cp-cover-label">Creator profile</span>
+        </section>
 
-        <div class="cp-identity">
-            <div class="cp-name-row">
-                <h1 class="cp-name">{{ creator.get_full_name|default:creator.username }}</h1>
-                {% if creator.profile.is_verified %}
-                    <span class="cp-verified" title="Verified creator" aria-label="Verified creator">✓</span>
-                {% endif %}
-            </div>
+        <section class="cp-profile-panel">
+            <div class="cp-profile-top">
 
-            <p class="cp-handle">@{{ creator.username }}</p>
-
-            {% if creator.profile.bio %}
-                <p class="cp-bio">{{ creator.profile.bio }}</p>
-            {% else %}
-                <p class="cp-bio">Welcome to my StreamSphere channel.</p>
-            {% endif %}
-        </div>
-
-        <div class="cp-actions">
-            {% if request.user.is_authenticated and request.user != creator %}
-                <form method="post" action="{% url 'creators:toggle_follow' creator.username %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    <button
-                        type="submit"
-                        class="cp-button {% if not following_creator %}cp-button-primary{% endif %}"
-                    >
-                        {% if following_creator %}Following{% else %}Follow creator{% endif %}
-                    </button>
-                </form>
-            {% elif not request.user.is_authenticated %}
-                <a class="cp-button cp-button-primary" href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}">
-                    Follow creator
-                </a>
-            {% endif %}
-
-            {% if request.user == creator %}
-                <a class="cp-button" href="{% url 'accounts:profile' %}">My account</a>
-            {% endif %}
-        </div>
-    </section>
-
-    <section class="cp-stats" aria-label="Creator statistics">
-        <div class="cp-stat">
-            <span class="cp-stat-number">{{ video_count|default:videos.count|default:0 }}</span>
-            <span class="cp-stat-label">Videos</span>
-        </div>
-        <div class="cp-stat">
-            <span class="cp-stat-number">{{ follower_count|default:0 }}</span>
-            <span class="cp-stat-label">Followers</span>
-        </div>
-        <div class="cp-stat">
-            <span class="cp-stat-number">{{ total_views|default:0 }}</span>
-            <span class="cp-stat-label">Total views</span>
-        </div>
-    </section>
-
-    <section class="cp-content">
-        <div class="cp-section-heading">
-            <div>
-                <h2>Videos</h2>
-                <p>Explore videos published by @{{ creator.username }}</p>
-            </div>
-        </div>
-
-        {% if videos %}
-            <div class="cp-video-grid">
-                {% for video in videos %}
-                    <article class="cp-video-card">
-                        <a class="cp-thumbnail" href="{% url 'videos:detail' video.pk %}" aria-label="Watch {{ video.title }}">
-                            {% if video.thumbnail %}
-                                <img
-                                    src="{{ video.thumbnail.url }}"
-                                    alt="{{ video.title }}"
-                                    loading="lazy"
-                                >
-                            {% elif video.thumbnail_url %}
-                                <img
-                                    src="{{ video.thumbnail_url }}"
-                                    alt="{{ video.title }}"
-                                    loading="lazy"
-                                >
-                            {% else %}
-                                <span class="cp-thumbnail-placeholder">{{ video.title|first|upper }}</span>
-                            {% endif %}
-
-                            {% if video.duration %}
-                                <span class="cp-duration">{{ video.duration }}</span>
-                            {% endif %}
-                        </a>
-
-                        <div class="cp-video-info">
-                            <h3 class="cp-video-title">
-                                <a href="{% url 'videos:detail' video.pk %}">{{ video.title }}</a>
-                            </h3>
-
-                            <div class="cp-video-meta">
-                                {{ video.views|default:0 }} views
-                                {% if video.created_at %}
-                                    · {{ video.created_at|date:"M j, Y" }}
-                                {% endif %}
-                            </div>
-
-                            <div class="cp-video-creator">
-                                <span class="cp-mini-avatar">
-                                    {% if creator.profile.avatar_image %}
-                                        <img src="{{ creator.profile.avatar_image.url }}" alt="" loading="lazy">
-                                    {% elif creator.profile.avatar %}
-                                        <img src="{{ creator.profile.avatar }}" alt="" loading="lazy">
-                                    {% else %}
-                                        {{ creator.username|first|upper }}
-                                    {% endif %}
-                                </span>
-                                <span>@{{ creator.username }}</span>
-                            </div>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-
-            {% if page_obj and page_obj.paginator.num_pages > 1 %}
-                <nav class="cp-pagination" aria-label="Video pagination">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    {% endif %}
-
-                    {% for number in page_obj.paginator.page_range %}
-                        {% if page_obj.number == number %}
-                            <span class="current" aria-current="page">{{ number }}</span>
-                        {% else %}
-                            <a href="?page={{ number }}">{{ number }}</a>
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}">Next</a>
-                    {% endif %}
-                </nav>
-            {% endif %}
-        {% else %}
-            <div class="cp-empty">
-                <h3>No videos yet</h3>
-                <p>
-                    {% if request.user == creator %}
-                        You have not published any videos yet. Upload your first video to get started.
+                <div class="cp-avatar-wrap">
+                    {% if creator.profile.avatar_image %}
+                        <img
+                            class="cp-avatar"
+                            src="{{ creator.profile.avatar_image.url }}"
+                            alt="{{ creator.username }} profile picture"
+                        >
+                    {% elif creator.profile.avatar %}
+                        <img
+                            class="cp-avatar"
+                            src="{{ creator.profile.avatar }}"
+                            alt="{{ creator.username }} profile picture"
+                        >
                     {% else %}
-                        This creator has not published any videos yet. Check back later for new content.
+                        <div class="cp-avatar-fallback">
+                            {{ creator.username|first|upper }}
+                        </div>
                     {% endif %}
-                </p>
+                </div>
 
-                {% if request.user == creator %}
-                    <div class="cp-empty-action">
-                        <a class="cp-button cp-button-primary" href="{% url 'videos:upload' %}">
-                            Upload a video
-                        </a>
+                <div class="cp-profile-info">
+                    <div class="cp-name-row">
+                        <h1 class="cp-display-name">
+                            {% if creator.get_full_name %}
+                                {{ creator.get_full_name }}
+                            {% else %}
+                                {{ creator.username }}
+                            {% endif %}
+                        </h1>
+
+                        {% if creator.profile.is_verified %}
+                            <span class="cp-verified" title="Verified creator">✓</span>
+                        {% endif %}
                     </div>
+                    <p class="cp-username">@{{ creator.username }}</p>
+                </div>
+
+                <div class="cp-profile-actions">
+                    {% if request.user.is_authenticated %}
+                        {% if request.user == creator %}
+                            <a class="cp-btn cp-btn-primary" href="{% url 'accounts:profile' %}">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                                </svg>
+                                Edit profile
+                            </a>
+                            <a class="cp-btn" href="{% url 'videos:upload' %}">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 5v14M5 12h14"></path>
+                                </svg>
+                                Upload video
+                            </a>
+                        {% else %}
+                            <form method="post" action="{% url 'creators:toggle_follow' creator.username %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                {% if following_creator %}
+                                    <button class="cp-btn cp-btn-following" type="submit">
+                                        Following
+                                    </button>
+                                {% else %}
+                                    <button class="cp-btn cp-btn-primary" type="submit">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 5v14M5 12h14"></path>
+                                        </svg>
+                                        Follow creator
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a
+                            class="cp-btn cp-btn-primary"
+                            href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
+                        >
+                            Follow creator
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="cp-bio">
+                {% if creator.profile.bio %}
+                    {{ creator.profile.bio }}
+                {% else %}
+                    <span class="cp-bio-empty">This creator hasn't added a bio yet.</span>
                 {% endif %}
             </div>
-        {% endif %}
-    </section>
+
+            <div class="cp-profile-meta">
+                {% if creator.date_joined %}
+                    <span class="cp-meta-item">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+                            <path d="M16 3v4M8 3v4M3 11h18"></path>
+                        </svg>
+                        Joined {{ creator.date_joined|date:"M Y" }}
+                    </span>
+                {% endif %}
+
+                {% if creator.profile.location %}
+                    <span class="cp-meta-item">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+                        {{ creator.profile.location }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="cp-stats">
+                <div class="cp-stat">
+                    <span class="cp-stat-value">
+                        {% if video_count != None %}
+                            {{ video_count }}
+                        {% else %}
+                            {{ videos|length }}
+                        {% endif %}
+                    </span>
+                    <span class="cp-stat-label">Videos</span>
+                </div>
+
+                <div class="cp-stat">
+                    <span class="cp-stat-value">{{ follower_count|default:0 }}</span>
+                    <span class="cp-stat-label">Followers</span>
+                </div>
+
+                <div class="cp-stat">
+                    <span class="cp-stat-value">{{ total_views|default:0 }}</span>
+                    <span class="cp-stat-label">Total views</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cp-videos-section">
+            <div class="cp-section-heading">
+                <h2 class="cp-section-title">
+                    Videos
+                    <span>
+                        {% if video_count != None %}
+                            {{ video_count }}
+                        {% else %}
+                            {{ videos|length }}
+                        {% endif %}
+                    </span>
+                </h2>
+
+                {% if request.user.is_authenticated and request.user == creator %}
+                    <a class="cp-upload-link" href="{% url 'videos:upload' %}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        Upload video
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if videos %}
+                <div class="cp-video-grid">
+                    {% for video in videos %}
+                        <article class="cp-video-card">
+                            <a
+                                class="cp-video-link"
+                                href="{% url 'videos:detail' video.pk %}"
+                                aria-label="Watch {{ video.title }}"
+                            >
+                                <div class="cp-thumbnail">
+                                    {% if video.thumbnail %}
+                                        <img
+                                            src="{{ video.thumbnail.url }}"
+                                            alt="{{ video.title }}"
+                                            loading="lazy"
+                                        >
+                                    {% elif video.thumbnail_url %}
+                                        <img
+                                            src="{{ video.thumbnail_url }}"
+                                            alt="{{ video.title }}"
+                                            loading="lazy"
+                                        >
+                                    {% else %}
+                                        <div class="cp-thumbnail-placeholder">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                                <path d="m10 9 5 3-5 3Z"></path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if video.is_premium %}
+                                        <span class="cp-premium-label">Premium</span>
+                                    {% endif %}
+
+                                    {% if video.duration %}
+                                        <span class="cp-duration">{{ video.duration }}</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+
+                            <div class="cp-video-content">
+                                <a class="cp-video-link" href="{% url 'videos:detail' video.pk %}">
+                                    <h3 class="cp-video-title">{{ video.title }}</h3>
+                                </a>
+
+                                <div class="cp-video-meta">
+                                    <span>{{ video.views|default:0 }} views</span>
+                                    <span class="cp-meta-dot">•</span>
+                                    <span>{{ video.created_at|timesince }} ago</span>
+                                </div>
+
+                                <div class="cp-card-creator">
+                                    <a
+                                        class="cp-small-avatar"
+                                        href="{% url 'creators:profile' video.creator.username %}"
+                                        aria-label="{{ video.creator.username }} profile"
+                                    >
+                                        {% if video.creator.profile.avatar_image %}
+                                            <img
+                                                src="{{ video.creator.profile.avatar_image.url }}"
+                                                alt=""
+                                                loading="lazy"
+                                            >
+                                        {% elif video.creator.profile.avatar %}
+                                            <img
+                                                src="{{ video.creator.profile.avatar }}"
+                                                alt=""
+                                                loading="lazy"
+                                            >
+                                        {% else %}
+                                            {{ video.creator.username|first|upper }}
+                                        {% endif %}
+                                    </a>
+
+                                    <a
+                                        class="cp-card-creator-name"
+                                        href="{% url 'creators:profile' video.creator.username %}"
+                                    >
+                                        @{{ video.creator.username }}
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                    <nav class="cp-pagination" aria-label="Video pages">
+                        {% if page_obj.has_previous %}
+                            <a class="cp-page-link" href="?page={{ page_obj.previous_page_number }}">
+                                Previous
+                            </a>
+                        {% else %}
+                            <span class="cp-page-link disabled">Previous</span>
+                        {% endif %}
+
+                        {% for number in page_obj.paginator.page_range %}
+                            {% if number == page_obj.number %}
+                                <span class="cp-page-link active" aria-current="page">
+                                    {{ number }}
+                                </span>
+                            {% elif number >= page_obj.number|add:"-2" and number <= page_obj.number|add:"2" %}
+                                <a class="cp-page-link" href="?page={{ number }}">
+                                    {{ number }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a class="cp-page-link" href="?page={{ page_obj.next_page_number }}">
+                                Next
+                            </a>
+                        {% else %}
+                            <span class="cp-page-link disabled">Next</span>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="cp-empty">
+                    <div class="cp-empty-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="m10 9 5 3-5 3Z"></path>
+                        </svg>
+                    </div>
+
+                    {% if request.user == creator %}
+                        <h3>Your channel is ready</h3>
+                        <p>
+                            You haven't published any videos yet.
+                            Upload your first video to start building your audience.
+                        </p>
+                        <a class="cp-btn cp-btn-primary" href="{% url 'videos:upload' %}">
+                            Upload your first video
+                        </a>
+                    {% else %}
+                        <h3>No videos yet</h3>
+                        <p>
+                            This creator hasn't published any videos.
+                            Check back later for new content.
+                        </p>
+                        <a class="cp-btn" href="{% url 'videos:list' %}">
+                            Explore videos
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+    </div>
 </main>
 {% endblock %}
