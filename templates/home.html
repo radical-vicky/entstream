@@ -503,11 +503,20 @@ Discover trending videos, follow your favourite creators, watch live streams and
         }
 
         .home-hero-content {
-            padding: 28px 22px;
+            padding: 28px 22px 0;
         }
 
+        /* CHANGED: Instead of hiding, we stack it nicely below the text */
         .home-hero-visual {
-            display: none;
+            display: block;
+            min-height: 240px;
+            width: 100%;
+        }
+
+        .home-hero-visual img {
+            /* Adjust fade for mobile since it's stacked vertically */
+            mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
         }
 
         .home-hero-title {
@@ -550,7 +559,7 @@ Discover trending videos, follow your favourite creators, watch live streams and
 
     @media (max-width: 400px) {
         .home-hero-content {
-            padding: 24px 16px;
+            padding: 24px 16px 0;
         }
 
         .home-hero-description {
