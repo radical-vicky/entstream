@@ -16,7 +16,8 @@ Discover trending videos, follow your favourite creators, watch live streams and
     .home-hero {
         position: relative;
         display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+        /* Keep the two columns on all screen sizes */
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
         min-height: 330px;
         overflow: hidden;
         background:
@@ -32,7 +33,7 @@ Discover trending videos, follow your favourite creators, watch live streams and
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
-        padding: clamp(25px, 4vw, 55px);
+        padding: clamp(20px, 4vw, 55px);
     }
 
     .home-eyebrow {
@@ -83,7 +84,7 @@ Discover trending videos, follow your favourite creators, watch live streams and
 
     .home-hero-visual {
         position: relative;
-        min-height: 280px;
+        min-height: 100%;
         overflow: hidden;
         background:
             linear-gradient(90deg, #0d1117 0%, rgba(13,17,23,.15) 50%, rgba(13,17,23,.08) 100%),
@@ -121,8 +122,9 @@ Discover trending videos, follow your favourite creators, watch live streams and
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: top center; /* Keeps the face/character visible */
         opacity: .85;
-        /* Creates a smooth fade from the text area into the image */
+        /* Fade from left to right on desktop */
         mask-image: linear-gradient(to right, transparent 0%, #000 40%);
         -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 40%);
         z-index: 2;
@@ -496,33 +498,53 @@ Discover trending videos, follow your favourite creators, watch live streams and
         }
     }
 
+    /* ==============================
+       MOBILE VIEW FIXES
+    ============================== */
     @media (max-width: 760px) {
         .home-hero {
-            grid-template-columns: minmax(0, 1fr);
-            min-height: 0;
+            /* Keep the two columns side-by-side instead of stacking */
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+            min-height: 360px;
         }
 
         .home-hero-content {
-            padding: 28px 22px 0;
-        }
-
-        /* CHANGED: Instead of hiding, we stack it nicely below the text */
-        .home-hero-visual {
-            display: block;
-            min-height: 240px;
-            width: 100%;
-        }
-
-        .home-hero-visual img {
-            /* Adjust fade for mobile since it's stacked vertically */
-            mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
+            /* Adjust padding for small screens */
+            padding: 20px 15px;
         }
 
         .home-hero-title {
-            max-width: 520px;
-            font-size: clamp(34px, 9vw, 48px);
-            letter-spacing: -1.8px;
+            font-size: clamp(26px, 7vw, 34px);
+            letter-spacing: -1px;
+        }
+
+        .home-hero-description {
+            font-size: 11px;
+            margin: 12px 0 16px;
+            line-height: 1.6;
+        }
+
+        .home-hero-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .home-hero-actions .ss-btn {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+
+        .home-hero-visual {
+            /* Ensure it fills its column height */
+            min-height: 100%;
+        }
+
+        .home-hero-visual img {
+            /* Adjust the fade so it's visible on mobile */
+            mask-image: linear-gradient(to right, transparent 0%, #000 30%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 30%);
+            object-position: center; 
         }
 
         .home-video-grid {
@@ -558,12 +580,12 @@ Discover trending videos, follow your favourite creators, watch live streams and
     }
 
     @media (max-width: 400px) {
-        .home-hero-content {
-            padding: 24px 16px 0;
+        .home-hero-title {
+            font-size: 22px;
         }
-
+        
         .home-hero-description {
-            font-size: 12px;
+            display: none; /* Hides description on very tiny screens to save space */
         }
 
         .home-video-grid {
