@@ -1,23 +1,9 @@
 {
-  "builds": [
+  "buildCommand": "chmod +x build.sh && ./build.sh",
+  "rewrites": [
     {
-      "src": "config/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.12",
-        "buildCommand": "bash build.sh"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "config/wsgi.py"
+      "source": "/static/(.*)",
+      "destination": "/static/$1"
     }
   ]
 }
