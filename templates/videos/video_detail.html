@@ -1,1560 +1,780 @@
-
-
 {% extends "base.html" %}
-
-
 
 {% block title %}{{ video.title }} | StreamSphere{% endblock %}
 
-
-
 {% block extra_css %}
-
 <style>
-
     :root {
-
         --vd-bg: #080808;
-
         --vd-panel: #111111;
-
         --vd-panel-2: #171717;
-
         --vd-border: #292929;
-
         --vd-text: #f5f5f5;
-
         --vd-muted: #999999;
-
         --vd-orange: #ff7900;
-
         --vd-orange-light: #ff9a3c;
-
         --vd-danger: #ff4d4d;
-
         --vd-radius: 3px;
-
     }
-
-
 
     .vd-page,
-
-    .vd-page \* {
-
+    .vd-page * {
         box-sizing: border-box;
-
     }
-
-
 
     .vd-page {
-
         width: min(1500px, 100%);
-
         margin: 0 auto;
-
         padding: 24px;
-
         color: var(--vd-text);
-
     }
-
-
 
     .vd-breadcrumbs {
-
         display: flex;
-
         align-items: center;
-
         flex-wrap: wrap;
-
         gap: 9px;
-
         margin-bottom: 18px;
-
         color: var(--vd-muted);
-
         font-size: 12px;
-
     }
-
-
 
     .vd-breadcrumbs a {
-
         color: var(--vd-muted);
-
         text-decoration: none;
-
     }
-
-
 
     .vd-breadcrumbs a:hover {
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-layout {
-
         display: grid;
-
         grid-template-columns: minmax(0, 1fr) 320px;
-
         gap: 28px;
-
         align-items: start;
-
     }
-
-
 
     .vd-main,
-
     .vd-sidebar {
-
         min-width: 0;
-
     }
-
-
 
     .vd-player {
-
         position: relative;
-
         width: 100%;
-
         overflow: hidden;
-
         background: #000;
-
         border: 1px solid var(--vd-border);
-
         aspect-ratio: 16 / 9;
-
     }
-
-
 
     .vd-player video {
-
         display: block;
-
         width: 100%;
-
         height: 100%;
-
         object-fit: contain;
-
         background: #000;
-
     }
-
-
 
     .vd-access-gate {
-
         display: flex;
-
         flex-direction: column;
-
         justify-content: center;
-
         align-items: center;
-
         min-height: 280px;
-
         padding: 30px;
-
         text-align: center;
-
         background:
-
             radial-gradient(ellipse at center, #24170c 0%, #0b0b0b 68%);
-
     }
-
-
 
     .vd-lock {
-
         display: grid;
-
         place-items: center;
-
         width: 54px;
-
         height: 54px;
-
         margin-bottom: 18px;
-
         border: 1px solid #78400e;
-
         color: var(--vd-orange);
-
         font-size: 24px;
-
     }
-
-
 
     .vd-access-gate h2 {
-
         margin: 0 0 10px;
-
         font-size: clamp(20px, 3vw, 28px);
-
     }
-
-
 
     .vd-access-gate p {
-
         max-width: 420px;
-
         margin: 0 0 22px;
-
         color: var(--vd-muted);
-
         line-height: 1.7;
-
         font-size: 14px;
-
     }
-
-
 
     .vd-button {
-
         display: inline-flex;
-
         justify-content: center;
-
         align-items: center;
-
         gap: 8px;
-
         min-height: 42px;
-
         padding: 11px 17px;
-
         border: 1px solid transparent;
-
         border-radius: var(--vd-radius);
-
         background: var(--vd-orange);
-
         color: #111;
-
         font-size: 13px;
-
         font-weight: 800;
-
         text-decoration: none;
-
         cursor: pointer;
-
-        transition: *background* .18s ease, border-color .18s ease;
-
+        transition: background .18s ease, border-color .18s ease;
     }
-
-
 
     .vd-button:hover {
-
         background: var(--vd-orange-light);
-
         color: #111;
-
     }
-
-
 
     .vd-button-secondary {
-
         border-color: var(--vd-border);
-
         background: var(--vd-panel-2);
-
         color: var(--vd-text);
-
     }
-
-
 
     .vd-button-secondary:hover {
-
         border-color: var(--vd-orange);
-
         background: #20170f;
-
         color: var(--vd-text);
-
     }
-
-
 
     .vd-video-heading {
-
         padding: 22px 0 17px;
-
         border-bottom: 1px solid var(--vd-border);
-
     }
-
-
 
     .vd-title {
-
         margin: 0 0 12px;
-
         overflow-wrap: anywhere;
-
         font-size: clamp(22px, 3vw, 30px);
-
         font-weight: 800;
-
         line-height: 1.3;
-
     }
-
-
 
     .vd-meta {
-
         display: flex;
-
         flex-wrap: wrap;
-
         align-items: center;
-
         gap: 8px 15px;
-
         color: var(--vd-muted);
-
         font-size: 12px;
-
     }
-
-
 
     .vd-meta-item {
-
         display: inline-flex;
-
         align-items: center;
-
         gap: 6px;
-
     }
-
-
 
     .vd-meta-dot {
-
         width: 4px;
-
         height: 4px;
-
         border-radius: 50%;
-
         background: var(--vd-orange);
-
     }
-
-
 
     .vd-actions {
-
         display: flex;
-
         flex-wrap: wrap;
-
         align-items: center;
-
         gap: 9px;
-
         padding: 16px 0;
-
         border-bottom: 1px solid var(--vd-border);
-
     }
-
-
 
     .vd-action-form {
-
         display: inline-flex;
-
         margin: 0;
-
     }
-
-
 
     .vd-action-button {
-
         display: inline-flex;
-
         justify-content: center;
-
         align-items: center;
-
         gap: 8px;
-
         min-height: 39px;
-
         padding: 9px 13px;
-
         border: 1px solid var(--vd-border);
-
         border-radius: var(--vd-radius);
-
         background: var(--vd-panel);
-
         color: var(--vd-text);
-
         font-size: 12px;
-
         font-weight: 700;
-
         text-decoration: none;
-
         cursor: pointer;
-
     }
-
-
 
     .vd-action-button:hover {
-
         border-color: var(--vd-orange);
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-action-button.is-active {
-
         border-color: #75400f;
-
         background: #24170c;
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-action-button:disabled {
-
         opacity: .55;
-
         cursor: not-allowed;
-
     }
-
-
 
     .vd-action-count {
-
         color: var(--vd-muted);
-
         font-weight: 500;
-
     }
-
-
 
     .vd-creator {
-
         display: flex;
-
         align-items: center;
-
         justify-content: space-between;
-
         gap: 15px;
-
         padding: 19px 0;
-
         border-bottom: 1px solid var(--vd-border);
-
     }
-
-
 
     .vd-creator-info {
-
         display: flex;
-
         align-items: center;
-
         gap: 13px;
-
         min-width: 0;
-
     }
-
-
 
     .vd-avatar {
-
         display: grid;
-
         place-items: center;
-
         flex: 0 0 auto;
-
         width: 48px;
-
         height: 48px;
-
         overflow: hidden;
-
         border: 1px solid #5a3518;
-
         border-radius: 50%;
-
         background: #21160d;
-
         color: var(--vd-orange);
-
         font-size: 17px;
-
         font-weight: 800;
-
         text-transform: uppercase;
-
     }
-
-
 
     .vd-avatar img {
-
         display: block;
-
         width: 100%;
-
         height: 100%;
-
         border-radius: inherit;
-
         object-fit: cover;
-
     }
-
-
 
     .vd-avatar-small {
-
         width: 35px;
-
         height: 35px;
-
         font-size: 12px;
-
     }
-
-
 
     .vd-avatar-card {
-
         width: 25px;
-
         height: 25px;
-
         font-size: 10px;
-
     }
-
-
 
     .vd-creator-copy {
-
         min-width: 0;
-
     }
-
-
 
     .vd-creator-name {
-
         display: block;
-
         overflow: hidden;
-
         color: var(--vd-text);
-
         font-size: 14px;
-
         font-weight: 800;
-
         text-decoration: none;
-
         text-overflow: ellipsis;
-
         white-space: nowrap;
-
     }
-
-
 
     .vd-creator-name:hover {
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-creator-subtitle {
-
         margin-top: 5px;
-
         color: var(--vd-muted);
-
         font-size: 11px;
-
     }
-
-
 
     .vd-description {
-
         margin-top: 20px;
-
         padding: 20px;
-
         border: 1px solid var(--vd-border);
-
         background: var(--vd-panel);
-
     }
-
-
 
     .vd-section-title {
-
         margin: 0 0 17px;
-
         font-size: 16px;
-
         font-weight: 800;
-
     }
-
-
 
     .vd-description-text {
-
         color: #c7c7c7;
-
         font-size: 13px;
-
         line-height: 1.8;
-
         overflow-wrap: anywhere;
-
         white-space: pre-line;
-
     }
-
-
 
     .vd-description-empty {
-
         color: var(--vd-muted);
-
     }
-
-
 
     .vd-comments {
-
         margin-top: 24px;
-
         padding: 20px;
-
         border: 1px solid var(--vd-border);
-
         background: var(--vd-panel);
-
     }
-
-
 
     .vd-comments-count {
-
         color: var(--vd-muted);
-
         font-size: 12px;
-
         font-weight: 500;
-
     }
-
-
 
     .vd-comment-form {
-
         display: flex;
-
         align-items: flex-start;
-
         gap: 12px;
-
         margin-bottom: 25px;
-
     }
-
-
 
     .vd-comment-form-main {
-
         flex: 1;
-
         min-width: 0;
-
     }
-
-
 
     .vd-comment-input {
-
         display: block;
-
         width: 100%;
-
         min-height: 88px;
-
         padding: 13px;
-
         resize: vertical;
-
         border: 1px solid var(--vd-border);
-
         border-radius: var(--vd-radius);
-
         outline: none;
-
         background: #090909;
-
         color: var(--vd-text);
-
         font: inherit;
-
         font-size: 13px;
-
     }
-
-
 
     .vd-comment-input:focus {
-
         border-color: var(--vd-orange);
-
     }
-
-
 
     .vd-comment-input::placeholder {
-
         color: #777;
-
     }
-
-
 
     .vd-comment-submit-row {
-
         display: flex;
-
         justify-content: flex-end;
-
         margin-top: 10px;
-
     }
-
-
 
     .vd-login-prompt {
-
         margin-bottom: 23px;
-
         padding: 15px;
-
         border: 1px solid var(--vd-border);
-
         color: var(--vd-muted);
-
         font-size: 13px;
-
         line-height: 1.6;
-
     }
-
-
 
     .vd-login-prompt a {
-
         color: var(--vd-orange);
-
         text-decoration: none;
-
     }
-
-
 
     .vd-comment-list {
-
         display: flex;
-
         flex-direction: column;
-
         gap: 21px;
-
     }
-
-
 
     .vd-comment {
-
         display: flex;
-
         align-items: flex-start;
-
         gap: 11px;
-
     }
-
-
 
     .vd-comment-main {
-
         flex: 1;
-
         min-width: 0;
-
     }
-
-
 
     .vd-comment-header {
-
         display: flex;
-
         flex-wrap: wrap;
-
         align-items: center;
-
         gap: 7px 10px;
-
         margin-bottom: 7px;
-
     }
-
-
 
     .vd-comment-author {
-
         color: var(--vd-text);
-
         font-size: 12px;
-
         font-weight: 800;
-
         text-decoration: none;
-
     }
-
-
 
     .vd-comment-author:hover {
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-comment-date {
-
         color: var(--vd-muted);
-
         font-size: 10px;
-
     }
-
-
 
     .vd-comment-text {
-
         margin: 0;
-
         color: #d0d0d0;
-
         font-size: 13px;
-
         line-height: 1.7;
-
         overflow-wrap: anywhere;
-
         white-space: pre-line;
-
     }
-
-
 
     .vd-comment-footer {
-
         display: flex;
-
         justify-content: flex-end;
-
         margin-top: 7px;
-
     }
-
-
 
     .vd-delete-button {
-
         padding: 4px 0;
-
         border: 0;
-
         background: transparent;
-
         color: var(--vd-danger);
-
         font-size: 11px;
-
         cursor: pointer;
-
     }
-
-
 
     .vd-delete-button:hover {
-
         text-decoration: underline;
-
     }
-
-
 
     .vd-empty-comments {
-
         padding: 24px 10px;
-
         color: var(--vd-muted);
-
         text-align: center;
-
         font-size: 13px;
-
     }
-
-
 
     .vd-sidebar-heading {
-
         display: flex;
-
         justify-content: space-between;
-
         align-items: center;
-
         gap: 10px;
-
         margin: 0 0 15px;
-
         font-size: 16px;
-
         font-weight: 800;
-
     }
-
-
 
     .vd-sidebar-count {
-
         color: var(--vd-muted);
-
         font-size: 11px;
-
         font-weight: 500;
-
     }
-
-
 
     .vd-related-list {
-
         display: flex;
-
         flex-direction: column;
-
         gap: 16px;
-
     }
-
-
 
     .vd-related-card {
-
         display: grid;
-
         grid-template-columns: 132px minmax(0, 1fr);
-
         gap: 11px;
-
         min-width: 0;
-
         text-decoration: none;
-
     }
-
-
 
     .vd-related-thumb {
-
         position: relative;
-
         overflow: hidden;
-
         aspect-ratio: 16 / 9;
-
         background: #1a1a1a;
-
     }
-
-
 
     .vd-related-thumb img {
-
         display: block;
-
         width: 100%;
-
         height: 100%;
-
         object-fit: cover;
-
         transition: transform .2s ease;
-
     }
-
-
 
     .vd-related-card:hover .vd-related-thumb img {
-
         transform: scale(1.04);
-
     }
-
-
 
     .vd-no-thumbnail {
-
         display: grid;
-
         place-items: center;
-
         width: 100%;
-
         height: 100%;
-
         min-height: 70px;
-
         background: linear-gradient(135deg, #22160d, #111);
-
         color: var(--vd-orange);
-
         font-size: 10px;
-
         font-weight: 800;
-
     }
-
-
 
     .vd-duration {
-
         position: absolute;
-
         right: 5px;
-
         bottom: 5px;
-
         padding: 3px 5px;
-
         background: rgba(0, 0, 0, .85);
-
         color: #fff;
-
         font-size: 10px;
-
     }
-
-
 
     .vd-premium-tag {
-
         display: inline-block;
-
         margin-bottom: 6px;
-
         padding: 3px 5px;
-
         background: #36200e;
-
         color: var(--vd-orange-light);
-
         font-size: 9px;
-
         font-weight: 800;
-
         text-transform: uppercase;
-
     }
-
-
 
     .vd-related-info {
-
         min-width: 0;
-
     }
-
-
 
     .vd-related-title {
-
         display: -webkit-box;
-
         overflow: hidden;
-
         margin: 0 0 8px;
-
         color: var(--vd-text);
-
         font-size: 12px;
-
         font-weight: 800;
-
         line-height: 1.5;
-
         -webkit-box-orient: vertical;
-
         -webkit-line-clamp: 2;
-
     }
-
-
 
     .vd-related-card:hover .vd-related-title {
-
         color: var(--vd-orange);
-
     }
-
-
 
     .vd-related-creator-row {
-
         display: flex;
-
         align-items: center;
-
         gap: 6px;
-
         min-width: 0;
-
         margin-bottom: 6px;
-
     }
-
-
 
     .vd-related-creator-name {
-
         overflow: hidden;
-
         color: #b0b0b0;
-
         font-size: 10px;
-
         text-overflow: ellipsis;
-
         white-space: nowrap;
-
     }
-
-
 
     .vd-related-meta {
-
         color: var(--vd-muted);
-
         font-size: 10px;
-
         line-height: 1.6;
-
     }
-
-
 
     .vd-related-empty {
-
         padding: 18px;
-
         border: 1px solid var(--vd-border);
-
         color: var(--vd-muted);
-
         font-size: 12px;
-
         line-height: 1.6;
-
     }
-
-
 
     .vd-mobile-related {
-
         display: none;
-
         margin-top: 24px;
-
         padding: 20px;
-
         border: 1px solid var(--vd-border);
-
         background: var(--vd-panel);
-
     }
-
-
 
     .vd-mobile-related .vd-related-card {
-
         grid-template-columns: 145px minmax(0, 1fr);
-
     }
-
-
 
     .vd-mobile-related .vd-related-title {
-
         font-size: 13px;
-
     }
-
-
 
     .vd-mobile-related .vd-related-meta {
-
         font-size: 11px;
-
     }
-
-
 
     .vd-share-status {
-
         min-height: 16px;
-
         margin-left: 4px;
-
         color: var(--vd-orange-light);
-
         font-size: 11px;
-
     }
-
-
 
     .vd-notification-link {
-
         margin-left: auto;
-
     }
-
-
 
     @media (max-width: 1050px) {
-
         .vd-page {
-
             padding: 18px;
-
         }
-
-
 
         .vd-layout {
-
             grid-template-columns: minmax(0, 1fr) 275px;
-
             gap: 20px;
-
         }
-
-
 
         .vd-related-card {
-
             grid-template-columns: 108px minmax(0, 1fr);
-
             gap: 9px;
-
         }
-
     }
-
-
 
     @media (max-width: 800px) {
-
         .vd-layout {
-
             display: block;
-
         }
-
-
 
         .vd-sidebar {
-
             display: none;
-
         }
-
-
 
         .vd-mobile-related {
-
             display: block;
-
         }
-
-
 
         .vd-notification-link {
-
             margin-left: 0;
-
         }
-
     }
-
-
 
     @media (max-width: 520px) {
-
         .vd-page {
-
             padding: 12px;
-
         }
-
-
 
         .vd-breadcrumbs {
-
             margin-bottom: 12px;
-
             font-size: 11px;
-
         }
-
-
 
         .vd-player {
-
             margin: 0 -12px;
-
             width: calc(100% + 24px);
-
             border-right: 0;
-
             border-left: 0;
-
         }
-
-
 
         .vd-access-gate {
-
             min-height: 240px;
-
             padding: 22px 16px;
-
         }
-
-
 
         .vd-video-heading {
-
             padding-top: 17px;
-
         }
-
-
 
         .vd-title {
-
             font-size: 21px;
-
         }
-
-
 
         .vd-actions {
-
             gap: 7px;
-
         }
-
-
 
         .vd-action-button {
-
             min-height: 37px;
-
             padding: 8px 10px;
-
             font-size: 11px;
-
         }
-
-
 
         .vd-creator {
-
             align-items: flex-start;
-
         }
-
-
 
         .vd-creator .vd-button {
-
             min-height: 36px;
-
             padding: 9px 11px;
-
             font-size: 11px;
-
         }
-
-
 
         .vd-description,
-
         .vd-comments,
-
         .vd-mobile-related {
-
             padding: 15px;
-
         }
-
-
 
         .vd-comment-form {
-
             gap: 9px;
-
         }
-
-
 
         .vd-avatar {
-
             width: 41px;
-
             height: 41px;
-
             font-size: 14px;
-
         }
-
-
 
         .vd-avatar-small {
-
             width: 32px;
-
             height: 32px;
-
             font-size: 11px;
-
         }
-
-
 
         .vd-mobile-related .vd-related-card {
-
             grid-template-columns: 115px minmax(0, 1fr);
-
             gap: 10px;
-
         }
-
-
 
         .vd-mobile-related .vd-related-title {
-
             font-size: 12px;
-
         }
-
     }
-
-
 
     @media (max-width: 360px) {
-
         .vd-actions {
-
             display: grid;
-
             grid-template-columns: repeat(2, minmax(0, 1fr));
-
         }
-
-
 
         .vd-action-form,
-
         .vd-action-button {
-
             width: 100%;
-
         }
-
-
 
         .vd-mobile-related .vd-related-card {
-
             grid-template-columns: 100px minmax(0, 1fr);
-
         }
-
     }
-
-
 
     /* Sharp-corner visual system: no rounded video cards, buttons or panels. */
     .vd-page,
@@ -1607,1119 +827,561 @@
     }
 
 </style>
-
 {% endblock %}
 
-
-
 {% block content %}
-
 <main class="vd-page">
-
     <nav class="vd-breadcrumbs" aria-label="Breadcrumb">
-
         <a href="{% url 'home' %}">Home</a>
-
         <span>/</span>
-
         <a href="{% url 'videos:list' %}">Videos</a>
-
         <span>/</span>
-
         <span>{{ video.title|truncatechars:45 }}</span>
-
     </nav>
 
-
-
     <div class="vd-layout">
-
         <section class="vd-main">
-
             <div class="vd-player">
-
                 {% if can_watch %}
-
                     {% if video.video_file %}
-
                         <video
-
                             controls
-
                             playsinline
-
                             preload="metadata"
-
                             {% if video.thumbnail %}
-
                                 poster="{{ video.thumbnail.url }}"
-
                             {% elif video.thumbnail_url %}
-
                                 poster="{{ video.thumbnail_url }}"
-
                             {% endif %}
-
                         >
-
-                            <source src="{{ video.video_file.url }}">
-
+                            <!-- FIXED: Removed .url from video_file -->
+                            <source src="{{ video.video_file }}">
                             Your browser does not support HTML video.
-
                         </video>
-
                     {% else %}
-
                         <div class="vd-access-gate">
-
                             <div class="vd-lock" aria-hidden="true">!</div>
-
                             <h2>Video unavailable</h2>
-
                             <p>The video file could not be found. Please try again later.</p>
-
                         </div>
-
                     {% endif %}
-
                 {% else %}
-
                     <div class="vd-access-gate">
-
                         <div class="vd-lock" aria-hidden="true">P</div>
-
                         <h2>Premium content</h2>
-
                         {% if user.is_authenticated %}
-
                             <p>
-
                                 This video requires access before you can watch it.
-
                                 Purchase it to unlock the full video.
-
                             </p>
-
                             <a class="vd-button" href="{% url 'videos:purchase' video.pk %}">
-
                                 Unlock video
-
                             </a>
-
                         {% else %}
-
                             <p>
-
                                 Sign in to check your access to this video,
-
                                 or create an account to get started.
-
                             </p>
-
                             <a class="vd-button" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
-
                                 Sign in to continue
-
                             </a>
-
                         {% endif %}
-
                     </div>
-
                 {% endif %}
-
             </div>
-
-
 
             <header class="vd-video-heading">
-
                 <h1 class="vd-title">{{ video.title }}</h1>
 
-
-
                 <div class="vd-meta">
-
                     <span class="vd-meta-item">
-
                         <span class="vd-meta-dot"></span>
-
                         {{ video.views|default:0 }} views
-
                     </span>
-
-
 
                     <span class="vd-meta-item">
-
                         {{ video.created_at|date:"M j, Y" }}
-
                     </span>
-
-
 
                     {% if video.is_premium %}
-
                         <span class="vd-meta-item">
-
                             <span class="vd-meta-dot"></span>
-
                             Premium
-
                         </span>
-
                     {% endif %}
-
                 </div>
-
             </header>
 
-
-
             <div class="vd-actions">
-
                 {% if user.is_authenticated %}
-
                     <form
-
                         class="vd-action-form"
-
                         method="post"
-
                         action="{% url 'videos:like' video.pk %}"
-
                     >
-
                         {% csrf_token %}
-
                         <button
-
                             type="submit"
-
                             class="vd-action-button{% if liked %} is-active{% endif %}"
-
                             aria-pressed="{% if liked %}true{% else %}false{% endif %}"
-
                         >
-
                             {% if liked %}Liked{% else %}Like{% endif %}
-
                             <span class="vd-action-count">{{ like_count }}</span>
-
                         </button>
-
                     </form>
-
                 {% else %}
-
                     <a
-
                         class="vd-action-button"
-
                         href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
-
                     >
-
                         Like <span class="vd-action-count">{{ like_count }}</span>
-
                     </a>
-
                 {% endif %}
-
-
 
                 <a class="vd-action-button" href="#vd-comments">
-
                     Comments <span class="vd-action-count">{{ comment_count }}</span>
-
                 </a>
 
-
-
                 <button
-
                     type="button"
-
                     class="vd-action-button"
-
                     id="vd-share-button"
-
                 >
-
                     Share
-
                 </button>
 
-
-
                 {% if user.is_authenticated %}
-
                     <a
-
                         class="vd-action-button vd-notification-link"
-
                         href="{% url 'accounts:notifications' %}"
-
                     >
-
                         Notifications
-
                     </a>
-
                 {% endif %}
-
-
 
                 <span
-
                     class="vd-share-status"
-
                     id="vd-share-status"
-
                     aria-live="polite"
-
                 ></span>
-
             </div>
 
-
-
             <section class="vd-creator">
-
                 <div class="vd-creator-info">
-
                     <div class="vd-avatar" aria-hidden="true">
-
                         {% if video.creator.profile.avatar_image %}
-
                             <img
-
                                 src="{{ video.creator.profile.avatar_image.url }}"
-
                                 alt=""
-
                                 loading="lazy"
-
                             >
-
                         {% elif video.creator.profile.avatar %}
-
                             <img
-
                                 src="{{ video.creator.profile.avatar }}"
-
                                 alt=""
-
                                 loading="lazy"
-
                             >
-
                         {% else %}
-
                             {{ video.creator.username|first|upper }}
-
                         {% endif %}
-
                     </div>
-
-
 
                     <div class="vd-creator-copy">
-
                         {% if user.is_authenticated and user.pk == video.creator_id %}
-
                             <a class="vd-creator-name" href="{% url 'accounts:profile' %}">
-
                                 {{ video.creator.username }}
-
                             </a>
-
                         {% else %}
-
                             <a
-
                                 class="vd-creator-name"
-
                                 href="{% url 'creators:profile' video.creator.username %}"
-
                             >
-
                                 {{ video.creator.username }}
-
                             </a>
-
                         {% endif %}
 
-
-
                         <div class="vd-creator-subtitle">
-
                             {{ follower_count }} follower{{ follower_count|pluralize }}
-
                         </div>
-
                     </div>
-
                 </div>
 
-
-
                 {% if user.is_authenticated and user.pk != video.creator_id %}
-
                     <form
-
                         method="post"
-
                         action="{% url 'creators:toggle_follow' video.creator.username %}"
-
                     >
-
                         {% csrf_token %}
-
                         <input type="hidden" name="next" value="{{ request.path }}">
 
-
-
                         <button
-
                             type="submit"
-
                             class="vd-button{% if following_creator %} vd-button-secondary{% endif %}"
-
                         >
-
                             {% if following_creator %}Following{% else %}Follow creator{% endif %}
-
                         </button>
-
                     </form>
-
                 {% elif not user.is_authenticated %}
-
                     <a
-
                         class="vd-button vd-button-secondary"
-
                         href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
-
                     >
-
                         Follow creator
-
                     </a>
-
                 {% endif %}
-
             </section>
-
-
 
             <section class="vd-description">
-
                 <h2 class="vd-section-title">About this video</h2>
 
-
-
                 {% if video.description %}
-
                     <div class="vd-description-text">{{ video.description }}</div>
-
                 {% else %}
-
                     <p class="vd-description-empty">
-
                         No description has been added for this video.
-
                     </p>
-
                 {% endif %}
-
             </section>
 
-
-
             <section class="vd-comments" id="vd-comments">
-
                 <h2 class="vd-section-title">
-
                     Comments
-
                     <span class="vd-comments-count" data-comment-count>({{ comment_count }})</span>
-
                 </h2>
 
-
-
                 {% if user.is_authenticated %}
-
                     <form
-
                         class="vd-comment-form"
-
                         method="post"
-
                         action="{% url 'videos:comment' video.pk %}"
-
                     >
-
                         {% csrf_token %}
 
-
-
                         <div class="vd-avatar vd-avatar-small" aria-hidden="true">
-
                             {% if user.profile.avatar_image %}
-
                                 <img
-
                                     src="{{ user.profile.avatar_image.url }}"
-
                                     alt=""
-
                                     loading="lazy"
-
                                 >
-
                             {% elif user.profile.avatar %}
-
                                 <img
-
                                     src="{{ user.profile.avatar }}"
-
                                     alt=""
-
                                     loading="lazy"
-
                                 >
-
                             {% else %}
-
                                 {{ user.username|first|upper }}
-
                             {% endif %}
-
                         </div>
-
-
 
                         <div class="vd-comment-form-main">
-
                             <textarea
-
                                 class="vd-comment-input"
-
                                 name="text"
-
                                 maxlength="2000"
-
                                 placeholder="Write a thoughtful comment..."
-
                                 aria-label="Write a comment"
-
                                 required
-
                             ></textarea>
 
-
-
                             <div class="vd-comment-submit-row">
-
                                 <button type="submit" class="vd-button">
-
                                     Post comment
-
                                 </button>
-
                             </div>
-
                         </div>
-
                     </form>
-
                 {% else %}
-
                     <div class="vd-login-prompt">
-
                         <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
-
                             Sign in
-
                         </a>
-
                         to join the conversation and leave a comment.
-
                     </div>
-
                 {% endif %}
 
-
-
                 <div class="vd-comment-list" id="vd-comment-list">
-
                     {% for comment in comments %}
-
                         <article class="vd-comment" data-comment-id="{{ comment.pk }}">
-
                             <div class="vd-avatar vd-avatar-small" aria-hidden="true">
-
                                 {% if comment.user.profile.avatar_image %}
-
                                     <img
-
                                         src="{{ comment.user.profile.avatar_image.url }}"
-
                                         alt=""
-
                                         loading="lazy"
-
                                     >
-
                                 {% elif comment.user.profile.avatar %}
-
                                     <img
-
                                         src="{{ comment.user.profile.avatar }}"
-
                                         alt=""
-
                                         loading="lazy"
-
                                     >
-
                                 {% else %}
-
                                     {{ comment.user.username|first|upper }}
-
                                 {% endif %}
-
                             </div>
 
-
-
                             <div class="vd-comment-main">
-
                                 <div class="vd-comment-header">
-
                                     <a
-
                                         class="vd-comment-author"
-
                                         href="{% url 'creators:profile' comment.user.username %}"
-
                                     >
-
                                         {{ comment.user.username }}
-
                                     </a>
 
-
-
                                     <time class="vd-comment-date" datetime="{{ comment.created_at|date:'c' }}">
-
                                         {{ comment.created_at|date:"M j, Y · g:i A" }}
-
                                     </time>
-
                                 </div>
-
-
 
                                 <p class="vd-comment-text">{{ comment.text }}</p>
 
-
-
                                 {% if user.is_authenticated %}
-
                                     {% if user.pk == comment.user_id or user.pk == video.creator_id %}
-
                                         <div class="vd-comment-footer">
-
                                             <form
-
                                                 method="post"
-
                                                 action="{% url 'videos:delete_comment' comment.pk %}"
-
                                                 onsubmit="return confirm('Delete this comment?');"
-
                                             >
-
                                                 {% csrf_token %}
-
                                                 <button type="submit" class="vd-delete-button">
-
                                                     Delete comment
-
                                                 </button>
-
                                             </form>
-
                                         </div>
-
                                     {% endif %}
-
                                 {% endif %}
-
                             </div>
-
                         </article>
-
                     {% empty %}
-
                         <div class="vd-empty-comments">
-
                             No comments yet. Be the first to join the conversation.
-
                         </div>
-
                     {% endfor %}
-
                 </div>
-
             </section>
 
-
-
             <section class="vd-mobile-related">
-
                 <h2 class="vd-sidebar-heading">
-
                     More videos
-
                     <span class="vd-sidebar-count">{{ related_videos|length }}</span>
-
                 </h2>
 
-
-
                 <div class="vd-related-list">
-
                     {% for related in related_videos %}
-
                         <a
-
                             class="vd-related-card"
-
                             href="{% url 'videos:detail' related.pk %}"
-
                         >
-
                             <div class="vd-related-thumb">
-
                                 {% if related.thumbnail %}
-
                                     <img
-
                                         src="{{ related.thumbnail.url }}"
-
                                         alt=""
-
                                         loading="lazy"
-
                                     >
-
                                 {% elif related.thumbnail_url %}
-
                                     <img
-
                                         src="{{ related.thumbnail_url }}"
-
                                         alt=""
-
                                         loading="lazy"
-
                                     >
-
                                 {% else %}
-
                                     <div class="vd-no-thumbnail">Thumbnail unavailable</div>
-
                                 {% endif %}
-
-
 
                                 {% if related.duration %}
-
                                     <span class="vd-duration">{{ related.duration }}</span>
-
                                 {% endif %}
-
                             </div>
 
-
-
                             <div class="vd-related-info">
-
                                 {% if related.is_premium %}
-
                                     <span class="vd-premium-tag">Premium</span>
-
                                 {% endif %}
-
-
 
                                 <h3 class="vd-related-title">{{ related.title }}</h3>
 
-
-
                                 <div class="vd-related-creator-row">
-
                                     <span class="vd-avatar vd-avatar-card" aria-hidden="true">
-
                                         {% if related.creator.profile.avatar_image %}
-
                                             <img
-
                                                 src="{{ related.creator.profile.avatar_image.url }}"
-
                                                 alt=""
-
                                                 loading="lazy"
-
                                             >
-
                                         {% elif related.creator.profile.avatar %}
-
                                             <img
-
                                                 src="{{ related.creator.profile.avatar }}"
-
                                                 alt=""
-
                                                 loading="lazy"
-
                                             >
-
                                         {% else %}
-
                                             {{ related.creator.username|first|upper }}
-
                                         {% endif %}
-
                                     </span>
-
-
 
                                     <span class="vd-related-creator-name">
-
                                         {{ related.creator.username }}
-
                                     </span>
-
                                 </div>
-
-
 
                                 <div class="vd-related-meta">
-
                                     {{ related.views|default:0 }} views
-
                                     <span> · </span>
-
                                     {{ related.created_at|date:"M j, Y" }}
-
                                 </div>
-
                             </div>
-
                         </a>
-
                     {% empty %}
-
                         <div class="vd-related-empty">
-
                             There are no other published videos yet.
-
                         </div>
-
                     {% endfor %}
-
                 </div>
-
             </section>
-
         </section>
 
-
-
         <aside class="vd-sidebar">
-
             <h2 class="vd-sidebar-heading">
-
                 More videos
-
                 <span class="vd-sidebar-count">{{ related_videos|length }}</span>
-
             </h2>
 
-
-
             <div class="vd-related-list">
-
                 {% for related in related_videos %}
-
                     <a
-
                         class="vd-related-card"
-
                         href="{% url 'videos:detail' related.pk %}"
-
                     >
-
                         <div class="vd-related-thumb">
-
                             {% if related.thumbnail %}
-
                                 <img
-
                                     src="{{ related.thumbnail.url }}"
-
                                     alt=""
-
                                     loading="lazy"
-
                                 >
-
                             {% elif related.thumbnail_url %}
-
                                 <img
-
                                     src="{{ related.thumbnail_url }}"
-
                                     alt=""
-
                                     loading="lazy"
-
                                 >
-
                             {% else %}
-
                                 <div class="vd-no-thumbnail">Thumbnail unavailable</div>
-
                             {% endif %}
-
-
 
                             {% if related.duration %}
-
                                 <span class="vd-duration">{{ related.duration }}</span>
-
                             {% endif %}
-
                         </div>
 
-
-
                         <div class="vd-related-info">
-
                             {% if related.is_premium %}
-
                                 <span class="vd-premium-tag">Premium</span>
-
                             {% endif %}
-
-
 
                             <h3 class="vd-related-title">{{ related.title }}</h3>
 
-
-
                             <div class="vd-related-creator-row">
-
                                 <span class="vd-avatar vd-avatar-card" aria-hidden="true">
-
                                     {% if related.creator.profile.avatar_image %}
-
                                         <img
-
                                             src="{{ related.creator.profile.avatar_image.url }}"
-
                                             alt=""
-
                                             loading="lazy"
-
                                         >
-
                                     {% elif related.creator.profile.avatar %}
-
                                         <img
-
                                             src="{{ related.creator.profile.avatar }}"
-
                                             alt=""
-
                                             loading="lazy"
-
                                         >
-
                                     {% else %}
-
                                         {{ related.creator.username|first|upper }}
-
                                     {% endif %}
-
                                 </span>
-
-
 
                                 <span class="vd-related-creator-name">
-
                                     {{ related.creator.username }}
-
                                 </span>
-
                             </div>
-
-
 
                             <div class="vd-related-meta">
-
                                 {{ related.views|default:0 }} views
-
                                 <span> · </span>
-
                                 {{ related.created_at|date:"M j, Y" }}
-
                             </div>
-
                         </div>
-
                     </a>
-
                 {% empty %}
-
                     <div class="vd-related-empty">
-
                         There are no other published videos yet.
-
                     </div>
-
                 {% endfor %}
-
             </div>
-
         </aside>
-
     </div>
-
 </main>
 
-
-
 <script>
-
-
-
 (function () {
-
     const shareButton = document.getElementById("vd-share-button");
-
     const shareStatus = document.getElementById("vd-share-status");
 
-
-
     if (!shareButton || !shareStatus) {
-
         return;
-
     }
 
-
-
     shareButton.addEventListener("click", async function () {
-
         const shareData = {
-
             title: document.title,
-
             text: document.querySelector(".vd-title")?.textContent?.trim()
-
                 || document.title,
-
             url: window.location.href
-
         };
 
-
-
         try {
-
             if (navigator.share) {
-
                 await navigator.share(shareData);
-
                 shareStatus.textContent = "Share opened.";
-
                 return;
-
             }
-
-
 
             if (navigator.clipboard && window.isSecureContext) {
-
                 await navigator.clipboard.writeText(shareData.url);
-
                 shareStatus.textContent = "Link copied.";
-
                 return;
-
             }
-
-
 
             const temporaryInput = document.createElement("textarea");
-
             temporaryInput.value = shareData.url;
-
             temporaryInput.setAttribute("readonly", "");
-
             temporaryInput.style.position = "fixed";
-
             temporaryInput.style.left = "-9999px";
 
-
-
             document.body.appendChild(temporaryInput);
-
             temporaryInput.select();
 
-
-
             const copied = document.execCommand("copy");
-
             temporaryInput.remove();
 
-
-
             shareStatus.textContent = copied
-
                 ? "Link copied."
-
                 : "Copy the page URL from your browser.";
-
         } catch (error) {
-
             if (error && error.name === "AbortError") {
-
                 shareStatus.textContent = "";
-
                 return;
-
             }
 
-
-
             shareStatus.textContent = "Unable to share right now.";
-
         }
-
     });
-
 })();
-
-
-
 
 
     // Like and comment actions use fetch so the page stays in place.
@@ -2822,7 +1484,5 @@
             }
         });
     }
-
 </script>
-
 {% endblock %}
