@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Video, VideoLike, VideoComment
-
+from .models import Video, VideoLike, VideoComment, VideoPurchase
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
@@ -38,10 +37,7 @@ class VideoCommentAdmin(admin.ModelAdmin):
     @admin.display(description="Comment")
     def short_text(self, obj):
         return obj.text[:70] + ("…" if len(obj.text) > 70 else "")
-    
 
-
-from .models import VideoPurchase
 
 @admin.register(VideoPurchase)
 class VideoPurchaseAdmin(admin.ModelAdmin):
