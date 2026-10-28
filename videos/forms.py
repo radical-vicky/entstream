@@ -14,7 +14,7 @@ class VideoForm(forms.ModelForm):
 
     class Meta:
         model = Video
-        # Note: We exclude 'video_file' because the URL is handled via 'video_file_url'
+        # We exclude 'video_file' because the URL is handled via 'video_file_url'
         fields = [
             "title", 
             "description", 
