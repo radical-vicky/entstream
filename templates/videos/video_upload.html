@@ -4,7 +4,6 @@
 
 {% block extra_css %}
 <style>
-    /* Paste your exact existing CSS here. It is unchanged. */
     .sv-upload {
         --sv-bg: #0b0c0e;
         --sv-panel: #111315;
@@ -20,7 +19,706 @@
         color: var(--sv-text);
         font-family: inherit;
     }
-    /* ... (Keep all CSS from your previous file) ... */
+
+    .sv-upload *,
+    .sv-upload *::before,
+    .sv-upload *::after {
+        box-sizing: border-box;
+    }
+
+    .sv-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        color: var(--sv-muted);
+        font-size: 12px;
+    }
+
+    .sv-breadcrumb a {
+        color: var(--sv-muted);
+        text-decoration: none;
+    }
+
+    .sv-breadcrumb a:hover {
+        color: var(--sv-orange);
+    }
+
+    .sv-breadcrumb span:last-child {
+        color: var(--sv-text);
+    }
+
+    .sv-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        margin-bottom: 32px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--sv-border);
+    }
+
+    .sv-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        color: var(--sv-orange);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .sv-eyebrow::before {
+        content: "";
+        width: 22px;
+        height: 2px;
+        background: var(--sv-orange);
+    }
+
+    .sv-heading h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 46px);
+        line-height: 1.1;
+        letter-spacing: -1.6px;
+        font-weight: 800;
+    }
+
+    .sv-heading p {
+        max-width: 600px;
+        margin: 12px 0 0;
+        color: var(--sv-muted);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .sv-heading-mark {
+        display: flex;
+        width: 68px;
+        height: 68px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #55301e;
+        background: #21140e;
+        color: var(--sv-orange);
+        font-size: 28px;
+    }
+
+    .sv-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .sv-main,
+    .sv-sidebar {
+        min-width: 0;
+    }
+
+    .sv-card {
+        margin-bottom: 20px;
+        border: 1px solid var(--sv-border);
+        background: var(--sv-panel);
+    }
+
+    .sv-card-header {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--sv-border);
+    }
+
+    .sv-step {
+        display: flex;
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #6c3921;
+        background: #25160f;
+        color: var(--sv-orange);
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .sv-card-header h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 750;
+    }
+
+    .sv-card-header p {
+        margin: 4px 0 0;
+        color: var(--sv-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .sv-card-body {
+        padding: 24px;
+    }
+
+    .sv-field {
+        margin-bottom: 24px;
+    }
+
+    .sv-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .sv-label {
+        display: block;
+        margin-bottom: 9px;
+        color: #ededed;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .sv-required {
+        color: var(--sv-orange);
+    }
+
+    .sv-upload input:not([type="checkbox"]):not([type="file"]),
+    .sv-upload textarea,
+    .sv-upload select {
+        display: block;
+        width: 100%;
+        min-height: 47px;
+        padding: 12px 14px;
+        border: 1px solid #35383d;
+        border-radius: 0;
+        outline: none;
+        background: #0d0f11;
+        color: var(--sv-text);
+        font: inherit;
+        font-size: 13px;
+        transition: border-color .18s ease, background .18s ease;
+    }
+
+    .sv-upload textarea {
+        min-height: 130px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+
+    .sv-upload input::placeholder,
+    .sv-upload textarea::placeholder {
+        color: #686e77;
+    }
+
+    .sv-upload input:focus,
+    .sv-upload textarea:focus,
+    .sv-upload select:focus {
+        border-color: var(--sv-orange);
+        background: #111315;
+    }
+
+    .sv-help {
+        display: block;
+        margin-top: 8px;
+        color: var(--sv-muted);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .sv-error {
+        margin: 8px 0 0;
+        color: #ff9c9c;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .sv-error-summary,
+    .sv-notice {
+        margin-bottom: 22px;
+        padding: 15px 17px;
+        border: 1px solid;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .sv-error-summary {
+        border-color: #7e2929;
+        background: #241010;
+        color: #ffd1d1;
+    }
+
+    .sv-error-summary ul {
+        margin: 8px 0 0;
+        padding-left: 19px;
+    }
+
+    .sv-notice-success {
+        border-color: #245a3a;
+        background: #101e16;
+        color: #b7f3c9;
+    }
+
+    .sv-notice-error {
+        border-color: #7e2929;
+        background: #241010;
+        color: #ffd1d1;
+    }
+
+    /* Video selection area */
+
+    .sv-dropzone {
+        position: relative;
+        display: flex;
+        min-height: 235px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 20px;
+        border: 1px dashed #4b4e53;
+        background: #0d0f11;
+        text-align: center;
+        transition: border-color .18s ease, background .18s ease;
+    }
+
+    .sv-dropzone:hover,
+    .sv-dropzone.is-dragging {
+        border-color: var(--sv-orange);
+        background: #19120e;
+    }
+
+    .sv-file-icon {
+        display: flex;
+        width: 54px;
+        height: 54px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        border: 1px solid #5a321f;
+        background: #25160f;
+        color: var(--sv-orange);
+        font-size: 25px;
+    }
+
+    .sv-dropzone h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 750;
+    }
+
+    .sv-dropzone p {
+        margin: 8px 0 17px;
+        color: var(--sv-muted);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .sv-browse-button {
+        display: inline-flex;
+        min-height: 39px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 17px;
+        border: 1px solid var(--sv-orange);
+        background: var(--sv-orange);
+        color: #17100b;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .sv-browse-button:hover {
+        background: var(--sv-orange-hover);
+        border-color: var(--sv-orange-hover);
+    }
+
+    .sv-file-name {
+        display: none;
+        width: 100%;
+        margin-top: 17px;
+        padding: 11px 13px;
+        border: 1px solid var(--sv-border);
+        background: #151719;
+        color: #e5e7eb;
+        font-size: 12px;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .sv-file-name.is-visible {
+        display: block;
+    }
+
+    .sv-video-preview {
+        display: none;
+        width: 100%;
+        max-height: 420px;
+        margin-top: 16px;
+        border: 1px solid var(--sv-border);
+        background: #000;
+    }
+
+    /* Publishing options */
+
+    .sv-status-options {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .sv-status-option {
+        position: relative;
+        display: block;
+        min-width: 0;
+        cursor: pointer;
+    }
+
+    .sv-status-option input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .sv-status-box {
+        display: flex;
+        min-height: 91px;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 15px;
+        border: 1px solid #34373c;
+        background: #0d0f11;
+        transition: border-color .18s ease, background .18s ease;
+    }
+
+    .sv-status-option input:checked + .sv-status-box {
+        border-color: var(--sv-orange);
+        background: #21150f;
+    }
+
+    .sv-status-option input:focus-visible + .sv-status-box {
+        outline: 2px solid var(--sv-orange);
+        outline-offset: 3px;
+    }
+
+    .sv-radio {
+        display: flex;
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        margin-top: 2px;
+        border: 1px solid #6b7078;
+        border-radius: 50%;
+    }
+
+    .sv-status-option input:checked + .sv-status-box .sv-radio {
+        border-color: var(--sv-orange);
+    }
+
+    .sv-status-option input:checked + .sv-status-box .sv-radio::after {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--sv-orange);
+        content: "";
+    }
+
+    .sv-status-box strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .sv-status-box small {
+        display: block;
+        color: var(--sv-muted);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .sv-premium-toggle {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 17px;
+        border: 1px solid var(--sv-border);
+        background: #0d0f11;
+    }
+
+    .sv-premium-toggle input {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        margin: 2px 0 0;
+        accent-color: var(--sv-orange);
+    }
+
+    .sv-premium-toggle label {
+        display: block;
+        margin: 0;
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer;
+    }
+
+    .sv-premium-toggle p {
+        margin: 5px 0 0;
+        color: var(--sv-muted);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .sv-price-field {
+        display: none;
+        margin-top: 18px;
+    }
+
+    /* Sidebar */
+
+    .sv-sidebar-card {
+        margin-bottom: 20px;
+        border: 1px solid var(--sv-border);
+        background: var(--sv-panel);
+    }
+
+    .sv-sidebar-title {
+        margin: 0;
+        padding: 17px 18px;
+        border-bottom: 1px solid var(--sv-border);
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .sv-sidebar-body {
+        padding: 18px;
+    }
+
+    .sv-checklist {
+        display: grid;
+        gap: 18px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .sv-checklist li {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+    }
+
+    .sv-check-icon {
+        display: flex;
+        width: 23px;
+        height: 23px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #493020;
+        color: var(--sv-orange);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .sv-checklist strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    .sv-checklist p {
+        margin: 0;
+        color: var(--sv-muted);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .sv-tip {
+        padding: 18px;
+        border-left: 2px solid var(--sv-orange);
+        background: #19120e;
+    }
+
+    .sv-tip strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--sv-orange);
+        font-size: 12px;
+    }
+
+    .sv-tip p {
+        margin: 0;
+        color: #c4c0bc;
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+    .sv-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .sv-button {
+        display: flex;
+        width: 100%;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 18px;
+        border: 1px solid transparent;
+        border-radius: 0;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .18s ease, border-color .18s ease;
+    }
+
+    .sv-button-primary {
+        background: var(--sv-orange);
+        color: #17100b;
+    }
+
+    .sv-button-primary:hover {
+        background: var(--sv-orange-hover);
+    }
+
+    .sv-button-primary:disabled {
+        opacity: .65;
+        cursor: wait;
+    }
+
+    .sv-button-secondary {
+        border-color: #393c41;
+        background: transparent;
+        color: #e5e7eb;
+    }
+
+    .sv-button-secondary:hover {
+        border-color: #777;
+        background: #1a1c1f;
+    }
+
+    .sv-privacy-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 14px;
+        color: var(--sv-muted);
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    .sv-privacy-note span {
+        color: var(--sv-orange);
+    }
+
+    @media (max-width: 900px) {
+        .sv-layout {
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 17px;
+        }
+
+        .sv-card-body {
+            padding: 20px;
+        }
+
+        .sv-status-options {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .sv-upload {
+            padding: 26px 16px 50px;
+        }
+
+        .sv-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sv-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .sv-sidebar-card {
+            margin-bottom: 0;
+        }
+
+        .sv-sidebar-card:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .sv-heading {
+            align-items: flex-start;
+        }
+
+        .sv-heading-mark {
+            width: 52px;
+            height: 52px;
+            font-size: 22px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sv-upload {
+            padding: 20px 12px 38px;
+        }
+
+        .sv-heading {
+            gap: 12px;
+            margin-bottom: 22px;
+            padding-bottom: 21px;
+        }
+
+        .sv-heading h1 {
+            font-size: 30px;
+            letter-spacing: -1px;
+        }
+
+        .sv-heading p {
+            font-size: 12px;
+        }
+
+        .sv-heading-mark {
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+        }
+
+        .sv-card-header {
+            padding: 16px;
+        }
+
+        .sv-card-body {
+            padding: 16px;
+        }
+
+        .sv-dropzone {
+            min-height: 210px;
+            padding: 22px 14px;
+        }
+
+        .sv-sidebar {
+            grid-template-columns: 1fr;
+        }
+
+        .sv-sidebar-card:last-child {
+            grid-column: auto;
+        }
+
+        .sv-status-options {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -37,20 +735,23 @@
         <div>
             <div class="sv-eyebrow">Creator studio</div>
             <h1>Upload your video</h1>
-            <p>Bring your content to StreamSphere. Add your video, write a compelling description, and choose how you want to publish it.</p>
+            <p>
+                Bring your content to StreamSphere. Add your video, write a
+                compelling description, and choose how you want to publish it.
+            </p>
         </div>
         <div class="sv-heading-mark" aria-hidden="true">&#9654;</div>
     </header>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="sv-notice {% if 'success' in message.tags %}sv-notice-success{% else %}sv-notice-error{% endif %}" role="status">
+            <div class="sv-notice {% if 'success' in message.tags %}sv-notice-success{% else %}sv-notice-error{% endif %}"
+                 role="status">
                 {{ message }}
             </div>
         {% endfor %}
     {% endif %}
 
-    <!-- Notice: Removed enctype="multipart/form-data" -->
     <form method="post" id="videoUploadForm">
         {% csrf_token %}
 
@@ -71,7 +772,9 @@
         {% endif %}
 
         <div class="sv-layout">
+
             <div class="sv-main">
+
                 <section class="sv-card">
                     <div class="sv-card-header">
                         <div class="sv-step">01</div>
@@ -83,15 +786,21 @@
 
                     <div class="sv-card-body">
                         <div class="sv-field">
-                            <label class="sv-label">Choose your video <span class="sv-required">*</span></label>
+                            <label class="sv-label">
+                                Choose your video <span class="sv-required">*</span>
+                            </label>
 
-                            <!-- Hidden input receives the Cloudinary URL -->
+                            <!-- Hidden input to receive the Cloudinary URL -->
                             {{ form.video_file_url }}
 
                             <div class="sv-dropzone" id="videoDropzone">
-                                <div class="sv-file-icon" aria-hidden="true">&#9654;</div>
-                                <h3 id="dropzoneTitle">Upload your video</h3>
-                                <p id="dropzoneText">Click below to upload directly to our secure cloud.</p>
+                                <div class="sv-file-icon" aria-hidden="true">
+                                    &#9654;
+                                </div>
+                                <h3 id="dropzoneTitle">Select your video</h3>
+                                <p id="dropzoneText">
+                                    Click below to browse your device and upload directly to the cloud.
+                                </p>
 
                                 <button type="button" class="sv-browse-button" id="upload_widget_opener">
                                     Browse files
@@ -104,8 +813,14 @@
                                 <p class="sv-error">{{ error }}</p>
                             {% endfor %}
 
-                            <small class="sv-help">Use a supported video format. Max 100MB.</small>
-                            <video id="videoPreview" class="sv-video-preview" controls preload="metadata" style="display:none;"></video>
+                            <small class="sv-help">
+                                Use a supported video format. Upload limits depend on your server configuration.
+                            </small>
+
+                            <video id="videoPreview"
+                                   class="sv-video-preview"
+                                   controls
+                                   preload="metadata"></video>
                         </div>
                     </div>
                 </section>
@@ -121,21 +836,42 @@
 
                     <div class="sv-card-body">
                         <div class="sv-field">
-                            <label class="sv-label" for="{{ form.title.id_for_label }}">Video title <span class="sv-required">*</span></label>
+                            <label class="sv-label" for="{{ form.title.id_for_label }}">
+                                Video title <span class="sv-required">*</span>
+                            </label>
                             {{ form.title }}
-                            {% for error in form.title.errors %}<p class="sv-error">{{ error }}</p>{% endfor %}
+                            {% for error in form.title.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
+                            <small class="sv-help">
+                                Choose a clear, descriptive title.
+                            </small>
                         </div>
 
                         <div class="sv-field">
-                            <label class="sv-label" for="{{ form.description.id_for_label }}">Description</label>
+                            <label class="sv-label" for="{{ form.description.id_for_label }}">
+                                Description
+                            </label>
                             {{ form.description }}
-                            {% for error in form.description.errors %}<p class="sv-error">{{ error }}</p>{% endfor %}
+                            {% for error in form.description.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
+                            <small class="sv-help">
+                                Tell viewers what your video covers and why they should watch.
+                            </small>
                         </div>
 
                         <div class="sv-field">
-                            <label class="sv-label" for="{{ form.duration.id_for_label }}">Video duration</label>
+                            <label class="sv-label" for="{{ form.duration.id_for_label }}">
+                                Video duration
+                            </label>
                             {{ form.duration }}
-                            {% for error in form.duration.errors %}<p class="sv-error">{{ error }}</p>{% endfor %}
+                            {% for error in form.duration.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
+                            <small class="sv-help">
+                                Enter the duration in the format expected by your application, for example 08:35.
+                            </small>
                         </div>
                     </div>
                 </section>
@@ -151,59 +887,134 @@
 
                     <div class="sv-card-body">
                         <div class="sv-field">
-                            <label class="sv-label">Publishing status <span class="sv-required">*</span></label>
+                            <label class="sv-label" for="{{ form.status.id_for_label }}">
+                                Publishing status <span class="sv-required">*</span>
+                            </label>
+
                             <div class="sv-status-options">
                                 {% for value, label in form.status.field.choices %}
                                     <label class="sv-status-option">
-                                        <input type="radio" name="{{ form.status.html_name }}" value="{{ value }}" {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}checked{% elif not form.status.value and value == form.status.field.initial %}checked{% endif %}>
+                                        <input type="radio"
+                                               name="{{ form.status.html_name }}"
+                                               value="{{ value }}"
+                                               {% if form.status.value|stringformat:"s" == value|stringformat:"s" %}checked{% elif not form.status.value and value == form.status.field.initial %}checked{% endif %}
+                                               {% if forloop.first and not form.status.value %}required{% endif %}>
+
                                         <span class="sv-status-box">
                                             <span class="sv-radio"></span>
                                             <span>
                                                 <strong>{{ label }}</strong>
-                                                <small>{% if value == "published" %}Make your video available to viewers.{% else %}Keep your video unpublished for now.{% endif %}</small>
+                                                <small>
+                                                    {% if value == "published" %}
+                                                        Make your video available to viewers.
+                                                    {% else %}
+                                                        Keep your video unpublished for now.
+                                                    {% endif %}
+                                                </small>
                                             </span>
                                         </span>
                                     </label>
                                 {% endfor %}
                             </div>
+
+                            {% for error in form.status.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
+
+                            <small class="sv-help">
+                                Choose whether to publish now or save a draft.
+                            </small>
                         </div>
 
                         <div class="sv-field">
                             <div class="sv-premium-toggle">
                                 {{ form.is_premium }}
                                 <div>
-                                    <label for="{{ form.is_premium.id_for_label }}">Premium content</label>
-                                    <p>Mark this video as paid content for viewers.</p>
+                                    <label for="{{ form.is_premium.id_for_label }}">
+                                        Premium content
+                                    </label>
+                                    <p>
+                                        Mark this video as paid content for viewers.
+                                    </p>
                                 </div>
                             </div>
+                            {% for error in form.is_premium.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
                         </div>
 
                         <div class="sv-field sv-price-field" id="priceField">
-                            <label class="sv-label" for="{{ form.price.id_for_label }}">Video price <span class="sv-required">*</span></label>
+                            <label class="sv-label" for="{{ form.price.id_for_label }}">
+                                Video price <span class="sv-required">*</span>
+                            </label>
                             {{ form.price }}
-                            {% for error in form.price.errors %}<p class="sv-error">{{ error }}</p>{% endfor %}
+                            {% for error in form.price.errors %}
+                                <p class="sv-error">{{ error }}</p>
+                            {% endfor %}
+                            <small class="sv-help">
+                                Enter an amount greater than zero for premium content.
+                            </small>
                         </div>
                     </div>
                 </section>
 
                 <div class="sv-actions">
-                    <button type="submit" class="sv-button sv-button-primary" id="uploadButton" disabled>
+                    <button type="submit"
+                            class="sv-button sv-button-primary"
+                            id="uploadButton" disabled>
                         Upload video
                     </button>
-                    <a href="{% url 'accounts:profile' %}" class="sv-button sv-button-secondary">Cancel and return to profile</a>
+
+                    <a href="{% url 'accounts:profile' %}"
+                       class="sv-button sv-button-secondary">
+                        Cancel and return to profile
+                    </a>
                 </div>
+
+                <div class="sv-privacy-note">
+                    <span aria-hidden="true">&#9679;</span>
+                    <span>
+                        Keep this page open while the upload is being submitted.
+                        Large files may take longer depending on your connection.
+                    </span>
+                </div>
+
             </div>
 
             <aside class="sv-sidebar">
-                <!-- Sidebar content remains exactly the same -->
+
                 <section class="sv-sidebar-card">
                     <h2 class="sv-sidebar-title">Upload checklist</h2>
                     <div class="sv-sidebar-body">
                         <ul class="sv-checklist">
-                            <li><span class="sv-check-icon">01</span><div><strong>Select a video</strong><p>Choose the correct file from your device.</p></div></li>
-                            <li><span class="sv-check-icon">02</span><div><strong>Add a title</strong><p>Make the topic easy to understand.</p></div></li>
-                            <li><span class="sv-check-icon">03</span><div><strong>Set publishing status</strong><p>Publish your video or keep it as a draft.</p></div></li>
-                            <li><span class="sv-check-icon">04</span><div><strong>Review and upload</strong><p>Check your details before submitting.</p></div></li>
+                            <li>
+                                <span class="sv-check-icon">01</span>
+                                <div>
+                                    <strong>Select a video</strong>
+                                    <p>Choose the correct file from your device.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="sv-check-icon">02</span>
+                                <div>
+                                    <strong>Add a title</strong>
+                                    <p>Make the topic easy to understand.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="sv-check-icon">03</span>
+                                <div>
+                                    <strong>Set publishing status</strong>
+                                    <p>Publish your video or keep it as a draft.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="sv-check-icon">04</span>
+                                <div>
+                                    <strong>Review and upload</strong>
+                                    <p>Check your details before submitting.</p>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </section>
@@ -213,11 +1024,16 @@
                     <div class="sv-sidebar-body">
                         <div class="sv-tip">
                             <strong>Make your video stand out</strong>
-                            <p>A clear title and useful description help viewers understand what they are about to watch.</p>
+                            <p>
+                                A clear title and useful description help viewers
+                                understand what they are about to watch.
+                            </p>
                         </div>
                     </div>
                 </section>
+
             </aside>
+
         </div>
     </form>
 </main>
@@ -262,6 +1078,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Save the secure URL to the hidden Django form field
                     hiddenUrlInput.value = result.info.secure_url;
                     
+                    // Update the UI to show success
                     fileNameBox.textContent = "Uploaded: " + result.info.original_filename;
                     fileNameBox.classList.add("is-visible");
                     dropzoneTitle.textContent = "Video ready!";
@@ -270,6 +1087,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     videoPreview.src = result.info.secure_url;
                     videoPreview.style.display = "block";
                     
+                    // Unlock the submit button
                     submitBtn.disabled = false;
                 }
             });
@@ -282,7 +1100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 2. Premium Toggle Logic
+    // 2. Premium Toggle Logic (Restored from your original design)
     function updatePriceVisibility() {
         if (premiumCheckbox && priceField) {
             priceField.style.display = premiumCheckbox.checked ? "block" : "none";
