@@ -52,15 +52,9 @@ class Video(models.Model):
         """Generate a thumbnail automatically from the Cloudinary video URL."""
         if not self.video_file:
             return ""
-        
-        # Cloudinary trick: Replace .mp4 with .jpg to get the first frame as an image
         if self.video_file.endswith(('.mp4', '.webm', '.mov', '.avi')):
             return self.video_file.rsplit('.', 1)[0] + '.jpg'
-        
         return self.video_file
-
-    # --- Also updating VideoLike and VideoComment just to be complete ---
-    # (You can keep your existing ones if they are already correct)
 
 
 class VideoLike(models.Model):
@@ -90,3 +84,20 @@ class VideoComment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user} on {self.video}"
+
+
+# ADDED BACK: VideoPurchase Model
+class VideoPurchase(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name="purchases")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="video_purchases")
+    purchased_at = models.DateTimeField(auto_now_add=True)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        ordering = ["-purchased_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["video", "user"], name="unique_video_purchase_per_user"),
+        ]
+
+    def __str__(self):
+        return f"{self.user} purchased {self.video}"
