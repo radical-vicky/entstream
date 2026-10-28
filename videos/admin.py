@@ -16,7 +16,6 @@ class VideoAdmin(admin.ModelAdmin):
     list_select_related = ("creator",)
     readonly_fields = ("created_at", "updated_at")
 
-
 @admin.register(VideoLike)
 class VideoLikeAdmin(admin.ModelAdmin):
     list_display = ("video", "user", "created_at")
@@ -24,7 +23,6 @@ class VideoLikeAdmin(admin.ModelAdmin):
     search_fields = ("video__title", "user__username")
     list_select_related = ("video", "user")
     readonly_fields = ("created_at",)
-
 
 @admin.register(VideoComment)
 class VideoCommentAdmin(admin.ModelAdmin):
@@ -37,7 +35,6 @@ class VideoCommentAdmin(admin.ModelAdmin):
     @admin.display(description="Comment")
     def short_text(self, obj):
         return obj.text[:70] + ("…" if len(obj.text) > 70 else "")
-
 
 @admin.register(VideoPurchase)
 class VideoPurchaseAdmin(admin.ModelAdmin):
