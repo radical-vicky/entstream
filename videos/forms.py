@@ -1,65 +1,77 @@
-
 from django import forms
 from .models import Video
 
 
-class VideoUploadForm(forms.ModelForm):
+class VideoForm(forms.ModelForm):
+    # Hidden field to receive the Cloudinary URL from the frontend JS widget
+    video_file_url = forms.URLField(
+        widget=forms.HiddenInput(),
+        required=True,
+        error_messages={
+            "required": "Please upload a video file before submitting."
+        }
+    )
+
     class Meta:
         model = Video
+        # Note: We exclude 'video_file' because the URL is handled via 'video_file_url'
         fields = [
-            "title",
-            "description",
-            "video_file",
-            "is_premium",
-            "price",
-            "duration",
-            "status",
+            "title", 
+            "description", 
+            "duration", 
+            "status", 
+            "is_premium", 
+            "price"
         ]
         widgets = {
             "title": forms.TextInput(attrs={
-                "placeholder": "Give your video a clear title",
-                "maxlength": 200,
+                "placeholder": "Enter a compelling title for your video",
+                "class": "sv-input",
             }),
             "description": forms.Textarea(attrs={
-                "placeholder": "Describe your video for viewers",
-                "rows": 5,
-            }),
-            "video_file": forms.FileInput(attrs={
-                "accept": "video/*",
-            }),
-            "price": forms.NumberInput(attrs={
-                "min": "0",
-                "step": "0.01",
+                "placeholder": "Tell viewers what your video is about...",
+                "rows": 4,
+                "class": "sv-textarea",
             }),
             "duration": forms.TextInput(attrs={
-                "placeholder": "e.g. 08:35",
+                "placeholder": "e.g., 05:24",
+                "class": "sv-input",
+            }),
+            "price": forms.NumberInput(attrs={
+                "placeholder": "0.00",
+                "step": "0.01",
+                "min": "0",
+                "class": "sv-input",
             }),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Creators can publish now or save a draft.
-        self.fields["status"].choices = [
-            (Video.Status.DRAFT, "Save as draft"),
-            (Video.Status.PUBLISHED, "Publish video"),
-        ]
-
-        self.fields["price"].required = False
-        self.fields["price"].initial = 0
 
     def clean(self):
         cleaned_data = super().clean()
         is_premium = cleaned_data.get("is_premium")
         price = cleaned_data.get("price")
+        video_url = cleaned_data.get("video_file_url")
 
-        if is_premium and (price is None or price <= 0):
-            self.add_error(
-                "price",
-                "Enter a price greater than zero for a premium video.",
-            )
+        # 1. Ensure a video was actually uploaded
+        if not video_url:
+            self.add_error("video_file_url", "You must upload a video file.")
 
-        if not is_premium:
-            cleaned_data["price"] = 0
+        # 2. Validate pricing rules
+        if is_premium and not price:
+            self.add_error("price", "You must set a price for premium content.")
+        elif is_premium and price and price <= 0:
+            self.add_error("price", "Price must be greater than zero.")
+        elif not is_premium:
+            # Automatically clear the price if it's a free video
+            cleaned_data["price"] = None
 
         return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Map the uploaded URL string to the model's video_file field
+        instance.video_file = self.cleaned_data.get("video_file_url")
+        
+        if commit:
+            instance.save()
+        return instance
