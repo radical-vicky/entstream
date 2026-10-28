@@ -1,14 +1,23 @@
 {
-  "buildCommand": "python manage.py migrate --noinput && python manage.py collectstatic --noinput",
-  "outputDirectory": "staticfiles_build",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/static/(.*)",
-      "destination": "/static/$1"
+      "src": "config/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12",
+        "buildCommand": "bash build.sh"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/api/index"
+      "src": "/(.*)",
+      "dest": "config/wsgi.py"
     }
   ]
 }
