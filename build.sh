@@ -4,13 +4,12 @@ set -e
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
-echo "Generating migrations..."
-# This tells Django to look at models.py and write the migration files
-python manage.py makemigrations accounts
-python manage.py makemigrations videos
-# (Add any other apps here if they are missing migrations, like creators, etc.)
+echo "Generating migrations for all apps..."
+# This forces Django to create migration files for any app that is missing them
+python manage.py makemigrations accounts videos creators payments subscriptions streaming
 
 echo "Running database migrations..."
+# --fake-initial handles tables that already exist
 python manage.py migrate --noinput --fake-initial
 
 echo "Building Tailwind..."
