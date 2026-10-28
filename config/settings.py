@@ -131,8 +131,6 @@ USE_TZ = True
 TAILWIND_APP_NAME = "theme"
 INTERNAL_IPS = ["127.0.0.1"]
 
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Vercel requires static files to be collected into this specific directory
 STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
