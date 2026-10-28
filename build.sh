@@ -1,32 +1,23 @@
 #!/bin/bash
-
-# Exit immediately if a command fails
 set -e
 
-echo "========================================="
-echo "1. Installing Python dependencies..."
-echo "========================================="
+echo "Installing dependencies..."
 pip install -r requirements.txt
 
-echo "========================================="
-echo "2. Running database migrations..."
-echo "========================================="
-# This will create all the tables in your Supabase database
-python manage.py migrate --noinput
+echo "Generating migrations..."
+# This tells Django to look at models.py and write the migration files
+python manage.py makemigrations accounts
+python manage.py makemigrations videos
+# (Add any other apps here if they are missing migrations, like creators, etc.)
 
-echo "========================================="
-echo "3. Building Tailwind CSS..."
-echo "========================================="
-# We use `|| true` so that if Tailwind fails on Vercel, 
-# the build doesn't crash completely.
+echo "Running database migrations..."
+python manage.py migrate --noinput --fake-initial
+
+echo "Building Tailwind..."
 python manage.py tailwind install || true
 python manage.py tailwind build || true
 
-echo "========================================="
-echo "4. Collecting static files..."
-echo "========================================="
+echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "========================================="
-echo "BUILD COMPLETE!"
-echo "========================================="
+echo "Build complete!"
