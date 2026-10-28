@@ -137,6 +137,13 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Vercel requires static files to be collected into this specific directory
 STATIC_ROOT = BASE_DIR / "staticfiles_build" / "static"
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles_build' / 'static' # <--- Add this line!
+
+# Make sure this is at the very bottom of settings.py
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Media (user uploads) - Cloudinary
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
