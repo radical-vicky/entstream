@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <style>
+    /* Paste your exact original CSS here. I have preserved everything. */
     .sv-upload {
         --sv-bg: #0b0c0e;
         --sv-panel: #111315;
@@ -332,6 +333,18 @@
         border-color: var(--sv-orange-hover);
     }
 
+    /* Hidden file input styling */
+    .sv-file-input {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
     .sv-file-name {
         display: none;
         width: 100%;
@@ -356,6 +369,22 @@
         margin-top: 16px;
         border: 1px solid var(--sv-border);
         background: #000;
+    }
+
+    /* Upload Progress Bar */
+    .sv-progress-wrap {
+        display: none;
+        margin-top: 15px;
+        background: #17191c;
+        border: 1px solid var(--sv-border);
+        height: 10px;
+        overflow: hidden;
+    }
+    .sv-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--sv-orange);
+        transition: width 0.2s ease;
     }
 
     /* Publishing options */
@@ -620,104 +649,33 @@
     }
 
     @media (max-width: 900px) {
-        .sv-layout {
-            grid-template-columns: minmax(0, 1fr) 260px;
-            gap: 17px;
-        }
-
-        .sv-card-body {
-            padding: 20px;
-        }
-
-        .sv-status-options {
-            grid-template-columns: 1fr;
-        }
+        .sv-layout { grid-template-columns: minmax(0, 1fr) 260px; gap: 17px; }
+        .sv-card-body { padding: 20px; }
+        .sv-status-options { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 720px) {
-        .sv-upload {
-            padding: 26px 16px 50px;
-        }
-
-        .sv-layout {
-            grid-template-columns: 1fr;
-        }
-
-        .sv-sidebar {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .sv-sidebar-card {
-            margin-bottom: 0;
-        }
-
-        .sv-sidebar-card:last-child {
-            grid-column: 1 / -1;
-        }
-
-        .sv-heading {
-            align-items: flex-start;
-        }
-
-        .sv-heading-mark {
-            width: 52px;
-            height: 52px;
-            font-size: 22px;
-        }
+        .sv-upload { padding: 26px 16px 50px; }
+        .sv-layout { grid-template-columns: 1fr; }
+        .sv-sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .sv-sidebar-card { margin-bottom: 0; }
+        .sv-sidebar-card:last-child { grid-column: 1 / -1; }
+        .sv-heading { align-items: flex-start; }
+        .sv-heading-mark { width: 52px; height: 52px; font-size: 22px; }
     }
 
     @media (max-width: 480px) {
-        .sv-upload {
-            padding: 20px 12px 38px;
-        }
-
-        .sv-heading {
-            gap: 12px;
-            margin-bottom: 22px;
-            padding-bottom: 21px;
-        }
-
-        .sv-heading h1 {
-            font-size: 30px;
-            letter-spacing: -1px;
-        }
-
-        .sv-heading p {
-            font-size: 12px;
-        }
-
-        .sv-heading-mark {
-            width: 42px;
-            height: 42px;
-            font-size: 18px;
-        }
-
-        .sv-card-header {
-            padding: 16px;
-        }
-
-        .sv-card-body {
-            padding: 16px;
-        }
-
-        .sv-dropzone {
-            min-height: 210px;
-            padding: 22px 14px;
-        }
-
-        .sv-sidebar {
-            grid-template-columns: 1fr;
-        }
-
-        .sv-sidebar-card:last-child {
-            grid-column: auto;
-        }
-
-        .sv-status-options {
-            grid-template-columns: 1fr;
-        }
+        .sv-upload { padding: 20px 12px 38px; }
+        .sv-heading { gap: 12px; margin-bottom: 22px; padding-bottom: 21px; }
+        .sv-heading h1 { font-size: 30px; letter-spacing: -1px; }
+        .sv-heading p { font-size: 12px; }
+        .sv-heading-mark { width: 42px; height: 42px; font-size: 18px; }
+        .sv-card-header { padding: 16px; }
+        .sv-card-body { padding: 16px; }
+        .sv-dropzone { min-height: 210px; padding: 22px 14px; }
+        .sv-sidebar { grid-template-columns: 1fr; }
+        .sv-sidebar-card:last-child { grid-column: auto; }
+        .sv-status-options { grid-template-columns: 1fr; }
     }
 </style>
 {% endblock %}
@@ -755,6 +713,9 @@
     <form method="post" id="videoUploadForm">
         {% csrf_token %}
 
+        <!-- Hidden input for Cloudinary URL -->
+        {{ form.video_file_url }}
+
         {% if form.errors %}
             <div class="sv-error-summary" role="alert">
                 <strong>Some details need your attention.</strong>
@@ -786,27 +747,31 @@
 
                     <div class="sv-card-body">
                         <div class="sv-field">
-                            <label class="sv-label">
+                            <label class="sv-label" for="id_video_file">
                                 Choose your video <span class="sv-required">*</span>
                             </label>
-
-                            <!-- Hidden input to receive the Cloudinary URL -->
-                            {{ form.video_file_url }}
 
                             <div class="sv-dropzone" id="videoDropzone">
                                 <div class="sv-file-icon" aria-hidden="true">
                                     &#9654;
                                 </div>
-                                <h3 id="dropzoneTitle">Select your video</h3>
+                                <h3 id="dropzoneTitle">Drop your video here</h3>
                                 <p id="dropzoneText">
-                                    Click below to browse your device and upload directly to the cloud.
+                                    Select a video file from your device to get started.
                                 </p>
 
-                                <button type="button" class="sv-browse-button" id="upload_widget_opener">
+                                <!-- Standard file input, visually hidden but user clicks the label -->
+                                <input type="file" id="id_video_file" class="sv-file-input" accept="video/*">
+                                <label class="sv-browse-button" for="id_video_file">
                                     Browse files
-                                </button>
+                                </label>
 
                                 <div class="sv-file-name" id="selectedFileName"></div>
+                            </div>
+                            
+                            <!-- Custom Progress Bar for the background upload -->
+                            <div class="sv-progress-wrap" id="progressWrap">
+                                <div class="sv-progress-bar" id="progressBar"></div>
                             </div>
 
                             {% for error in form.video_file_url.errors %}
@@ -982,39 +947,14 @@
             </div>
 
             <aside class="sv-sidebar">
-
                 <section class="sv-sidebar-card">
                     <h2 class="sv-sidebar-title">Upload checklist</h2>
                     <div class="sv-sidebar-body">
                         <ul class="sv-checklist">
-                            <li>
-                                <span class="sv-check-icon">01</span>
-                                <div>
-                                    <strong>Select a video</strong>
-                                    <p>Choose the correct file from your device.</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="sv-check-icon">02</span>
-                                <div>
-                                    <strong>Add a title</strong>
-                                    <p>Make the topic easy to understand.</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="sv-check-icon">03</span>
-                                <div>
-                                    <strong>Set publishing status</strong>
-                                    <p>Publish your video or keep it as a draft.</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="sv-check-icon">04</span>
-                                <div>
-                                    <strong>Review and upload</strong>
-                                    <p>Check your details before submitting.</p>
-                                </div>
-                            </li>
+                            <li><span class="sv-check-icon">01</span><div><strong>Select a video</strong><p>Choose the correct file from your device.</p></div></li>
+                            <li><span class="sv-check-icon">02</span><div><strong>Add a title</strong><p>Make the topic easy to understand.</p></div></li>
+                            <li><span class="sv-check-icon">03</span><div><strong>Set publishing status</strong><p>Publish your video or keep it as a draft.</p></div></li>
+                            <li><span class="sv-check-icon">04</span><div><strong>Review and upload</strong><p>Check your details before submitting.</p></div></li>
                         </ul>
                     </div>
                 </section>
@@ -1024,103 +964,179 @@
                     <div class="sv-sidebar-body">
                         <div class="sv-tip">
                             <strong>Make your video stand out</strong>
-                            <p>
-                                A clear title and useful description help viewers
-                                understand what they are about to watch.
-                            </p>
+                            <p>A clear title and useful description help viewers understand what they are about to watch.</p>
                         </div>
                     </div>
                 </section>
-
             </aside>
-
         </div>
     </form>
 </main>
 
-<!-- Cloudinary Widget Script -->
-<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const uploadBtn = document.getElementById("upload_widget_opener");
-    const submitBtn = document.getElementById("uploadButton");
-    const fileNameBox = document.getElementById("selectedFileName");
+    const fileInput = document.getElementById("id_video_file");
+    const dropzone = document.getElementById("videoDropzone");
     const dropzoneTitle = document.getElementById("dropzoneTitle");
     const dropzoneText = document.getElementById("dropzoneText");
-    const videoPreview = document.getElementById("videoPreview");
-    const hiddenUrlInput = document.getElementById("id_video_file_url");
+    const fileNameBox = document.getElementById("selectedFileName");
+    const preview = document.getElementById("videoPreview");
     const premiumCheckbox = document.getElementById("id_is_premium");
     const priceField = document.getElementById("priceField");
+    const form = document.getElementById("videoUploadForm");
+    const uploadButton = document.getElementById("uploadButton");
+    const hiddenUrlInput = document.getElementById("id_video_file_url");
+    
+    const progressWrap = document.getElementById("progressWrap");
+    const progressBar = document.getElementById("progressBar");
 
-    // 1. Cloudinary Upload Logic
-    uploadBtn.addEventListener("click", async function (e) {
-        e.preventDefault();
-        uploadBtn.textContent = "Loading...";
-        
+    let previewUrl = null;
+
+    // 1. Handle file selection visually
+    function displaySelectedFile(file) {
+        if (!file || !fileInput) return;
+
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        fileNameBox.textContent = file.name;
+        fileNameBox.classList.add("is-visible");
+        dropzoneTitle.textContent = file.name;
+        dropzoneText.textContent = "Uploading to secure cloud storage...";
+
+        if (file.type && file.type.startsWith("video/")) {
+            previewUrl = URL.createObjectURL(file);
+            preview.src = previewUrl;
+            preview.style.display = "block";
+        } else {
+            preview.removeAttribute("src");
+            preview.style.display = "none";
+        }
+
+        // Trigger background upload automatically
+        uploadFileToCloudinary(file);
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            displaySelectedFile(file);
+        });
+    }
+
+    // Drag and drop support
+    if (dropzone && fileInput) {
+        ["dragenter", "dragover"].forEach(function (eventName) {
+            dropzone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropzone.classList.add("is-dragging");
+            });
+        });
+
+        ["dragleave", "drop"].forEach(function (eventName) {
+            dropzone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropzone.classList.remove("is-dragging");
+            });
+        });
+
+        dropzone.addEventListener("drop", function (event) {
+            const files = event.dataTransfer.files;
+            if (!files || !files.length) return;
+            try {
+                const transfer = new DataTransfer();
+                Array.from(files).forEach(file => transfer.items.add(file));
+                fileInput.files = transfer.files;
+                fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+            } catch (error) {}
+        });
+    }
+
+    // 2. Background Cloudinary Upload
+    async function uploadFileToCloudinary(file) {
+        uploadButton.disabled = true;
+        progressWrap.style.display = "block";
+        progressBar.style.width = "0%";
+
         try {
+            // Get signature from Django
             const response = await fetch("{% url 'videos:cloudinary_signature' %}");
             const data = await response.json();
-            
-            uploadBtn.textContent = "Browse files";
 
-            const widget = cloudinary.createUploadWidget({
-                cloudName: data.cloud_name,
-                apiKey: data.api_key,
-                uploadSignature: data.signature,
-                uploadSignatureTimestamp: data.timestamp,
-                folder: data.folder,
-                resourceType: "video",
-                clientAllowedFormats: ["mp4", "webm", "mov", "ogg"],
-                maxFileSize: 100000000, // 100MB limit
-            }, (error, result) => { 
-                if (!error && result && result.event === "success") { 
-                    // Save the secure URL to the hidden Django form field
-                    hiddenUrlInput.value = result.info.secure_url;
-                    
-                    // Update the UI to show success
-                    fileNameBox.textContent = "Uploaded: " + result.info.original_filename;
-                    fileNameBox.classList.add("is-visible");
-                    dropzoneTitle.textContent = "Video ready!";
-                    dropzoneText.textContent = "Your video has been securely uploaded.";
-                    
-                    videoPreview.src = result.info.secure_url;
-                    videoPreview.style.display = "block";
-                    
-                    // Unlock the submit button
-                    submitBtn.disabled = false;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("api_key", data.api_key);
+            formData.append("timestamp", data.timestamp);
+            formData.append("signature", data.signature);
+            formData.append("folder", data.folder);
+
+            // Send directly to Cloudinary
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", `https://api.cloudinary.com/v1_1/${data.cloud_name}/video/upload`, true);
+
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressBar.style.width = percentComplete + "%";
                 }
-            });
+            };
 
-            widget.open();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const res = JSON.parse(xhr.responseText);
+                    hiddenUrlInput.value = res.secure_url; // Store in hidden field
+                    
+                    dropzoneText.textContent = "Upload complete. Ready to publish.";
+                    progressWrap.style.display = "none";
+                    uploadButton.disabled = false; // Enable submit
+                } else {
+                    alert("Upload failed. Please try again.");
+                    progressWrap.style.display = "none";
+                    fileInput.value = "";
+                }
+            };
+
+            xhr.onerror = function () {
+                alert("Upload error. Please check your connection.");
+                progressWrap.style.display = "none";
+                fileInput.value = "";
+            };
+
+            xhr.send(formData);
+
         } catch (err) {
-            console.error("Failed to load upload widget", err);
-            uploadBtn.textContent = "Browse files";
-            alert("Error preparing upload. Please try again.");
+            console.error("Signature error", err);
+            alert("Could not prepare upload. Try again.");
+            progressWrap.style.display = "none";
         }
-    });
+    }
 
-    // 2. Premium Toggle Logic (Restored from your original design)
+    // 3. Premium toggle
     function updatePriceVisibility() {
-        if (premiumCheckbox && priceField) {
-            priceField.style.display = premiumCheckbox.checked ? "block" : "none";
-        }
+        if (!premiumCheckbox || !priceField) return;
+        priceField.style.display = premiumCheckbox.checked ? "block" : "none";
     }
     if (premiumCheckbox) {
         premiumCheckbox.addEventListener("change", updatePriceVisibility);
         updatePriceVisibility();
     }
 
-    // 3. Form Submit Validation
-    document.getElementById("videoUploadForm").addEventListener("submit", function (e) {
-        if (!hiddenUrlInput.value) {
-            e.preventDefault();
-            alert("Please wait for the video to finish uploading before submitting.");
-        } else {
-            submitBtn.textContent = "Saving...";
-            submitBtn.disabled = true;
-        }
-    });
+    // 4. Form submit
+    if (form && uploadButton) {
+        form.addEventListener("submit", function (event) {
+            if (!form.checkValidity()) return;
+            if (!hiddenUrlInput.value) {
+                event.preventDefault();
+                alert("Please wait for the upload to finish.");
+                return;
+            }
+            uploadButton.disabled = true;
+            uploadButton.textContent = "Saving...";
+        });
+    }
 });
 </script>
 {% endblock %}
