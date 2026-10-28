@@ -17,7 +17,7 @@ class Video(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 
-    # Changed to URLField to accept the Cloudinary Widget URL
+    # Cloudinary URL instead of a file upload
     video_file = models.URLField(max_length=500, help_text="Cloudinary Video URL")
 
     is_premium = models.BooleanField(default=False)
@@ -49,7 +49,6 @@ class Video(models.Model):
 
     @property
     def thumbnail_url(self):
-        """Generate a thumbnail automatically from the Cloudinary video URL."""
         if not self.video_file:
             return ""
         if self.video_file.endswith(('.mp4', '.webm', '.mov', '.avi')):
@@ -86,7 +85,7 @@ class VideoComment(models.Model):
         return f"Comment by {self.user} on {self.video}"
 
 
-# ADDED BACK: VideoPurchase Model
+# The missing model causing the build error
 class VideoPurchase(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name="purchases")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="video_purchases")
