@@ -1,5 +1,5 @@
 {
-  "buildCommand": "python manage.py makemigrations accounts videos streaming chat creators payments subscriptions earnings moderation --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
+  "buildCommand": "python manage.py migrate --noinput && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles_build",
   "rewrites": [
     {
