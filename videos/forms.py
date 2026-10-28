@@ -2,7 +2,6 @@ from django import forms
 from .models import Video
 
 class VideoForm(forms.ModelForm):
-    # This hidden field will hold the Cloudinary URL
     video_url = forms.URLField(
         widget=forms.HiddenInput(),
         required=True,
@@ -11,7 +10,6 @@ class VideoForm(forms.ModelForm):
 
     class Meta:
         model = Video
-        # Exclude video_file because the widget handles it
         fields = ["title", "description", "is_premium", "price", "status"]
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Give your video a title'}),
