@@ -1,453 +1,575 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}StreamSphere - Discover More{% endblock %}
+{% block title %}StreamSphere | Discover Videos, Creators and Live Streams{% endblock %}
+
+{% block meta_description %}
+Discover trending videos, follow your favourite creators, watch live streams and explore StreamSphere.
+{% endblock %}
 
 {% block extra_css %}
 <style>
-/* 
- * StreamSphere Home Page Layout
- * Extracted directly from the UI design. 
- * Uses no external icon libraries.
- */
- .sp-home {
-    --bg: #0b0d10;
-    --panel: #12151a;
-    --panel-hover: #191d24;
-    --line: #2b3039;
-    --text: #f4f6f8;
-    --muted: #9ba3af;
-    --orange: #ff7900;
-    --orange-hover: #e86e00;
-    --red: #ef4444;
+    /* ==============================
+       GLOBAL VARIABLES & LAYOUT
+    ============================== */
+    .home-wrapper {
+        --bg: #0b0d10;
+        --panel: #12151a;
+        --panel-hover: #191d24;
+        --border: #2b3039;
+        --text: #f4f6f8;
+        --muted: #9ba3af;
+        --orange: #ff7900;
+        --orange-hover: #e86e00;
+        --red: #ef4444;
+        
+        display: flex;
+        max-width: 1600px;
+        margin: 0 auto;
+        min-height: calc(100vh - 60px);
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .home-wrapper * { box-sizing: border-box; }
+    .home-wrapper a { text-decoration: none; color: inherit; }
+
+    /* ==============================
+       SIDEBAR
+    ============================== */
+    .home-sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+        padding: 20px 0;
+        display: none; /* Hidden on mobile */
+        background: var(--bg);
+    }
+    @media (min-width: 1024px) {
+        .home-sidebar { display: block; }
+    }
+
+    .sidebar-group { margin-bottom: 24px; }
+    .sidebar-title {
+        font-size: 10px; font-weight: 800; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 1px;
+        padding: 0 24px; margin-bottom: 8px;
+    }
+    .sidebar-link {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 24px; font-size: 13px; font-weight: 600;
+        color: var(--text); transition: background 0.2s;
+    }
+    .sidebar-link:hover { background: var(--panel); }
+    .sidebar-link.active {
+        background: rgba(255,121,0,0.1); color: var(--orange);
+        border-left: 3px solid var(--orange);
+    }
+    .sidebar-badge {
+        background: var(--red); color: #fff;
+        font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ==============================
+       MAIN CONTENT AREA
+    ============================== */
+    .home-main {
+        flex: 1; min-width: 0; padding: 24px;
+        display: flex; flex-direction: column; gap: 32px;
+    }
+
+    /* ==============================
+       HERO SECTION
+    ============================== */
+    .home-hero {
+        position: relative; display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+        min-height: 330px; overflow: hidden;
+        background: linear-gradient(135deg, #111419 0%, #1a1e26 100%);
+        border: 1px solid var(--border); border-radius: 8px;
+    }
+
+    .home-hero-content {
+        position: relative; z-index: 2;
+        display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+        padding: clamp(20px, 4vw, 45px);
+    }
+
+    .home-eyebrow {
+        display: inline-flex; align-items: center; gap: 9px;
+        margin-bottom: 18px; color: var(--orange);
+        font-size: 11px; font-weight: 850; letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .home-eyebrow::before { width: 24px; height: 2px; background: var(--orange); content: ""; }
+
+    .home-hero-title {
+        max-width: 650px; margin: 0;
+        font-size: clamp(30px, 4vw, 48px); font-weight: 850; letter-spacing: -1.5px; line-height: 1.1;
+    }
+    .home-hero-title span { color: var(--orange); }
+
+    .home-hero-description {
+        max-width: 500px; margin: 16px 0 24px;
+        color: #d1d5db; font-size: 14px; line-height: 1.6;
+    }
+
+    .home-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .home-hero-visual {
+        position: relative; min-height: 100%; overflow: hidden;
+    }
+    .home-hero-visual img {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; object-position: top center; opacity: 0.85;
+        mask-image: linear-gradient(to right, transparent 0%, #000 40%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 40%);
+        z-index: 2;
+    }
+
+    /* ==============================
+       BUTTONS
+    ============================== */
+    .ss-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 12px 24px; border-radius: 4px; font-size: 13px; font-weight: 700;
+        transition: all 0.2s; border: 1px solid transparent; cursor: pointer; text-decoration: none;
+    }
+    .ss-btn-primary { background: var(--orange); color: #111; }
+    .ss-btn-primary:hover { background: var(--orange-hover); }
+    .ss-btn-outline { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.2); }
+    .ss-btn-outline:hover { background: rgba(255,255,255,0.15); }
+    .ss-btn-lg { padding: 14px 28px; font-size: 14px; }
+
+    /* ==============================
+       DISCOVERY PILLS
+    ============================== */
+    .home-discovery {
+        display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+        scrollbar-width: none; margin-top: -10px;
+    }
+    .home-discovery::-webkit-scrollbar { display: none; }
+    .home-chip {
+        white-space: nowrap; padding: 8px 16px; border-radius: 4px;
+        background: var(--panel); border: 1px solid var(--border);
+        font-size: 12px; font-weight: 600; color: var(--text);
+        transition: background 0.2s; text-decoration: none;
+    }
+    .home-chip:hover { background: var(--panel-hover); }
+    .home-chip.is-active {
+        background: rgba(255,121,0,0.1); border-color: var(--orange); color: var(--orange);
+    }
+
+    /* ==============================
+       SECTION HEADERS
+    ============================== */
+    .home-section { margin-top: 10px; }
+    .home-section-header {
+        display: flex; align-items: flex-end; justify-content: space-between;
+        margin-bottom: 20px; padding-left: 14px; position: relative;
+    }
+    .home-section-header::before {
+        content: ''; position: absolute; left: 0; top: 2px; bottom: 4px;
+        width: 4px; background: var(--orange); border-radius: 2px;
+    }
+    .home-section-title { margin: 0; font-size: 20px; font-weight: 800; }
+    .home-section-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .home-view-all { font-size: 12px; font-weight: 600; color: var(--orange); }
+    .home-view-all:hover { text-decoration: underline; }
+
+    /* ==============================
+       VIDEO GRIDS & CARDS
+    ============================== */
+    .home-video-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;
+    }
+    .home-video-card { display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
     
-    min-height: calc(100vh - 60px);
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+    .home-thumb {
+        position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
+        background: var(--panel); border: 1px solid var(--border); display: block;
+    }
+    .home-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .home-video-card:hover .home-thumb img { transform: scale(1.03); }
+    
+    .home-thumb-placeholder {
+        display: flex; align-items: center; justify-content: center; height: 100%;
+        background: #151b22; color: #38414c; font-size: 28px; font-weight: 900;
+    }
 
-.sp-home a { text-decoration: none; color: inherit; }
-.sp-home button { font-family: inherit; cursor: pointer; border: none; }
+    .home-duration {
+        position: absolute; bottom: 8px; right: 8px;
+        background: rgba(0,0,0,0.8); color: #fff;
+        padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    .home-video-badge {
+        position: absolute; top: 8px; left: 8px;
+        background: var(--orange); color: #111;
+        padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+    }
+    .home-video-badge.premium { background: #f1c75b; }
 
-.sp-layout {
-    display: flex;
-    max-width: 1400px;
-    margin: 0 auto;
-}
+    .home-thumb-overlay {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: rgba(0,0,0,0); transition: background 0.2s;
+    }
+    .home-play-button {
+        display: grid; place-items: center; width: 44px; height: 44px;
+        background: var(--orange); color: #111; border-radius: 50%;
+        opacity: 0; transform: translateY(5px); transition: all 0.2s;
+    }
+    .home-play-button svg { width: 18px; height: 18px; margin-left: 2px; }
+    .home-video-card:hover .home-thumb-overlay { background: rgba(0,0,0,0.24); }
+    .home-video-card:hover .home-play-button { opacity: 1; transform: translateY(0); }
 
-/* ==================== SIDEBAR ==================== */
-.sp-sidebar {
-    width: 240px;
-    flex-shrink: 0;
-    border-right: 1px solid var(--line);
-    padding: 20px 0;
-    display: none; /* Hidden on mobile */
-}
-@media (min-width: 1024px) {
-    .sp-sidebar { display: block; }
-}
+    .home-video-info { display: flex; gap: 12px; }
+    .home-video-avatar {
+        width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+        background: #252a32; border: 1px solid var(--border); overflow: hidden;
+        display: grid; place-items: center; font-size: 14px; font-weight: 800; color: var(--text);
+    }
+    .home-video-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .home-video-copy { flex: 1; min-width: 0; }
+    .home-video-title {
+        margin: 0 0 4px; font-size: 14px; font-weight: 700; line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .home-video-title a:hover { color: var(--orange); }
+    .home-video-creator { display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+    .home-video-meta { display: block; color: var(--muted); font-size: 12px; }
 
-.sp-nav-group { margin-bottom: 24px; }
-.sp-nav-title {
-    font-size: 10px; font-weight: 800; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 1px;
-    padding: 0 24px; margin-bottom: 8px;
-}
-.sp-nav-link {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 24px; font-size: 13px; font-weight: 600;
-    color: var(--text); transition: background 0.2s;
-}
-.sp-nav-link:hover { background: var(--panel); }
-.sp-nav-link.active {
-    background: rgba(255,121,0,0.1); color: var(--orange);
-    border-left: 3px solid var(--orange);
-}
-.sp-nav-badge {
-    background: var(--red); color: #fff;
-    font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
-}
+    /* ==============================
+       LIVE STRIP
+    ============================== */
+    .home-live-strip {
+        background: linear-gradient(90deg, #2a1612 0%, #151a22 100%);
+        border: 1px solid #4b3322; border-radius: 8px;
+        padding: 24px 32px; display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 20px; position: relative; overflow: hidden;
+    }
+    .home-live-strip::before {
+        content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
+        background: radial-gradient(circle at right, rgba(255,121,0,0.15), transparent 70%);
+        pointer-events: none;
+    }
+    .home-live-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .home-live-dot {
+        width: 10px; height: 10px; border-radius: 50%; background: var(--red);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+    .home-live-title { margin: 0; font-size: 20px; font-weight: 800; }
+    .home-live-description { margin: 0; color: var(--muted); font-size: 13px; }
 
-/* ==================== MAIN CONTENT ==================== */
-.sp-main {
-    flex: 1; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 32px;
-}
+    /* ==============================
+       CREATOR BANNER
+    ============================== */
+    .home-creator-banner {
+        background: var(--panel); border: 1px solid var(--orange);
+        border-radius: 8px; padding: 24px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 20px; margin-top: 12px;
+    }
+    .home-creator-banner h2 { margin: 0 0 6px; font-size: 18px; font-weight: 800; }
+    .home-creator-banner h2 span { color: var(--orange); }
+    .home-creator-banner p { margin: 0; font-size: 12px; color: var(--muted); max-width: 450px; line-height: 1.5; }
+    .home-creator-banner-actions { display: flex; gap: 12px; }
 
-/* ==================== HERO SECTION ==================== */
-.sp-hero {
-    position: relative; border-radius: 8px; overflow: hidden;
-    background: linear-gradient(135deg, #111419 0%, #1a1e26 100%);
-    border: 1px solid var(--line);
-    display: flex; align-items: center; min-height: 280px;
-}
-/* Placeholder for the actual background image */
-.sp-hero-bg {
-    position: absolute; inset: 0; z-index: 1;
-    background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop'); 
-    background-size: cover; background-position: center;
-    opacity: 0.6;
-}
-.sp-hero-overlay {
-    position: absolute; inset: 0; z-index: 2;
-    background: linear-gradient(90deg, #0b0d10 0%, rgba(11,13,16,0.8) 45%, transparent 100%);
-}
-.sp-hero-content {
-    position: relative; z-index: 3; padding: 40px; max-width: 550px;
-}
-.sp-hero h1 {
-    font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.1;
-    margin: 0 0 12px; letter-spacing: -1px;
-}
-.sp-hero h1 span { color: var(--orange); }
-.sp-hero p {
-    color: #d1d5db; font-size: 14px; line-height: 1.6; margin: 0 0 24px;
-}
-.sp-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.sp-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 12px 24px; border-radius: 4px; font-size: 13px; font-weight: 700;
-    transition: all 0.2s;
-}
-.sp-btn-primary { background: var(--orange); color: #111; }
-.sp-btn-primary:hover { background: var(--orange-hover); }
-.sp-btn-secondary { 
-    background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
-    backdrop-filter: blur(4px);
-}
-.sp-btn-secondary:hover { background: rgba(255,255,255,0.15); }
-
-/* ==================== CATEGORY PILLS ==================== */
-.sp-categories {
-    display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
-    scrollbar-width: none;
-}
-.sp-categories::-webkit-scrollbar { display: none; }
-.sp-pill {
-    white-space: nowrap; padding: 8px 16px; border-radius: 4px;
-    background: var(--panel); border: 1px solid var(--line);
-    font-size: 12px; font-weight: 600; color: var(--text);
-    display: flex; align-items: center; gap: 8px; transition: background 0.2s;
-}
-.sp-pill:hover { background: var(--panel-hover); }
-.sp-pill.active {
-    background: rgba(255,121,0,0.1); border-color: var(--orange); color: var(--orange);
-}
-
-/* ==================== SECTIONS & GRIDS ==================== */
-.sp-section-header {
-    display: flex; justify-content: space-between; align-items: flex-end;
-    margin-bottom: 20px; padding-left: 14px; position: relative;
-}
-/* The orange accent line */
-.sp-section-header::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 4px;
-    width: 4px; background: var(--orange); border-radius: 2px;
-}
-.sp-section-title-group h2 { margin: 0; font-size: 20px; font-weight: 800; }
-.sp-section-title-group p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-.sp-view-all {
-    font-size: 12px; font-weight: 600; color: var(--orange);
-    display: flex; align-items: center; gap: 4px;
-}
-.sp-view-all:hover { text-decoration: underline; }
-
-.sp-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;
-}
-
-/* ==================== VIDEO CARDS ==================== */
-.sp-video-card { display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
-.sp-thumb-wrap {
-    position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
-    background: var(--panel); border: 1px solid var(--line);
-}
-.sp-thumb-wrap img {
-    width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;
-}
-.sp-video-card:hover .sp-thumb-wrap img { transform: scale(1.03); }
-.sp-duration {
-    position: absolute; bottom: 8px; right: 8px;
-    background: rgba(0,0,0,0.8); color: #fff;
-    padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;
-}
-
-.sp-video-info { display: flex; gap: 12px; }
-.sp-channel-avatar {
-    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-    background: #252a32; border: 1px solid var(--line); overflow: hidden;
-}
-.sp-channel-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sp-video-text { flex: 1; min-width: 0; }
-.sp-video-title {
-    margin: 0 0 4px; font-size: 14px; font-weight: 700; line-height: 1.4;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.sp-video-meta {
-    display: flex; flex-direction: column; gap: 2px; color: var(--muted); font-size: 12px;
-}
-.sp-channel-name { display: flex; align-items: center; gap: 4px; font-weight: 600; }
-/* CSS checkmark badge instead of FontAwesome */
-.sp-verified {
-    display: inline-block; width: 12px; height: 12px; border-radius: 50%;
-    background: var(--muted); position: relative;
-}
-.sp-verified::after {
-    content: ''; position: absolute; left: 4px; top: 2px;
-    width: 3px; height: 6px; border: solid var(--bg); border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-.sp-dot { font-size: 16px; line-height: 1; color: var(--muted); margin-left: auto; }
-
-/* ==================== LIVE BANNER ==================== */
-.sp-live-banner {
-    background: linear-gradient(90deg, #2a1612 0%, #151a22 100%);
-    border: 1px solid #4b3322; border-radius: 8px;
-    padding: 24px 32px; display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 20px; position: relative; overflow: hidden;
-}
-/* subtle glow effect */
-.sp-live-banner::before {
-    content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
-    background: radial-gradient(circle at right, rgba(255,121,0,0.15), transparent 70%);
-    pointer-events: none;
-}
-.sp-live-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--red); color: #fff; padding: 4px 10px; border-radius: 4px;
-    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-    margin-bottom: 12px;
-}
-.sp-live-banner h3 { margin: 0 0 8px; font-size: 20px; font-weight: 800; }
-.sp-live-banner p { margin: 0; color: var(--muted); font-size: 13px; max-width: 400px; }
-
-/* ==================== BOTTOM CTA ==================== */
-.sp-cta-box {
-    background: var(--panel); border: 1px solid var(--orange);
-    border-radius: 8px; padding: 24px 32px;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 20px; margin-top: 12px;
-}
-.sp-cta-content { display: flex; align-items: center; gap: 20px; }
-.sp-cta-icon-fallback {
-    width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--orange);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.sp-cta-icon-fallback::before {
-    content: ''; width: 16px; height: 16px; border: 2px solid var(--orange); border-radius: 50%;
-}
-.sp-cta-icon-fallback::after {
-    content: ''; position: absolute; width: 22px; height: 2px; background: var(--orange); transform: rotate(45deg);
-}
-.sp-cta-box h3 { margin: 0 0 6px; font-size: 18px; font-weight: 800; }
-.sp-cta-box h3 span { color: var(--orange); }
-.sp-cta-box p { margin: 0; font-size: 12px; color: var(--muted); max-width: 450px; line-height: 1.5; }
-
-.sp-cta-actions { display: flex; gap: 12px; }
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+    @media (max-width: 1024px) {
+        .home-hero { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.65fr); }
+    }
+    @media (max-width: 760px) {
+        .home-main { padding: 16px; gap: 24px; }
+        .home-hero {
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+            min-height: 300px;
+        }
+        .home-hero-content { padding: 20px; }
+        .home-hero-title { font-size: 26px; }
+        .home-hero-description { font-size: 12px; }
+        .home-hero-actions { flex-direction: column; width: 100%; }
+        .home-hero-actions .ss-btn { width: 100%; }
+        .home-hero-visual img { mask-image: linear-gradient(to right, transparent 0%, #000 30%); -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 30%); object-position: center; }
+        .home-video-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .home-live-strip { padding: 18px; flex-direction: column; align-items: flex-start; }
+        .home-live-strip .ss-btn { width: 100%; }
+        .home-creator-banner { flex-direction: column; align-items: flex-start; }
+        .home-creator-banner-actions { width: 100%; }
+        .home-creator-banner-actions .ss-btn { flex: 1; }
+    }
+    @media (max-width: 400px) {
+        .home-video-grid { grid-template-columns: 1fr; }
+        .home-hero-description { display: none; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="sp-home">
-  <div class="sp-layout">
+<div class="home-wrapper">
     
-    <!-- SIDEBAR -->
-    <aside class="sp-sidebar">
-      <div class="sp-nav-group">
-        <a href="#" class="sp-nav-link active">
-          <span>Explore videos</span>
-        </a>
-        <a href="#" class="sp-nav-link">
-          <span>Live streams</span>
-          <span class="sp-nav-badge">Live</span>
-        </a>
-        <a href="#" class="sp-nav-link">
-          <span>Subscriptions</span>
-        </a>
-      </div>
+    <!-- SIDEBAR (From Screenshot) -->
+    <aside class="home-sidebar">
+        <div class="sidebar-group">
+            <a href="{% url 'videos:list' %}" class="sidebar-link active">
+                <span>Explore videos</span>
+            </a>
+            <a href="{% url 'streaming:list' %}" class="sidebar-link">
+                <span>Live streams</span>
+                <span class="sidebar-badge">Live</span>
+            </a>
+            <a href="#" class="sidebar-link">
+                <span>Subscriptions</span>
+            </a>
+        </div>
 
-      <div class="sp-nav-group">
-        <div class="sp-nav-title">Your Space</div>
-        <a href="{% url 'accounts:profile' %}" class="sp-nav-link">My profile</a>
-        <a href="#" class="sp-nav-link">Messages</a>
-      </div>
+        <div class="sidebar-group">
+            <div class="sidebar-title">Your Space</div>
+            <a href="{% if user.is_authenticated %}{% url 'accounts:profile' %}{% else %}{% url 'account_login' %}{% endif %}" class="sidebar-link">My profile</a>
+            <a href="{% url 'chat:inbox' %}" class="sidebar-link">Messages</a>
+        </div>
 
-      <div class="sp-nav-group">
-        <div class="sp-nav-title">Creator Studio</div>
-        <a href="#" class="sp-nav-link">Upload video</a>
-        <a href="#" class="sp-nav-link">My live streams</a>
-        <a href="#" class="sp-nav-link">Earnings</a>
-        <a href="#" class="sp-nav-link">Payments</a>
-      </div>
-      
-      <div class="sp-nav-group" style="margin-top: auto; padding-top: 20px;">
-        <a href="#" class="sp-nav-link">Settings</a>
-      </div>
+        <div class="sidebar-group">
+            <div class="sidebar-title">Creator Studio</div>
+            <a href="{% url 'videos:upload' %}" class="sidebar-link">Upload video</a>
+            <a href="#" class="sidebar-link">My live streams</a>
+            <a href="{% url 'earnings:dashboard' %}" class="sidebar-link">Earnings</a>
+            <a href="#" class="sidebar-link">Payments</a>
+        </div>
+        
+        <div class="sidebar-group" style="margin-top: auto;">
+            <a href="#" class="sidebar-link">Settings</a>
+        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="sp-main">
-      
-      <!-- HERO SECTION -->
-      <section class="sp-hero">
-        <div class="sp-hero-bg"></div>
-        <div class="sp-hero-overlay"></div>
-        <div class="sp-hero-content">
-          <h1>Discover more.<br><span>Watch without limits.</span></h1>
-          <p>Explore videos from independent creators, discover new channels, join live streams and find the content worth coming back for.</p>
-          <div class="sp-hero-actions">
-            <a href="#" class="sp-btn sp-btn-primary">Explore videos &rarr;</a>
-            <a href="#" class="sp-btn sp-btn-secondary">Upload a video</a>
-          </div>
-        </div>
-      </section>
-
-      <!-- CATEGORIES -->
-      <div class="sp-categories">
-        <button class="sp-pill active">All videos</button>
-        <button class="sp-pill">Live streams</button>
-        <button class="sp-pill">Popular</button>
-        <button class="sp-pill">Latest</button>
-        <button class="sp-pill">Entertainment</button>
-        <button class="sp-pill">Education</button>
-        <button class="sp-pill">Music</button>
-      </div>
-
-      <!-- TRENDING NOW -->
-      <section>
-        <div class="sp-section-header">
-          <div class="sp-section-title-group">
-            <h2>Trending now</h2>
-            <p>Videos people are watching</p>
-          </div>
-          <a href="#" class="sp-view-all">View all &rarr;</a>
-        </div>
+    <main class="home-main">
         
-        <div class="sp-grid">
-          <!-- Video Card 1 -->
-          <div class="sp-video-card">
-            <div class="sp-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1000&auto=format&fit=crop" alt="Solo Travel">
-              <span class="sp-duration">12:48</span>
-            </div>
-            <div class="sp-video-info">
-              <div class="sp-channel-avatar">
-                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-              </div>
-              <div class="sp-video-text">
-                <h3 class="sp-video-title">Solo Travel: Finding Peace in Nature</h3>
-                <div class="sp-video-meta">
-                  <span class="sp-channel-name">WanderLens <span class="sp-verified"></span></span>
-                  <span>3.2M views &bull; 2 days ago</span>
+        <section class="home-hero">
+            <div class="home-hero-content">
+                <div class="home-eyebrow">Your world. Your videos.</div>
+                <h1 class="home-hero-title">
+                    Discover more.<br>
+                    <span>Watch without limits.</span>
+                </h1>
+                <p class="home-hero-description">
+                    Explore videos from independent creators, discover new channels,
+                    join live streams and find the content worth coming back for.
+                </p>
+                <div class="home-hero-actions">
+                    <a href="{% url 'videos:list' %}" class="ss-btn ss-btn-primary ss-btn-lg">
+                        Explore videos
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-outline ss-btn-lg">
+                            Upload a video
+                        </a>
+                    {% else %}
+                        <a href="{% url 'account_signup' %}" class="ss-btn ss-btn-outline ss-btn-lg">
+                            Become a creator
+                        </a>
+                    {% endif %}
                 </div>
-              </div>
-              <span class="sp-dot">&bull;&bull;&bull;</span>
             </div>
-          </div>
+            <div class="home-hero-visual" aria-hidden="true">
+                <img src="{% static 'images/hero-bg.jpg' %}" alt="StreamSphere Hero Visual">
+            </div>
+        </section>
 
-          <!-- Video Card 2 -->
-          <div class="sp-video-card">
-            <div class="sp-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop" alt="Productivity">
-              <span class="sp-duration">08:36</span>
-            </div>
-            <div class="sp-video-info">
-              <div class="sp-channel-avatar">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-              </div>
-              <div class="sp-video-text">
-                <h3 class="sp-video-title">5 Productivity Tips for a Better You</h3>
-                <div class="sp-video-meta">
-                  <span class="sp-channel-name">Mindful Living <span class="sp-verified"></span></span>
-                  <span>1.1M views &bull; 1 day ago</span>
+        <nav class="home-discovery" aria-label="Video categories">
+            <a href="{% url 'videos:list' %}" class="home-chip is-active">All videos</a>
+            <a href="{% url 'streaming:list' %}" class="home-chip">Live streams</a>
+            <a href="{% url 'videos:list' %}?sort=popular" class="home-chip">Popular</a>
+            <a href="{% url 'videos:list' %}?sort=latest" class="home-chip">Latest</a>
+            <a href="{% url 'videos:list' %}?category=entertainment" class="home-chip">Entertainment</a>
+            <a href="{% url 'videos:list' %}?category=education" class="home-chip">Education</a>
+            <a href="{% url 'videos:list' %}?category=music" class="home-chip">Music</a>
+            <a href="{% url 'videos:list' %}?category=gaming" class="home-chip">Gaming</a>
+        </nav>
+
+        <section class="home-section">
+            <div class="home-section-header">
+                <div>
+                    <h2 class="home-section-title">Trending now</h2>
+                    <p class="home-section-subtitle">Videos people are watching</p>
                 </div>
-              </div>
-              <span class="sp-dot">&bull;&bull;&bull;</span>
+                <a href="{% url 'videos:list' %}?sort=popular" class="home-view-all">
+                    View all &rarr;
+                </a>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- LIVE BANNER -->
-      <section class="sp-live-banner">
-        <div>
-          <span class="sp-live-badge">Live</span>
-          <h3>Live on StreamSphere</h3>
-          <p>Join creators broadcasting right now, or prepare your next stream.</p>
-        </div>
-        <a href="#" class="sp-btn sp-btn-primary">Explore live streams &rarr;</a>
-      </section>
+            <div class="home-video-grid">
+                {% for video in trending_videos %}
+                    <article class="home-video-card">
+                        <a href="{% url 'videos:detail' video.pk %}" class="home-thumb">
+                            {% if video.thumbnail_url %}
+                                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" loading="lazy">
+                            {% else %}
+                                <div class="home-thumb-placeholder"><span>SS</span></div>
+                            {% endif %}
 
-      <!-- RECENTLY UPLOADED -->
-      <section>
-        <div class="sp-section-header">
-          <div class="sp-section-title-group">
-            <h2>Recently uploaded</h2>
-            <p>The latest videos from creators</p>
-          </div>
-          <a href="#" class="sp-view-all">View all &rarr;</a>
-        </div>
-        
-        <div class="sp-grid">
-          <!-- Video Card 3 -->
-          <div class="sp-video-card">
-            <div class="sp-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000&auto=format&fit=crop" alt="Coffee">
-              <span class="sp-duration">10:24</span>
+                            <span class="home-thumb-overlay" aria-hidden="true">
+                                <span class="home-play-button">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 5v14l11-7z"></path>
+                                    </svg>
+                                </span>
+                            </span>
+
+                            {% if video.duration %}
+                                <span class="home-duration">{{ video.duration }}</span>
+                            {% endif %}
+
+                            {% if video.is_premium %}
+                                <span class="home-video-badge premium">Premium</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="home-video-info">
+                            <a class="home-video-avatar" href="{% url 'creators:profile' video.creator.username %}">
+                                {% if video.creator.profile.avatar_image %}
+                                    <img src="{{ video.creator.profile.avatar_image.url }}" alt="" loading="lazy">
+                                {% elif video.creator.profile.avatar %}
+                                    <img src="{{ video.creator.profile.avatar }}" alt="" loading="lazy">
+                                {% else %}
+                                    {{ video.creator.username|first|upper }}
+                                {% endif %}
+                            </a>
+
+                            <div class="home-video-copy">
+                                <h3 class="home-video-title">
+                                    <a href="{% url 'videos:detail' video.pk %}">{{ video.title }}</a>
+                                </h3>
+                                <a class="home-video-creator" href="{% url 'creators:profile' video.creator.username %}">
+                                    {{ video.creator.get_full_name|default:video.creator.username }}
+                                </a>
+                                <span class="home-video-meta">
+                                    {{ video.views|default:0 }} views &bull; {{ video.created_at|timesince }} ago
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="ss-empty" style="grid-column:1/-1; text-align: center; padding: 40px; background: var(--panel); border: 1px dashed var(--border); border-radius: 8px;">
+                        <h3>Fresh content is on its way</h3>
+                        <p style="color: var(--muted); margin-bottom: 20px;">There are no published videos to display yet.</p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload your first video</a>
+                        {% else %}
+                            <a href="{% url 'account_signup' %}" class="ss-btn ss-btn-primary">Join StreamSphere</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-            <div class="sp-video-info">
-              <div class="sp-channel-avatar">
-                <img src="https://images.unsplash.com/photo-1511556820780-d912e42b4980?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-              </div>
-              <div class="sp-video-text">
-                <h3 class="sp-video-title">The Perfect Coffee at Home (Quick & Easy)</h3>
-                <div class="sp-video-meta">
-                  <span class="sp-channel-name">Foodie Guide <span class="sp-verified"></span></span>
-                  <span>856K views &bull; 5 hours ago</span>
+        </section>
+
+        <section class="home-section">
+            <div class="home-live-strip">
+                <div>
+                    <div class="home-live-heading">
+                        <span class="home-live-dot"></span>
+                        <h2 class="home-live-title">Live on StreamSphere</h2>
+                    </div>
+                    <p class="home-live-description">
+                        Join creators broadcasting right now, or prepare your next stream.
+                    </p>
                 </div>
-              </div>
-              <span class="sp-dot">&bull;&bull;&bull;</span>
+                <a href="{% url 'streaming:list' %}" class="ss-btn ss-btn-primary">
+                    Explore live streams &rarr;
+                </a>
             </div>
-          </div>
+        </section>
 
-          <!-- Video Card 4 -->
-          <div class="sp-video-card">
-            <div class="sp-thumb-wrap">
-              <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1000&auto=format&fit=crop" alt="City">
-              <span class="sp-duration">14:32</span>
-            </div>
-            <div class="sp-video-info">
-              <div class="sp-channel-avatar">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" alt="Avatar">
-              </div>
-              <div class="sp-video-text">
-                <h3 class="sp-video-title">City Adventures: Hidden Gems You Need to See</h3>
-                <div class="sp-video-meta">
-                  <span class="sp-channel-name">Travel Vibes <span class="sp-verified"></span></span>
-                  <span>1.4M views &bull; 12 hours ago</span>
+        <section class="home-section">
+            <div class="home-section-header">
+                <div>
+                    <h2 class="home-section-title">Recently uploaded</h2>
+                    <p class="home-section-subtitle">The latest videos from creators</p>
                 </div>
-              </div>
-              <span class="sp-dot">&bull;&bull;&bull;</span>
+                <a href="{% url 'videos:list' %}?sort=latest" class="home-view-all">
+                    View all &rarr;
+                </a>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- BOTTOM CTA -->
-      <section class="sp-cta-box">
-        <div class="sp-cta-content">
-          <div class="sp-cta-icon-fallback" style="position: relative;"></div>
-          <div>
-            <h3>Build your audience on <span>StreamSphere</span></h3>
-            <p>Share your videos, grow your community, connect with viewers and explore creator tools designed to help you develop your channel.</p>
-          </div>
-        </div>
-        <div class="sp-cta-actions">
-          <a href="#" class="sp-btn sp-btn-primary">Upload video</a>
-          <a href="#" class="sp-btn sp-btn-secondary" style="color: var(--text); border-color: var(--line);">Creator dashboard</a>
-        </div>
-      </section>
+            <div class="home-video-grid">
+                {% for video in recent_videos %}
+                    <article class="home-video-card">
+                        <a href="{% url 'videos:detail' video.pk %}" class="home-thumb">
+                            {% if video.thumbnail_url %}
+                                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" loading="lazy">
+                            {% else %}
+                                <div class="home-thumb-placeholder"><span>SS</span></div>
+                            {% endif %}
+
+                            <span class="home-thumb-overlay" aria-hidden="true">
+                                <span class="home-play-button">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 5v14l11-7z"></path>
+                                    </svg>
+                                </span>
+                            </span>
+
+                            {% if video.is_premium %}
+                                <span class="home-video-badge premium">Premium</span>
+                            {% endif %}
+
+                            {% if video.duration %}
+                                <span class="home-duration">{{ video.duration }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="home-video-info">
+                            <a class="home-video-avatar" href="{% url 'creators:profile' video.creator.username %}">
+                                {% if video.creator.profile.avatar_image %}
+                                    <img src="{{ video.creator.profile.avatar_image.url }}" alt="" loading="lazy">
+                                {% elif video.creator.profile.avatar %}
+                                    <img src="{{ video.creator.profile.avatar }}" alt="" loading="lazy">
+                                {% else %}
+                                    {{ video.creator.username|first|upper }}
+                                {% endif %}
+                            </a>
+
+                            <div class="home-video-copy">
+                                <h3 class="home-video-title">
+                                    <a href="{% url 'videos:detail' video.pk %}">{{ video.title }}</a>
+                                </h3>
+                                <a class="home-video-creator" href="{% url 'creators:profile' video.creator.username %}">
+                                    {{ video.creator.get_full_name|default:video.creator.username }}
+                                </a>
+                                <span class="home-video-meta">
+                                    {{ video.views|default:0 }} views &bull; {{ video.created_at|timesince }} ago
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p class="ss-muted" style="color: var(--muted);">No recent uploads to display yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="home-section">
+            <div class="home-creator-banner">
+                <div>
+                    <h2>Build your audience on <span>StreamSphere</span></h2>
+                    <p>
+                        Share your videos, grow your community, connect with viewers
+                        and explore creator tools designed to help you develop your channel.
+                    </p>
+                </div>
+                <div class="home-creator-banner-actions">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload video</a>
+                        <a href="{% url 'earnings:dashboard' %}" class="ss-btn ss-btn-outline" style="border-color: var(--border);">Creator dashboard</a>
+                    {% else %}
+                        <a href="{% url 'account_signup' %}" class="ss-btn ss-btn-primary">Create an account</a>
+                        <a href="{% url 'account_login' %}" class="ss-btn ss-btn-outline" style="border-color: var(--border);">Sign in</a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
 
     </main>
-  </div>
 </div>
 {% endblock %}
