@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -6,777 +5,323 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --cp-bg: #0b0b0d;
-        --cp-panel: #121215;
-        --cp-panel-hover: #19191e;
-        --cp-border: #29292f;
-        --cp-text: #f5f5f7;
-        --cp-muted: #96969f;
-        --cp-orange: #ff7900;
-        --cp-orange-light: #ff9638;
-    }
-
-    .cp-page, .cp-page * { box-sizing: border-box; }
-
+    /* ==============================
+       PAGE VARIABLES
+    ============================== */
     .cp-page {
-        min-height: 100vh;
-        padding: 26px 24px 60px;
-        background: var(--cp-bg);
-        color: var(--cp-text);
-    }
-
-    .cp-container {
+        --panel: #12151a;
+        --border: #2b3039;
+        --text: #f4f6f8;
+        --muted: #9ba3af;
+        --orange: #ff7900;
+        --orange-hover: #e86e00;
+        
         width: 100%;
-        max-width: 1440px;
+        max-width: 1200px;
         margin: 0 auto;
+        padding-bottom: 40px;
+        color: var(--text);
     }
 
-    .cp-breadcrumbs {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 22px;
-        color: var(--cp-muted);
-        font-size: 12px;
-    }
+    .cp-page * { box-sizing: border-box; }
+    .cp-page a { text-decoration: none; color: inherit; }
 
-    .cp-breadcrumbs a {
-        color: var(--cp-muted);
-        text-decoration: none;
+    /* ==============================
+       PROFILE HEADER
+    ============================== */
+    .cp-header {
+        position: relative;
+        background: linear-gradient(135deg, #111419 0%, #1a1e26 100%);
+        border: 1px solid var(--border);
+        border-radius: 0;
+        overflow: hidden;
+        margin-bottom: 24px;
     }
-
-    .cp-breadcrumbs a:hover { color: var(--cp-orange); }
 
     .cp-cover {
-        position: relative;
-        height: 250px;
-        overflow: hidden;
-        border: 1px solid var(--cp-border);
-        border-radius: 12px 12px 0 0;
-        background:
-            radial-gradient(circle at 80% 20%, rgba(255,121,0,.22), transparent 32%),
-            radial-gradient(circle at 20% 100%, rgba(255,121,0,.12), transparent 40%),
-            linear-gradient(135deg, #252529, #101013 60%, #1a120c);
-    }
-
-    .cp-cover-image {
-        display: block;
+        height: 240px;
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        background: url('{{ creator.profile.cover_image.url|default:"" }}') center/cover no-repeat;
+        position: relative;
+    }
+    
+    /* Fallback cover pattern if no image exists */
+    .cp-cover::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 80% 20%, rgba(255,121,0,.22), transparent 32%),
+                    radial-gradient(circle at 20% 100%, rgba(255,121,0,.12), transparent 40%),
+                    linear-gradient(135deg, #252529, #101013 60%, #1a120c);
+        z-index: -1;
+    }
+    
+    .cp-cover img {
+        width: 100%; height: 100%; object-fit: cover;
     }
 
-    .cp-cover-label {
-        position: absolute;
-        right: 18px;
-        bottom: 16px;
-        padding: 7px 11px;
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 6px;
-        background: rgba(0,0,0,.6);
-        color: #fff;
-        font-size: 10px;
-        letter-spacing: .7px;
-        text-transform: uppercase;
+    .cp-profile-info-wrap {
+        padding: 0 32px 32px;
+        position: relative;
     }
 
-    .cp-profile-panel {
-        margin-bottom: 30px;
-        padding: 0 30px 25px;
-        border: 1px solid var(--cp-border);
-        border-top: 0;
-        border-radius: 0 0 12px 12px;
-        background: var(--cp-panel);
+    .cp-top-row {
+        display: flex; align-items: flex-end; gap: 24px;
+        margin-top: -65px; margin-bottom: 20px;
     }
 
-    .cp-profile-top {
-        display: flex;
-        align-items: flex-end;
-        gap: 22px;
-        min-width: 0;
-    }
-
-    /* Main avatar is a true circle: equal width and height. */
     .cp-avatar-wrap {
-        position: relative;
-        z-index: 2;
-        flex: 0 0 116px;
-        width: 116px;
-        height: 116px;
-        margin-top: -58px;
-        overflow: hidden;
-        border: 5px solid var(--cp-panel);
-        border-radius: 50%;
-        background: #25252b;
+        width: 150px; height: 150px;
+        border-radius: 50%; padding: 4px;
+        background: var(--panel); flex-shrink: 0;
+        border: 2px solid var(--orange);
+        position: relative; z-index: 2;
     }
-
+    
     .cp-avatar {
+        width: 100%; height: 100%; border-radius: 50%;
+        object-fit: cover; background: #252a32;
         display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-        object-position: center;
     }
-
+    
     .cp-avatar-fallback {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff7900, #9c3c00);
-        color: #fff;
-        font-size: 38px;
-        font-weight: 800;
+        width: 100%; height: 100%; border-radius: 50%;
+        background: #252a32; color: var(--orange);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 42px; font-weight: 800;
     }
 
-    .cp-profile-info {
-        flex: 1;
-        min-width: 0;
-        padding: 18px 0 0;
-    }
-
-    .cp-name-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 7px;
-    }
-
+    .cp-name-area { flex: 1; padding-bottom: 10px; }
+    
     .cp-display-name {
-        margin: 0;
-        color: var(--cp-text);
-        font-size: clamp(22px, 3vw, 30px);
-        font-weight: 800;
-        line-height: 1.25;
-        overflow-wrap: anywhere;
+        margin: 0 0 4px; font-size: 32px; font-weight: 850;
+        display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
     }
-
+    
+    /* CSS Verified Badge */
     .cp-verified {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--cp-orange);
-        color: #111;
-        font-size: 12px;
-        font-weight: 900;
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 20px; height: 20px; border-radius: 50%;
+        background: var(--orange); color: #111; font-size: 12px;
     }
+    
+    .cp-username { margin: 0; color: var(--muted); font-size: 15px; font-weight: 500; }
 
-    .cp-username {
-        margin: 0;
-        color: var(--cp-muted);
-        font-size: 13px;
-        overflow-wrap: anywhere;
+    .cp-actions { display: flex; gap: 12px; padding-bottom: 10px; }
+
+    /* ==============================
+       BUTTONS
+    ============================== */
+    .ss-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 24px; border-radius: 0; font-size: 13px; font-weight: 700;
+        transition: all 0.2s; border: 1px solid transparent; cursor: pointer; text-decoration: none;
     }
+    .ss-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .ss-btn-primary { background: var(--orange); color: #111; border-color: var(--orange); }
+    .ss-btn-primary:hover { background: var(--orange-hover); border-color: var(--orange-hover); }
+    .ss-btn-outline { background: transparent; color: #fff; border-color: var(--border); }
+    .ss-btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #555; }
 
-    .cp-profile-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 9px;
-        margin-left: auto;
-        padding-bottom: 4px;
-    }
-
-    .cp-profile-actions form { margin: 0; }
-
-    .cp-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-height: 42px;
-        padding: 0 16px;
-        border: 1px solid var(--cp-border);
-        border-radius: 7px;
-        background: #1a1a1f;
-        color: var(--cp-text);
-        font: inherit;
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration: none;
-        cursor: pointer;
-        transition: .2s ease;
-    }
-
-    .cp-btn:hover {
-        border-color: #55555e;
-        background: #222228;
-        color: #fff;
-        transform: translateY(-1px);
-    }
-
-    .cp-btn-primary {
-        border-color: var(--cp-orange);
-        background: var(--cp-orange);
-        color: #111;
-    }
-
-    .cp-btn-primary:hover {
-        border-color: var(--cp-orange-light);
-        background: var(--cp-orange-light);
-        color: #111;
-    }
-
-    .cp-btn svg, .cp-meta-item svg, .cp-upload-link svg {
-        width: 16px;
-        height: 16px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.8;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-
-    .cp-btn-following {
-        background: #222228;
-        color: #fff;
-    }
-
-    .cp-btn-following:hover {
-        border-color: #e35454;
-        color: #ff7777;
-    }
-
+    /* ==============================
+       BIO & STATS
+    ============================== */
     .cp-bio {
-        max-width: 760px;
-        margin: 20px 0;
-        color: #c7c7ce;
-        font-size: 14px;
-        line-height: 1.8;
-        overflow-wrap: anywhere;
-        white-space: pre-line;
+        font-size: 15px; line-height: 1.6; color: #d1d5db;
+        margin-bottom: 16px; max-width: 800px;
     }
-
-    .cp-bio-empty {
-        color: var(--cp-muted);
-        font-style: italic;
+    
+    .cp-meta-row {
+        display: flex; flex-wrap: wrap; gap: 16px; color: var(--muted);
+        font-size: 13px; margin-bottom: 30px;
     }
+    
+    .cp-meta-item { display: flex; align-items: center; gap: 6px; }
+    .cp-meta-item svg { width: 15px; height: 15px; fill: none; stroke: var(--orange); stroke-width: 2; }
 
-    .cp-profile-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 18px;
-        margin-bottom: 23px;
-        color: var(--cp-muted);
-        font-size: 12px;
+    .cp-stats-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        border: 1px solid var(--border); background: var(--panel);
     }
-
-    .cp-meta-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
+    .cp-stat-box {
+        padding: 20px 24px; border-right: 1px solid var(--border);
+        display: flex; flex-direction: column;
     }
+    .cp-stat-box:last-child { border-right: none; }
+    .cp-stat-icon { margin-bottom: 8px; color: var(--orange); }
+    .cp-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .cp-stat-val { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1; }
+    .cp-stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 
-    .cp-meta-item svg { stroke: var(--cp-orange); }
-
-    .cp-stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        padding-top: 20px;
-        border-top: 1px solid var(--cp-border);
+    /* ==============================
+       TABS NAVIGATION
+    ============================== */
+    .cp-tabs {
+        display: flex; gap: 32px; border-bottom: 1px solid var(--border);
+        margin-bottom: 24px; overflow-x: auto; scrollbar-width: none;
     }
-
-    .cp-stat {
-        min-width: 0;
-        padding: 15px 17px;
-        border: 1px solid var(--cp-border);
-        border-radius: 8px;
-        background: #0e0e11;
+    .cp-tabs::-webkit-scrollbar { display: none; }
+    .cp-tab {
+        padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--muted);
+        display: flex; align-items: center; gap: 8px; border-bottom: 3px solid transparent;
+        white-space: nowrap; cursor: pointer;
     }
+    .cp-tab:hover { color: var(--text); }
+    .cp-tab.active { color: var(--text); border-bottom-color: var(--orange); }
+    .cp-tab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-    .cp-stat-value {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--cp-text);
-        font-size: 22px;
-        font-weight: 800;
-        overflow-wrap: anywhere;
-    }
-
-    .cp-stat-label {
-        color: var(--cp-muted);
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: .5px;
-        text-transform: uppercase;
-    }
-
-    .cp-videos-section { margin-top: 34px; }
-
-    .cp-section-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
+    /* ==============================
+       VIDEO GRID
+    ============================== */
+    .cp-grid-header {
+        display: flex; align-items: center; justify-content: space-between;
         margin-bottom: 20px;
     }
-
-    .cp-section-title {
-        margin: 0;
-        color: var(--cp-text);
-        font-size: 20px;
-        font-weight: 800;
+    .cp-grid-title { margin: 0; font-size: 22px; font-weight: 800; }
+    
+    .cp-filter-btn {
+        background: var(--panel); border: 1px solid var(--border); color: var(--text);
+        padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 0;
+        display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
     }
-
-    .cp-section-title span {
-        margin-left: 8px;
-        color: var(--cp-muted);
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .cp-upload-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        color: var(--cp-orange);
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration: none;
-    }
-
-    .cp-upload-link:hover { color: var(--cp-orange-light); }
 
     .cp-video-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 23px 18px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;
     }
-
     .cp-video-card {
-        min-width: 0;
-        overflow: hidden;
-        border: 1px solid var(--cp-border);
-        border-radius: 9px;
-        background: var(--cp-panel);
-        transition: border-color .2s ease, transform .2s ease;
+        background: var(--panel); border: 1px solid var(--border); border-radius: 0;
+        display: flex; flex-direction: column; overflow: hidden; transition: border-color 0.2s;
     }
-
-    .cp-video-card:hover {
-        transform: translateY(-3px);
-        border-color: rgba(255,121,0,.6);
+    .cp-video-card:hover { border-color: #555; }
+    
+    .cp-thumb {
+        position: relative; aspect-ratio: 16/9; background: #151b22;
+        display: block; overflow: hidden;
     }
-
-    .cp-video-link {
-        display: block;
-        color: inherit;
-        text-decoration: none;
+    .cp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cp-thumb-placeholder {
+        width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+        color: #38414c;
     }
-
-    .cp-thumbnail {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        overflow: hidden;
-        background: #202025;
+    
+    .cp-badge-premium {
+        position: absolute; top: 12px; left: 12px;
+        background: var(--orange); color: #111; font-size: 10px; font-weight: 800;
+        padding: 4px 8px; border-radius: 0; text-transform: uppercase;
     }
-
-    .cp-thumbnail img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform .3s ease;
-    }
-
-    .cp-video-card:hover .cp-thumbnail img { transform: scale(1.04); }
-
-    .cp-thumbnail-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        background:
-            radial-gradient(circle at 75% 20%, rgba(255,121,0,.2), transparent 35%),
-            linear-gradient(135deg, #29292f, #101013);
-    }
-
-    .cp-thumbnail-placeholder svg {
-        width: 38px;
-        height: 38px;
-        fill: none;
-        stroke: #aaa;
-        stroke-width: 1.4;
-    }
-
-    .cp-duration, .cp-premium-label {
-        position: absolute;
-        padding: 5px 7px;
-        border-radius: 4px;
-        font-size: 10px;
-        font-weight: 700;
-    }
-
     .cp-duration {
-        right: 8px;
-        bottom: 8px;
-        background: rgba(0,0,0,.85);
-        color: #fff;
+        position: absolute; bottom: 12px; right: 12px;
+        background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; font-weight: 700;
+        padding: 4px 6px; border-radius: 0;
     }
 
-    .cp-premium-label {
-        top: 8px;
-        left: 8px;
-        background: var(--cp-orange);
-        color: #111;
-        text-transform: uppercase;
+    .cp-video-info { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+    .cp-video-title { margin: 0 0 8px; font-size: 16px; font-weight: 700; line-height: 1.4; }
+    .cp-video-title a:hover { color: var(--orange); }
+    .cp-video-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    
+    .cp-video-author {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-top: auto; border-top: 1px solid var(--border); padding-top: 14px;
     }
-
-    .cp-video-content { padding: 13px; }
-
-    .cp-video-title {
-        display: -webkit-box;
-        min-height: 42px;
-        margin: 0 0 11px;
-        overflow: hidden;
-        color: var(--cp-text);
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1.6;
-        overflow-wrap: anywhere;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
-
-    .cp-video-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 6px;
-        color: var(--cp-muted);
-        font-size: 10px;
-    }
-
-    .cp-meta-dot { color: #55555e; }
-
-    .cp-card-creator {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        min-width: 0;
-        margin-top: 13px;
-        padding-top: 11px;
-        border-top: 1px solid #25252b;
-    }
-
-    /* Small creator avatar is also a perfect circle. */
+    .cp-author-left { display: flex; align-items: center; gap: 10px; }
     .cp-small-avatar {
-        display: flex;
-        flex: 0 0 30px;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        overflow: hidden;
-        border: 1px solid #383840;
-        border-radius: 50%;
-        background: #25252b;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 800;
-        text-decoration: none;
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #252a32; overflow: hidden; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 800; color: #fff;
+        border: 1px solid var(--border);
+    }
+    .cp-small-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .cp-author-name { font-size: 13px; font-weight: 600; color: #d1d5db; }
+    .cp-more-btn { color: var(--muted); cursor: pointer; letter-spacing: 2px; line-height: 1; }
+
+    /* ==============================
+       BOTTOM CTA BANNER
+    ============================== */
+    .cp-cta-banner {
+        margin-top: 50px; background: linear-gradient(90deg, #1a0f08 0%, #0b0d10 50%, #0b0d10 100%);
+        border: 1px solid var(--orange); border-radius: 0;
+        padding: 40px; display: flex; align-items: center; gap: 40px;
+        position: relative; overflow: hidden;
+    }
+    
+    /* Pure CSS illustration to replace the image */
+    .cp-cta-graphic {
+        width: 120px; height: 90px; position: relative; flex-shrink: 0;
+    }
+    .cp-cta-graphic::before {
+        content: ''; position: absolute; inset: 10px;
+        border: 4px solid var(--orange); border-radius: 4px;
+        transform: rotate(-4deg);
+    }
+    .cp-cta-graphic::after {
+        content: ''; position: absolute; left: 45px; top: 35px;
+        border-left: 24px solid var(--orange);
+        border-top: 14px solid transparent; border-bottom: 14px solid transparent;
     }
 
-    .cp-small-avatar img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
+    .cp-cta-content { flex: 1; }
+    .cp-cta-banner h2 { margin: 0 0 8px; font-size: 26px; font-weight: 800; color: #fff; }
+    .cp-cta-banner p { margin: 0 0 24px; font-size: 14px; color: var(--muted); max-width: 550px; line-height: 1.6; }
 
-    .cp-card-creator-name {
-        min-width: 0;
-        overflow: hidden;
-        color: #c6c6ce;
-        font-size: 11px;
-        font-weight: 600;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .cp-empty {
-        padding: 58px 20px;
-        border: 1px dashed #383840;
-        border-radius: 11px;
-        background: #101013;
-        text-align: center;
-    }
-
-    .cp-empty-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 18px;
-        border: 1px solid rgba(255,121,0,.25);
-        border-radius: 50%;
-        background: rgba(255,121,0,.08);
-    }
-
-    .cp-empty-icon svg {
-        width: 27px;
-        height: 27px;
-        fill: none;
-        stroke: var(--cp-orange);
-        stroke-width: 1.6;
-    }
-
-    .cp-empty h3 {
-        margin: 0 0 8px;
-        color: var(--cp-text);
-        font-size: 18px;
-    }
-
-    .cp-empty p {
-        max-width: 420px;
-        margin: 0 auto 20px;
-        color: var(--cp-muted);
-        font-size: 13px;
-        line-height: 1.8;
-    }
-
-    .cp-pagination {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 32px;
-    }
-
-    .cp-page-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 38px;
-        height: 38px;
-        padding: 0 12px;
-        border: 1px solid var(--cp-border);
-        border-radius: 7px;
-        background: var(--cp-panel);
-        color: #d5d5dc;
-        font-size: 12px;
-        text-decoration: none;
-    }
-
-    .cp-page-link:hover {
-        border-color: var(--cp-orange);
-        color: var(--cp-orange);
-    }
-
-    .cp-page-link.active {
-        border-color: var(--cp-orange);
-        background: var(--cp-orange);
-        color: #111;
-        font-weight: 800;
-    }
-
-    .cp-page-link.disabled {
-        opacity: .4;
-        pointer-events: none;
-    }
-
-    @media (max-width: 1200px) {
-        .cp-video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .cp-cover { height: 220px; }
-    }
-
+    /* ==============================
+       RESPONSIVE
+    ============================== */
     @media (max-width: 900px) {
-        .cp-page { padding: 20px 16px 45px; }
-        .cp-profile-panel { padding-right: 22px; padding-left: 22px; }
-
-        .cp-profile-top {
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .cp-profile-info { padding-top: 8px; }
-
-        .cp-profile-actions {
-            width: 100%;
-            margin-left: 0;
-            padding-top: 8px;
-        }
-
-        .cp-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 560px) {
-        .cp-page { padding: 16px 12px 35px; }
-        .cp-breadcrumbs { margin-bottom: 15px; }
-        .cp-cover { height: 150px; }
-
-        .cp-profile-panel {
-            margin-bottom: 24px;
-            padding: 0 14px 17px;
-        }
-
-        .cp-profile-top { gap: 12px; }
-
-        .cp-avatar-wrap {
-            flex-basis: 82px;
-            width: 82px;
-            height: 82px;
-            margin-top: -41px;
-            border-width: 4px;
-        }
-
-        .cp-avatar-fallback { font-size: 29px; }
-
-        .cp-profile-info {
-            flex: 1 1 calc(100% - 100px);
-            padding-top: 7px;
-        }
-
-        .cp-display-name { font-size: 21px; }
-        .cp-verified { width: 17px; height: 17px; font-size: 10px; }
-        .cp-username { font-size: 12px; }
-
-        .cp-profile-actions { gap: 8px; padding-top: 4px; }
-
-        .cp-btn {
-            min-height: 40px;
-            padding: 0 11px;
-            font-size: 11px;
-        }
-
-        .cp-bio { margin: 17px 0; font-size: 13px; }
-
-        .cp-profile-meta {
-            gap: 12px;
-            margin-bottom: 17px;
-            font-size: 11px;
-        }
-
-        .cp-stats { gap: 8px; padding-top: 15px; }
-
-        .cp-stat { padding: 12px 9px; }
-        .cp-stat-value { font-size: 18px; }
-        .cp-stat-label { font-size: 9px; letter-spacing: .2px; }
-
-        .cp-videos-section { margin-top: 26px; }
-        .cp-section-heading { margin-bottom: 15px; }
-        .cp-section-title { font-size: 18px; }
-        .cp-section-title span { font-size: 11px; }
-
-        .cp-video-grid { gap: 12px; }
-        .cp-video-content { padding: 9px; }
-        .cp-video-title { min-height: 39px; font-size: 12px; }
-        .cp-video-meta { gap: 4px; font-size: 9px; }
-        .cp-card-creator { gap: 7px; margin-top: 10px; padding-top: 9px; }
-
-        .cp-small-avatar {
-            flex-basis: 26px;
-            width: 26px;
-            height: 26px;
-            font-size: 10px;
-        }
-
-        .cp-card-creator-name { font-size: 10px; }
-        .cp-empty { padding: 40px 16px; }
-    }
-
-    @media (max-width: 360px) {
-        .cp-video-grid { grid-template-columns: 1fr; }
-        .cp-profile-actions { flex-direction: column; align-items: stretch; }
-        .cp-profile-actions form, .cp-profile-actions .cp-btn { width: 100%; }
-        .cp-stats { grid-template-columns: 1fr; }
+        .cp-top-row { flex-wrap: wrap; }
+        .cp-name-area { width: 100%; flex: none; order: 3; }
+        .cp-actions { width: 100%; order: 4; padding-bottom: 0; margin-top: 10px; }
+        .cp-avatar-wrap { width: 120px; height: 120px; margin-top: -50px; }
+        .cp-cover { height: 180px; }
+        .cp-stats-grid { grid-template-columns: 1fr; }
+        .cp-stat-box { border-right: none; border-bottom: 1px solid var(--border); }
+        .cp-stat-box:last-child { border-bottom: none; }
+        .cp-cta-banner { flex-direction: column; text-align: center; gap: 20px; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="cp-page">
-    <div class="cp-container">
+<div class="cp-page">
 
-        <nav class="cp-breadcrumbs" aria-label="Breadcrumb">
-            <a href="{% url 'home' %}">Home</a>
-            <span>/</span>
-            <a href="{% url 'videos:list' %}">Videos</a>
-            <span>/</span>
-            <span>{{ creator.username }}</span>
-        </nav>
-
-        <section class="cp-cover" aria-label="Creator cover">
+    <!-- PROFILE HEADER BLOCK -->
+    <section class="cp-header">
+        <div class="cp-cover">
             {% if creator.profile.cover_image %}
-                <img
-                    class="cp-cover-image"
-                    src="{{ creator.profile.cover_image.url }}"
-                    alt=""
-                >
+                <img src="{{ creator.profile.cover_image.url }}" alt="Cover">
             {% endif %}
-            <span class="cp-cover-label">Creator profile</span>
-        </section>
-
-        <section class="cp-profile-panel">
-            <div class="cp-profile-top">
-
+        </div>
+        
+        <div class="cp-profile-info-wrap">
+            <div class="cp-top-row">
                 <div class="cp-avatar-wrap">
                     {% if creator.profile.avatar_image %}
-                        <img
-                            class="cp-avatar"
-                            src="{{ creator.profile.avatar_image.url }}"
-                            alt="{{ creator.username }} profile picture"
-                        >
+                        <img class="cp-avatar" src="{{ creator.profile.avatar_image.url }}" alt="{{ creator.username }}">
                     {% elif creator.profile.avatar %}
-                        <img
-                            class="cp-avatar"
-                            src="{{ creator.profile.avatar }}"
-                            alt="{{ creator.username }} profile picture"
-                        >
+                        <img class="cp-avatar" src="{{ creator.profile.avatar }}" alt="{{ creator.username }}">
                     {% else %}
-                        <div class="cp-avatar-fallback">
-                            {{ creator.username|first|upper }}
-                        </div>
+                        <div class="cp-avatar-fallback">{{ creator.username|first|upper }}</div>
                     {% endif %}
                 </div>
 
-                <div class="cp-profile-info">
-                    <div class="cp-name-row">
-                        <h1 class="cp-display-name">
-                            {% if creator.get_full_name %}
-                                {{ creator.get_full_name }}
-                            {% else %}
-                                {{ creator.username }}
-                            {% endif %}
-                        </h1>
-
+                <div class="cp-name-area">
+                    <h1 class="cp-display-name">
+                        {% if creator.get_full_name %}{{ creator.get_full_name }}{% else %}{{ creator.username }}{% endif %}
                         {% if creator.profile.is_verified %}
-                            <span class="cp-verified" title="Verified creator">✓</span>
+                            <span class="cp-verified">✓</span>
                         {% endif %}
-                    </div>
+                    </h1>
                     <p class="cp-username">@{{ creator.username }}</p>
                 </div>
 
-                <div class="cp-profile-actions">
+                <div class="cp-actions">
                     {% if request.user.is_authenticated %}
                         {% if request.user == creator %}
-                            <a class="cp-btn cp-btn-primary" href="{% url 'accounts:profile' %}">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12 20h9"></path>
-                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-                                </svg>
+                            <a class="ss-btn ss-btn-primary" href="{% url 'accounts:profile' %}">
+                                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
                                 Edit profile
                             </a>
-                            <a class="cp-btn" href="{% url 'videos:upload' %}">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12 5v14M5 12h14"></path>
-                                </svg>
+                            <a class="ss-btn ss-btn-outline" href="{% url 'videos:upload' %}">
+                                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                                 Upload video
                             </a>
                         {% else %}
@@ -784,24 +329,17 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="next" value="{{ request.path }}">
                                 {% if following_creator %}
-                                    <button class="cp-btn cp-btn-following" type="submit">
-                                        Following
-                                    </button>
+                                    <button class="ss-btn ss-btn-outline" type="submit">Following</button>
                                 {% else %}
-                                    <button class="cp-btn cp-btn-primary" type="submit">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                                            <path d="M12 5v14M5 12h14"></path>
-                                        </svg>
+                                    <button class="ss-btn ss-btn-primary" type="submit">
+                                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                                         Follow creator
                                     </button>
                                 {% endif %}
                             </form>
                         {% endif %}
                     {% else %}
-                        <a
-                            class="cp-btn cp-btn-primary"
-                            href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
-                        >
+                        <a class="ss-btn ss-btn-primary" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
                             Follow creator
                         </a>
                     {% endif %}
@@ -812,230 +350,171 @@
                 {% if creator.profile.bio %}
                     {{ creator.profile.bio }}
                 {% else %}
-                    <span class="cp-bio-empty">This creator hasn't added a bio yet.</span>
+                    <span style="color: var(--muted); font-style: italic;">This creator hasn't added a bio yet.</span>
                 {% endif %}
             </div>
 
-            <div class="cp-profile-meta">
+            <div class="cp-meta-row">
                 {% if creator.date_joined %}
                     <span class="cp-meta-item">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="3" y="5" width="18" height="16" rx="2"></rect>
-                            <path d="M16 3v4M8 3v4M3 11h18"></path>
-                        </svg>
+                        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg>
                         Joined {{ creator.date_joined|date:"M Y" }}
                     </span>
                 {% endif %}
-
                 {% if creator.profile.location %}
                     <span class="cp-meta-item">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
-                            <circle cx="12" cy="10" r="2.5"></circle>
-                        </svg>
+                        <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
                         {{ creator.profile.location }}
                     </span>
                 {% endif %}
             </div>
 
-            <div class="cp-stats">
-                <div class="cp-stat">
-                    <span class="cp-stat-value">
-                        {% if video_count != None %}
-                            {{ video_count }}
-                        {% else %}
-                            {{ videos|length }}
-                        {% endif %}
-                    </span>
-                    <span class="cp-stat-label">Videos</span>
+            <div class="cp-stats-grid">
+                <div class="cp-stat-box">
+                    <div class="cp-stat-icon">
+                        <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+                    </div>
+                    <span class="cp-stat-val">{% if video_count != None %}{{ video_count }}{% else %}{{ videos|length }}{% endif %}</span>
+                    <span class="cp-stat-lbl">Videos</span>
                 </div>
-
-                <div class="cp-stat">
-                    <span class="cp-stat-value">{{ follower_count|default:0 }}</span>
-                    <span class="cp-stat-label">Followers</span>
+                <div class="cp-stat-box">
+                    <div class="cp-stat-icon">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span class="cp-stat-val">{{ follower_count|default:0 }}</span>
+                    <span class="cp-stat-lbl">Followers</span>
                 </div>
-
-                <div class="cp-stat">
-                    <span class="cp-stat-value">{{ total_views|default:0 }}</span>
-                    <span class="cp-stat-label">Total views</span>
+                <div class="cp-stat-box">
+                    <div class="cp-stat-icon">
+                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <span class="cp-stat-val">{{ total_views|default:0 }}</span>
+                    <span class="cp-stat-lbl">Total views</span>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="cp-videos-section">
-            <div class="cp-section-heading">
-                <h2 class="cp-section-title">
-                    Videos
-                    <span>
-                        {% if video_count != None %}
-                            {{ video_count }}
-                        {% else %}
-                            {{ videos|length }}
-                        {% endif %}
-                    </span>
-                </h2>
+    <!-- TABS NAVIGATION -->
+    <nav class="cp-tabs">
+        <a href="#" class="cp-tab active">
+            <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+            Videos
+        </a>
+        <a href="#" class="cp-tab">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 0v10l4 4"/></svg>
+            Live streams
+        </a>
+        <a href="#" class="cp-tab">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Playlists
+        </a>
+        <a href="#" class="cp-tab">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Liked videos
+        </a>
+    </nav>
 
-                {% if request.user.is_authenticated and request.user == creator %}
-                    <a class="cp-upload-link" href="{% url 'videos:upload' %}">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 5v14M5 12h14"></path>
-                        </svg>
-                        Upload video
-                    </a>
-                {% endif %}
-            </div>
+    <!-- VIDEO GRID SECTION -->
+    <section class="cp-videos-section">
+        <div class="cp-grid-header">
+            <h2 class="cp-grid-title">Your Videos</h2>
+            <button class="cp-filter-btn">
+                <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                Latest
+            </button>
+        </div>
 
-            {% if videos %}
-                <div class="cp-video-grid">
-                    {% for video in videos %}
-                        <article class="cp-video-card">
-                            <a
-                                class="cp-video-link"
-                                href="{% url 'videos:detail' video.pk %}"
-                                aria-label="Watch {{ video.title }}"
-                            >
-                                <div class="cp-thumbnail">
-                                    {% if video.thumbnail %}
-                                        <img
-                                            src="{{ video.thumbnail.url }}"
-                                            alt="{{ video.title }}"
-                                            loading="lazy"
-                                        >
-                                    {% elif video.thumbnail_url %}
-                                        <img
-                                            src="{{ video.thumbnail_url }}"
-                                            alt="{{ video.title }}"
-                                            loading="lazy"
-                                        >
-                                    {% else %}
-                                        <div class="cp-thumbnail-placeholder">
-                                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                                                <path d="m10 9 5 3-5 3Z"></path>
-                                            </svg>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if video.is_premium %}
-                                        <span class="cp-premium-label">Premium</span>
-                                    {% endif %}
-
-                                    {% if video.duration %}
-                                        <span class="cp-duration">{{ video.duration }}</span>
-                                    {% endif %}
+        {% if videos %}
+            <div class="cp-video-grid">
+                {% for video in videos %}
+                    <article class="cp-video-card">
+                        <a href="{% url 'videos:detail' video.pk %}" class="cp-thumb">
+                            {% if video.thumbnail %}
+                                <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" loading="lazy">
+                            {% elif video.thumbnail_url %}
+                                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}" loading="lazy">
+                            {% else %}
+                                <div class="cp-thumb-placeholder">
+                                    <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3Z"/></svg>
                                 </div>
-                            </a>
+                            {% endif %}
+                            
+                            {% if video.is_premium %}
+                                <span class="cp-badge-premium">Premium</span>
+                            {% endif %}
+                            {% if video.duration %}
+                                <span class="cp-duration">{{ video.duration }}</span>
+                            {% endif %}
+                        </a>
 
-                            <div class="cp-video-content">
-                                <a class="cp-video-link" href="{% url 'videos:detail' video.pk %}">
-                                    <h3 class="cp-video-title">{{ video.title }}</h3>
-                                </a>
+                        <div class="cp-video-info">
+                            <h3 class="cp-video-title">
+                                <a href="{% url 'videos:detail' video.pk %}">{{ video.title }}</a>
+                            </h3>
+                            <div class="cp-video-meta">
+                                {{ video.views|default:0 }} views &bull; {{ video.created_at|timesince }} ago
+                            </div>
 
-                                <div class="cp-video-meta">
-                                    <span>{{ video.views|default:0 }} views</span>
-                                    <span class="cp-meta-dot">•</span>
-                                    <span>{{ video.created_at|timesince }} ago</span>
-                                </div>
-
-                                <div class="cp-card-creator">
-                                    <a
-                                        class="cp-small-avatar"
-                                        href="{% url 'creators:profile' video.creator.username %}"
-                                        aria-label="{{ video.creator.username }} profile"
-                                    >
+                            <div class="cp-video-author">
+                                <div class="cp-author-left">
+                                    <a href="{% url 'creators:profile' video.creator.username %}" class="cp-small-avatar">
                                         {% if video.creator.profile.avatar_image %}
-                                            <img
-                                                src="{{ video.creator.profile.avatar_image.url }}"
-                                                alt=""
-                                                loading="lazy"
-                                            >
+                                            <img src="{{ video.creator.profile.avatar_image.url }}" alt="">
                                         {% elif video.creator.profile.avatar %}
-                                            <img
-                                                src="{{ video.creator.profile.avatar }}"
-                                                alt=""
-                                                loading="lazy"
-                                            >
+                                            <img src="{{ video.creator.profile.avatar }}" alt="">
                                         {% else %}
                                             {{ video.creator.username|first|upper }}
                                         {% endif %}
                                     </a>
-
-                                    <a
-                                        class="cp-card-creator-name"
-                                        href="{% url 'creators:profile' video.creator.username %}"
-                                    >
+                                    <a href="{% url 'creators:profile' video.creator.username %}" class="cp-author-name">
                                         @{{ video.creator.username }}
                                     </a>
                                 </div>
+                                <span class="cp-more-btn">&bull;&bull;&bull;</span>
                             </div>
-                        </article>
-                    {% endfor %}
-                </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
 
-                {% if page_obj and page_obj.paginator.num_pages > 1 %}
-                    <nav class="cp-pagination" aria-label="Video pages">
-                        {% if page_obj.has_previous %}
-                            <a class="cp-page-link" href="?page={{ page_obj.previous_page_number }}">
-                                Previous
-                            </a>
-                        {% else %}
-                            <span class="cp-page-link disabled">Previous</span>
-                        {% endif %}
-
-                        {% for number in page_obj.paginator.page_range %}
-                            {% if number == page_obj.number %}
-                                <span class="cp-page-link active" aria-current="page">
-                                    {{ number }}
-                                </span>
-                            {% elif number >= page_obj.number|add:"-2" and number <= page_obj.number|add:"2" %}
-                                <a class="cp-page-link" href="?page={{ number }}">
-                                    {{ number }}
-                                </a>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if page_obj.has_next %}
-                            <a class="cp-page-link" href="?page={{ page_obj.next_page_number }}">
-                                Next
-                            </a>
-                        {% else %}
-                            <span class="cp-page-link disabled">Next</span>
-                        {% endif %}
-                    </nav>
-                {% endif %}
-
-            {% else %}
-                <div class="cp-empty">
-                    <div class="cp-empty-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                            <path d="m10 9 5 3-5 3Z"></path>
-                        </svg>
-                    </div>
-
-                    {% if request.user == creator %}
-                        <h3>Your channel is ready</h3>
-                        <p>
-                            You haven't published any videos yet.
-                            Upload your first video to start building your audience.
-                        </p>
-                        <a class="cp-btn cp-btn-primary" href="{% url 'videos:upload' %}">
-                            Upload your first video
-                        </a>
-                    {% else %}
-                        <h3>No videos yet</h3>
-                        <p>
-                            This creator hasn't published any videos.
-                            Check back later for new content.
-                        </p>
-                        <a class="cp-btn" href="{% url 'videos:list' %}">
-                            Explore videos
-                        </a>
+            {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                <nav class="cp-pagination" style="display:flex; justify-content:center; gap:8px; margin-top:32px;">
+                    {% if page_obj.has_previous %}
+                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                     {% endif %}
-                </div>
+                    <span class="ss-btn ss-btn-primary" style="cursor:default;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}
+                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    {% endif %}
+                </nav>
             {% endif %}
-        </section>
 
-    </div>
-</main>
+        {% else %}
+            <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel);">
+                <h3 style="margin: 0 0 8px; font-size: 18px;">No videos yet</h3>
+                <p style="color: var(--muted); margin-bottom: 20px;">This creator hasn't published any videos yet.</p>
+                {% if request.user == creator %}
+                    <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload your first video</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- BOTTOM CTA BANNER -->
+    <section class="cp-cta-banner">
+        <div class="cp-cta-graphic"></div>
+        <div class="cp-cta-content">
+            <h2>Share your story with the world</h2>
+            <p>Upload your videos, build your audience and become part of the StreamSphere community.</p>
+            {% if request.user == creator %}
+                <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    Upload your first video
+                </a>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
 {% endblock %}
