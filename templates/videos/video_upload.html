@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Upload Video - StreamSphere{% endblock %}
 
 {% block extra_css %}
@@ -16,7 +17,6 @@
         --sv-muted: #9ba3af;
         --sv-orange: #ff7900;
         --sv-orange-hover: #e86e00;
-        --sv-red: #ef4444;
         
         width: 100%;
         max-width: 1300px;
@@ -31,11 +31,10 @@
     }
 
     /* ==============================
-       HERO BANNER (Replaces old Heading)
+       HERO BANNER
     ============================== */
     .sv-hero {
         position: relative;
-        border-radius: 8px;
         overflow: hidden;
         border: 1px solid var(--sv-border);
         background: #111;
@@ -45,7 +44,6 @@
         min-height: 220px;
     }
     
-    /* Dark gradient overlay to make text readable over the image */
     .sv-hero::before {
         content: '';
         position: absolute;
@@ -54,8 +52,6 @@
         z-index: 2;
     }
 
-    /* Placeholder for your background image. 
-       Add style="background-image: url('...')" inline or in your CSS to set it. */
     .sv-hero-bg {
         position: absolute;
         inset: 0;
@@ -139,7 +135,6 @@
         margin-bottom: 24px;
         border: 1px solid var(--sv-border);
         background: var(--sv-panel);
-        border-radius: 8px;
         overflow: hidden;
     }
 
@@ -158,7 +153,6 @@
         flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
         background: var(--sv-orange);
         color: #111;
         font-size: 14px;
@@ -214,7 +208,6 @@
         min-height: 46px;
         padding: 12px 14px;
         border: 1px solid var(--sv-border);
-        border-radius: 6px;
         outline: none;
         background: #0d1014;
         color: var(--sv-text);
@@ -259,7 +252,6 @@
         margin-bottom: 24px;
         padding: 16px;
         border: 1px solid;
-        border-radius: 6px;
         font-size: 13px;
         line-height: 1.6;
     }
@@ -294,7 +286,6 @@
         justify-content: center;
         padding: 28px 20px;
         border: 2px dashed #353a45;
-        border-radius: 8px;
         background: #0d1014;
         text-align: center;
         transition: all .18s ease;
@@ -313,7 +304,6 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 16px;
-        border-radius: 50%;
         background: rgba(255,121,0,0.1);
         color: var(--sv-orange);
         font-size: 24px;
@@ -338,7 +328,6 @@
         align-items: center;
         justify-content: center;
         padding: 0 20px;
-        border-radius: 4px;
         background: var(--sv-orange);
         color: #111;
         font-size: 13px;
@@ -368,7 +357,6 @@
         margin-top: 17px;
         padding: 12px;
         border: 1px solid var(--sv-border);
-        border-radius: 4px;
         background: #151719;
         color: #e5e7eb;
         font-size: 12px;
@@ -385,7 +373,6 @@
         width: 100%;
         max-height: 400px;
         margin-top: 20px;
-        border-radius: 6px;
         background: #000;
     }
 
@@ -395,7 +382,6 @@
         margin-top: 15px;
         background: #17191c;
         border: 1px solid var(--sv-border);
-        border-radius: 4px;
         height: 8px;
         overflow: hidden;
     }
@@ -434,7 +420,6 @@
         gap: 12px;
         padding: 16px;
         border: 1px solid var(--sv-border);
-        border-radius: 6px;
         background: #0d1014;
         transition: all .18s ease;
     }
@@ -487,7 +472,6 @@
         gap: 14px;
         padding: 18px;
         border: 1px solid var(--sv-border);
-        border-radius: 6px;
         background: #0d1014;
     }
 
@@ -536,7 +520,6 @@
         align-items: center;
         justify-content: center;
         padding: 12px 20px;
-        border-radius: 6px;
         font-size: 14px;
         font-weight: 700;
         text-align: center;
@@ -578,7 +561,6 @@
         margin-bottom: 24px;
         border: 1px solid var(--sv-border);
         background: var(--sv-panel);
-        border-radius: 8px;
         overflow: hidden;
     }
 
@@ -621,14 +603,12 @@
         flex-shrink: 0;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
         background: rgba(255,121,0,0.1);
         color: var(--sv-orange);
         font-size: 11px;
         font-weight: 800;
     }
     
-    /* Custom checkmark to match screenshot */
     .sv-check-icon::after {
         content: '✓';
         font-size: 12px;
@@ -650,7 +630,6 @@
     /* Creator Tip */
     .sv-tip {
         padding: 16px;
-        border-radius: 6px;
         background: #0d1014;
         border: 1px solid var(--sv-border);
         border-left: 3px solid var(--sv-orange);
@@ -904,7 +883,6 @@
                             {% endfor %}
                         </div>
 
-                        <!-- Submit Button goes inside the last card like the screenshot -->
                         <button type="submit" class="sv-button sv-button-primary" id="uploadButton" style="margin-top: 10px;" disabled>
                             <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:8px;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
                             Upload video
