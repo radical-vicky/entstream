@@ -41,21 +41,21 @@
     .cp-cover {
         height: 240px;
         width: 100%;
-        background: url('{{ creator.profile.cover_image.url|default:"" }}') center/cover no-repeat;
+        /* FIX: Added a fallback background image */
+        background: url('{{ creator.profile.cover_image.url|default:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop" }}') center/cover no-repeat;
         position: relative;
     }
     
     /* Fallback cover pattern if no image exists */
     .cp-cover::before {
         content: ''; position: absolute; inset: 0;
-        background: radial-gradient(circle at 80% 20%, rgba(255,121,0,.22), transparent 32%),
-                    radial-gradient(circle at 20% 100%, rgba(255,121,0,.12), transparent 40%),
-                    linear-gradient(135deg, #252529, #101013 60%, #1a120c);
-        z-index: -1;
+        background: radial-gradient(circle at 80% 20%, rgba(255,121,0,.15), transparent 32%),
+                    linear-gradient(135deg, rgba(37,37,41,0.6), rgba(16,16,19,0.8) 60%, rgba(26,18,12,0.6));
+        z-index: 1;
     }
     
     .cp-cover img {
-        width: 100%; height: 100%; object-fit: cover;
+        width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2;
     }
 
     .cp-profile-info-wrap {
@@ -74,7 +74,10 @@
         background: var(--panel); flex-shrink: 0;
         border: 2px solid var(--orange);
         position: relative; z-index: 2;
+        cursor: pointer; /* Make it clear it's clickable */
+        transition: transform 0.2s;
     }
+    .cp-avatar-wrap:hover { transform: scale(1.05); }
     
     .cp-avatar {
         width: 100%; height: 100%; border-radius: 50%;
@@ -141,11 +144,16 @@
         display: grid; grid-template-columns: repeat(3, 1fr);
         border: 1px solid var(--border); background: var(--panel);
     }
+    
+    /* FIX: Made stat boxes clickable links */
     .cp-stat-box {
         padding: 20px 24px; border-right: 1px solid var(--border);
-        display: flex; flex-direction: column;
+        display: flex; flex-direction: column; text-decoration: none; color: inherit;
+        transition: background 0.2s;
     }
+    .cp-stat-box:hover { background: rgba(255,255,255,0.02); }
     .cp-stat-box:last-child { border-right: none; }
+    
     .cp-stat-icon { margin-bottom: 8px; color: var(--orange); }
     .cp-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
     .cp-stat-val { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1; }
@@ -162,7 +170,7 @@
     .cp-tab {
         padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--muted);
         display: flex; align-items: center; gap: 8px; border-bottom: 3px solid transparent;
-        white-space: nowrap; cursor: pointer;
+        white-space: nowrap; cursor: pointer; text-decoration: none;
     }
     .cp-tab:hover { color: var(--text); }
     .cp-tab.active { color: var(--text); border-bottom-color: var(--orange); }
@@ -183,8 +191,9 @@
         display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
     }
 
+    /* FIX: Reduced card size */
     .cp-video-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
     }
     .cp-video-card {
         background: var(--panel); border: 1px solid var(--border); border-radius: 0;
@@ -213,26 +222,32 @@
         padding: 4px 6px; border-radius: 0;
     }
 
-    .cp-video-info { padding: 16px; flex: 1; display: flex; flex-direction: column; }
-    .cp-video-title { margin: 0 0 8px; font-size: 16px; font-weight: 700; line-height: 1.4; }
+    .cp-video-info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
+    .cp-video-title { margin: 0 0 6px; font-size: 14px; font-weight: 700; line-height: 1.4; }
     .cp-video-title a:hover { color: var(--orange); }
-    .cp-video-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .cp-video-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
     
     .cp-video-author {
         display: flex; align-items: center; justify-content: space-between;
-        margin-top: auto; border-top: 1px solid var(--border); padding-top: 14px;
+        margin-top: auto; border-top: 1px solid var(--border); padding-top: 12px;
     }
-    .cp-author-left { display: flex; align-items: center; gap: 10px; }
+    .cp-author-left { display: flex; align-items: center; gap: 8px; }
     .cp-small-avatar {
-        width: 28px; height: 28px; border-radius: 50%;
+        width: 24px; height: 24px; border-radius: 50%;
         background: #252a32; overflow: hidden; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
-        font-size: 11px; font-weight: 800; color: #fff;
+        font-size: 10px; font-weight: 800; color: #fff;
         border: 1px solid var(--border);
     }
     .cp-small-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .cp-author-name { font-size: 13px; font-weight: 600; color: #d1d5db; }
-    .cp-more-btn { color: var(--muted); cursor: pointer; letter-spacing: 2px; line-height: 1; }
+    .cp-author-name { font-size: 12px; font-weight: 600; color: #d1d5db; }
+    
+    /* FIX: Kebab menu (•••) style */
+    .cp-more-btn { 
+        color: var(--muted); cursor: pointer; letter-spacing: 1px; line-height: 1; 
+        background: transparent; border: none; font-size: 16px; padding: 0 4px;
+    }
+    .cp-more-btn:hover { color: #fff; }
 
     /* ==============================
        BOTTOM CTA BANNER
@@ -264,6 +279,20 @@
     .cp-cta-banner p { margin: 0 0 24px; font-size: 14px; color: var(--muted); max-width: 550px; line-height: 1.6; }
 
     /* ==============================
+       LIGHTBOX MODAL (For Avatar)
+    ============================== */
+    .cp-lightbox {
+        display: none; position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
+        cursor: zoom-out;
+    }
+    .cp-lightbox.is-active { display: flex; }
+    .cp-lightbox img {
+        max-width: 90vw; max-height: 90vh; object-fit: contain;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* ==============================
        RESPONSIVE
     ============================== */
     @media (max-width: 900px) {
@@ -272,9 +301,14 @@
         .cp-actions { width: 100%; order: 4; padding-bottom: 0; margin-top: 10px; }
         .cp-avatar-wrap { width: 120px; height: 120px; margin-top: -50px; }
         .cp-cover { height: 180px; }
-        .cp-stats-grid { grid-template-columns: 1fr; }
-        .cp-stat-box { border-right: none; border-bottom: 1px solid var(--border); }
-        .cp-stat-box:last-child { border-bottom: none; }
+        
+        /* FIX: Keep stats grid horizontal on mobile, just make it smaller */
+        .cp-stats-grid { grid-template-columns: repeat(3, 1fr); }
+        .cp-stat-box { padding: 12px 10px; }
+        .cp-stat-val { font-size: 20px; }
+        .cp-stat-lbl { font-size: 10px; letter-spacing: 0; }
+        .cp-stat-icon svg { width: 18px; height: 18px; }
+        
         .cp-cta-banner { flex-direction: column; text-align: center; gap: 20px; }
     }
 </style>
@@ -293,11 +327,12 @@
         
         <div class="cp-profile-info-wrap">
             <div class="cp-top-row">
-                <div class="cp-avatar-wrap">
+                <!-- FIX: Added onclick to open lightbox -->
+                <div class="cp-avatar-wrap" onclick="openLightbox()" title="Click to view full size">
                     {% if creator.profile.avatar_image %}
-                        <img class="cp-avatar" src="{{ creator.profile.avatar_image.url }}" alt="{{ creator.username }}">
+                        <img id="profileAvatarImage" class="cp-avatar" src="{{ creator.profile.avatar_image.url }}" alt="{{ creator.username }}">
                     {% elif creator.profile.avatar %}
-                        <img class="cp-avatar" src="{{ creator.profile.avatar }}" alt="{{ creator.username }}">
+                        <img id="profileAvatarImage" class="cp-avatar" src="{{ creator.profile.avatar }}" alt="{{ creator.username }}">
                     {% else %}
                         <div class="cp-avatar-fallback">{{ creator.username|first|upper }}</div>
                     {% endif %}
@@ -369,47 +404,51 @@
                 {% endif %}
             </div>
 
+            <!-- FIX: Wrapped the stat boxes in anchor tags -->
             <div class="cp-stats-grid">
-                <div class="cp-stat-box">
+                <a href="?tab=videos" class="cp-stat-box">
                     <div class="cp-stat-icon">
                         <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
                     </div>
                     <span class="cp-stat-val">{% if video_count != None %}{{ video_count }}{% else %}{{ videos|length }}{% endif %}</span>
                     <span class="cp-stat-lbl">Videos</span>
-                </div>
-                <div class="cp-stat-box">
+                </a>
+                
+                <a href="?tab=followers" class="cp-stat-box">
                     <div class="cp-stat-icon">
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
                     <span class="cp-stat-val">{{ follower_count|default:0 }}</span>
                     <span class="cp-stat-lbl">Followers</span>
-                </div>
-                <div class="cp-stat-box">
+                </a>
+                
+                <a href="?tab=views" class="cp-stat-box">
                     <div class="cp-stat-icon">
                         <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
                     </div>
                     <span class="cp-stat-val">{{ total_views|default:0 }}</span>
                     <span class="cp-stat-lbl">Total views</span>
-                </div>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- TABS NAVIGATION -->
+    <!-- FIX: Added href links to the tabs -->
     <nav class="cp-tabs">
-        <a href="#" class="cp-tab active">
+        <a href="?tab=videos" class="cp-tab {% if not request.GET.tab or request.GET.tab == 'videos' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
             Videos
         </a>
-        <a href="#" class="cp-tab">
+        <a href="?tab=live" class="cp-tab {% if request.GET.tab == 'live' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 0v10l4 4"/></svg>
             Live streams
         </a>
-        <a href="#" class="cp-tab">
+        <a href="?tab=playlists" class="cp-tab {% if request.GET.tab == 'playlists' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             Playlists
         </a>
-        <a href="#" class="cp-tab">
+        <a href="?tab=liked" class="cp-tab {% if request.GET.tab == 'liked' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             Liked videos
         </a>
@@ -418,7 +457,13 @@
     <!-- VIDEO GRID SECTION -->
     <section class="cp-videos-section">
         <div class="cp-grid-header">
-            <h2 class="cp-grid-title">Your Videos</h2>
+            <!-- You can dynamically change this title based on the tab -->
+            <h2 class="cp-grid-title">
+                {% if request.GET.tab == 'live' %}Live Streams
+                {% elif request.GET.tab == 'playlists' %}Playlists
+                {% elif request.GET.tab == 'liked' %}Liked Videos
+                {% else %}Your Videos{% endif %}
+            </h2>
             <button class="cp-filter-btn">
                 <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
                 Latest
@@ -471,7 +516,8 @@
                                         @{{ video.creator.username }}
                                     </a>
                                 </div>
-                                <span class="cp-more-btn">&bull;&bull;&bull;</span>
+                                <!-- FIX: Kebab menu button -->
+                                <button class="cp-more-btn" title="More options" type="button">&bull;&bull;&bull;</button>
                             </div>
                         </div>
                     </article>
@@ -481,19 +527,27 @@
             {% if page_obj and page_obj.paginator.num_pages > 1 %}
                 <nav class="cp-pagination" style="display:flex; justify-content:center; gap:8px; margin-top:32px;">
                     {% if page_obj.has_previous %}
-                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}">Previous</a>
                     {% endif %}
                     <span class="ss-btn ss-btn-primary" style="cursor:default;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
                     {% if page_obj.has_next %}
-                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.next_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}">Next</a>
                     {% endif %}
                 </nav>
             {% endif %}
 
         {% else %}
             <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel);">
-                <h3 style="margin: 0 0 8px; font-size: 18px;">No videos yet</h3>
-                <p style="color: var(--muted); margin-bottom: 20px;">This creator hasn't published any videos yet.</p>
+                <h3 style="margin: 0 0 8px; font-size: 18px;">No videos found</h3>
+                <p style="color: var(--muted); margin-bottom: 20px;">
+                    {% if request.GET.tab == 'live' %}
+                        There are no live streams active right now.
+                    {% elif request.GET.tab == 'liked' %}
+                        There are no liked videos yet.
+                    {% else %}
+                        This creator hasn't published any videos yet.
+                    {% endif %}
+                </p>
                 {% if request.user == creator %}
                     <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload your first video</a>
                 {% endif %}
@@ -517,4 +571,28 @@
     </section>
 
 </div>
+
+<!-- FIX: Lightbox Container for Avatar Viewing -->
+<div id="avatarLightbox" class="cp-lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="Full size avatar">
+</div>
+
+<script>
+    // Simple script to handle the avatar lightbox
+    function openLightbox() {
+        const sourceImg = document.getElementById('profileAvatarImage');
+        if (!sourceImg) return; // If user has no image, do nothing
+
+        const lightbox = document.getElementById('avatarLightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        
+        lightboxImg.src = sourceImg.src;
+        lightbox.classList.add('is-active');
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('avatarLightbox');
+        lightbox.classList.remove('is-active');
+    }
+</script>
 {% endblock %}
