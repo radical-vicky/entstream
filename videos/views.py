@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
+from .forms import VideoForm
 
 from accounts.models import Notification
 from creators.models import Follow
@@ -294,3 +295,51 @@ def watch_video(request, pk):
 def my_videos(request):
     videos = Video.objects.filter(creator=request.user).order_by("-id")
     return render(request, "videos/video_list.html", {"videos": videos})
+
+
+@login_required
+def video_edit(request, pk):
+    """
+    Edit a video. Only the creator may edit.
+    # CHANGED: new view.
+    """
+    video = get_object_or_404(Video, pk=pk)
+
+    # Ownership check
+    if video.creator != request.user:
+        messages.error(request, "You can only edit your own videos.")
+        return redirect("videos:detail", pk=video.pk)
+
+    if request.method == "POST":
+        form = VideoForm(request.POST, request.FILES, instance=video)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Video updated.")
+            return redirect("videos:detail", pk=video.pk)
+    else:
+        form = VideoForm(instance=video)
+
+    return render(
+        request,
+        "videos/video_edit.html",
+        {"form": form, "video": video},
+    )
+
+
+@login_required
+@require_POST
+def video_delete(request, pk):
+    """
+    Delete a video. Only the creator may delete, and only via POST.
+    # CHANGED: new view.
+    """
+    video = get_object_or_404(Video, pk=pk)
+
+    # Ownership check
+    if video.creator != request.user:
+        messages.error(request, "You can only delete your own videos.")
+        return redirect("videos:detail", pk=video.pk)
+
+    video.delete()
+    messages.success(request, "Video deleted.")
+    return redirect("accounts:profile")

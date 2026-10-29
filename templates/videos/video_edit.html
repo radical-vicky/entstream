@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Edit video - StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.ve-page { min-height: calc(100vh - 60px); padding: clamp(14px,3vw,30px); background: #0b0d10; color: #f4f6f8; }
+.ve-page * { box-sizing: border-box; }
+.ve-card { max-width: 760px; margin: auto; padding: 22px; background: #12151a; border: 1px solid #2b3039; }
+.ve-card h1 { margin: 0 0 6px; font-size: 22px; }
+.ve-card p.ve-sub { margin: 0 0 18px; color: #9ba3af; font-size: 12px; }
+.ve-card label { display: block; margin: 14px 0 6px; font-size: 12px; font-weight: 700; }
+.ve-card input[type=text], .ve-card input[type=url], .ve-card input[type=number],
+.ve-card input[type=file], .ve-card textarea, .ve-card select {
+  width: 100%; padding: 10px 12px; background: #191d24; color: #f4f6f8;
+  border: 1px solid #2b3039; font: inherit;
+}
+.ve-card textarea { min-height: 120px; resize: vertical; }
+.ve-card .helptext { display: block; margin-top: 4px; color: #9ba3af; font-size: 11px; }
+.ve-card .errorlist { margin: 6px 0 0; padding: 0; list-style: none; color: #ff9ba1; font-size: 12px; }
+.ve-actions { display: flex; gap: 8px; margin-top: 18px; }
+.ve-btn { display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; padding: 10px 15px; font-size: 12px; font-weight: 750;
+  border: 1px solid transparent; cursor: pointer; text-decoration: none; }
+.ve-btn-primary { background: #ff7900; border-color: #ff7900; color: #111; }
+.ve-btn-primary:hover { background: #e86e00; border-color: #e86e00; }
+.ve-btn-secondary { background: #20252d; border-color: #363d48; color: #f4f6f8; }
+.ve-btn-secondary:hover { background: #2a3039; }
+.ve-errors { padding: 12px 14px; margin-bottom: 14px; border: 1px solid #6b3037; color: #ff9ba1; font-size: 12px; }
+
+/* Video replace block */
+.ve-video-current { margin: 0 0 14px; padding: 12px; background: #0d1014; border: 1px solid #2b3039; }
+.ve-video-current video { display: block; width: 100%; max-height: 260px; background: #000; }
+.ve-video-current p { margin: 8px 0 0; color: #9ba3af; font-size: 11px; }
+.ve-video-replace { margin: 10px 0 6px; padding: 14px; border: 1px dashed #363d48; background: #0d1014; }
+.ve-video-replace .ve-replace-label { margin: 0 0 8px; font-size: 12px; font-weight: 700; }
+.ve-video-replace p.ve-replace-note { margin: 8px 0 0; color: #9ba3af; font-size: 11px; }
+.ve-video-picked { margin-top: 8px; color: #8be4bb; font-size: 11px; word-break: break-all; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ve-page">
+  <div class="ve-card">
+    <h1>Edit video</h1>
+    <p class="ve-sub">Update the details for "{{ video.title|default:'this video' }}".</p>
+
+    {% if form.errors %}
+      <div class="ve-errors">
+        {% for field, errs in form.errors.items %}
+          {% for err in errs %}<div>{{ field }}: {{ err }}</div>{% endfor %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# Current video preview, so the creator can see what's currently attached. #}
+    {% if video.video_file %}
+      <div class="ve-video-current">
+        <video src="{{ video.video_file }}" controls preload="metadata"></video>
+        <p>Current video file. Upload a replacement below only if needed.</p>
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate id="video-edit-form">
+      {% csrf_token %}
+
+      {# --- Replace video (Cloudinary widget) --- #}
+      <div class="ve-video-replace">
+        <p class="ve-replace-label">Replace video file (optional)</p>
+        <p class="ve-replace-note">
+          Leave untouched to keep the current video. Choose a new file only if
+          the wrong one was uploaded.
+        </p>
+        <button type="button" id="ve-upload-btn" class="ve-btn ve-btn-secondary">
+          Choose new video file
+        </button>
+        <div class="ve-video-picked" id="ve-upload-status" hidden></div>
+
+        {# Bound to VideoForm.video_file_url (required=False) #}
+        {{ form.video_file_url }}
+        {% if form.video_file_url.errors %}
+          <ul class="errorlist">
+            {% for err in form.video_file_url.errors %}<li>{{ err }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {# --- Metadata fields (title, description, duration, premium, price, status) --- #}
+      {% for field in form %}
+        {% if field.name != "video_file_url" %}
+          <div class="ve-field">
+            <label for="{{ field.id_for_label }}">
+              {{ field.label }}{% if field.field.required %} *{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="ve-actions">
+        <button type="submit" class="ve-btn ve-btn-primary">Save changes</button>
+        <a class="ve-btn ve-btn-secondary" href="{% url 'videos:detail' video.pk %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# Cloudinary upload widget — fill in your own cloud name + unsigned preset. #}
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+<script>
+(function () {
+  var statusEl = document.getElementById('ve-upload-status');
+  var hidden   = document.querySelector('input[name="video_file_url"]');
+  var btn      = document.getElementById('ve-upload-btn');
+  if (!btn || !window.cloudinary) return;
+
+  var widget = cloudinary.createUploadWidget(
+    {
+      cloudName: "YOUR_CLOUD_NAME",       // e.g. "dvuooxbqi"
+      uploadPreset: "YOUR_UNSIGNED_PRESET",
+      resourceType: "video",
+      sources: ["local", "url", "camera"],
+      multiple: false,
+      maxFileSize: 500000000,             // 500 MB
+      clientAllowedFormats: ["mp4", "webm", "mov", "m4v"]
+    },
+    function (error, result) {
+      if (error) {
+        statusEl.hidden = false;
+        statusEl.textContent = "Upload error: " + (error.message || "unknown");
+        return;
+      }
+      if (result && result.event === "success") {
+        hidden.value = result.info.secure_url;
+        statusEl.hidden = false;
+        statusEl.textContent = "New video selected: " + result.info.secure_url;
+      }
+    }
+  );
+
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    widget.open();
+  });
+})();
+</script>
+{% endblock %}

@@ -39,6 +39,10 @@
 .sp-btn-primary:hover { background: #e86e00; border-color: #e86e00; }
 .sp-btn-secondary { background: #20252d; border-color: #363d48; color: var(--text) !important; }
 .sp-btn-secondary:hover { background: #2a3039; border-color: #596270; }
+/* CHANGED: styles for edit/delete controls */
+.sp-btn-danger { background: #3a1d20; border-color: #6b3037; color: #ff9ba1 !important; }
+.sp-btn-danger:hover { background: #4d2429; border-color: #8a3d46; }
+.sp-btn-sm { min-height: 30px; padding: 6px 10px; font-size: 11px; }
 .sp-page :is(a, button):focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 
 .sp-messages { display: grid; gap: 9px; margin-bottom: 18px; }
@@ -131,6 +135,9 @@
     -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 .sp-video-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font-size: 11px; }
+/* CHANGED: per-video edit/delete row */
+.sp-video-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sp-video-actions form { display: inline; margin: 0; }
 .sp-empty { padding: 35px 18px; border: 1px dashed #343a44; text-align: center; }
 .sp-empty h3 { margin: 0 0 8px; font-size: 16px; }
 .sp-empty p { max-width: 430px; margin: 0 auto 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
@@ -149,6 +156,9 @@
 .sp-info-copy p, .sp-info-copy a { display: block; overflow-wrap: anywhere; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .sp-info-copy a:hover { color: var(--orange); }
 .sp-help { margin: 8px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+/* CHANGED: danger-zone form layout */
+.sp-danger-zone { margin-top: 12px; }
+.sp-danger-zone form { display: inline-block; margin: 0; }
 
 @media(max-width:1000px) {
     .sp-content-grid { grid-template-columns: minmax(0,1fr) 250px; }
@@ -239,9 +249,10 @@
       </div>
 
       <div class="sp-profile-actions">
-        {% if request.user == profile_user %}
+        {# CHANGED: is_owner is set by the view; works for both self and others. #}
+        {% if is_owner %}
           <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Edit profile</a>
-                  {% else %}
+        {% else %}
           <a class="sp-btn sp-btn-primary" href="{% url 'chat:start' username=profile_user.username %}">Message</a>
           <a class="sp-btn sp-btn-secondary" href="{% url 'streaming:list' %}">Watch Streams</a>
         {% endif %}
@@ -277,30 +288,47 @@
 
           <div class="sp-video-grid">
             {% for video in videos %}
-              <a class="sp-video-card" href="{% url 'videos:detail' video.pk %}">
-                <div class="sp-video-thumb">
-                  {% if video.thumbnail %}
-                    {# If thumbnail is a file/ImageField, .url is correct. #}
-                    <img src="{{ video.thumbnail.url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
-                  {% elif video.thumbnail_url %}
-                    <img src="{{ video.thumbnail_url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
-                  {% else %}
-                    <div class="sp-video-placeholder">Video thumbnail</div>
-                  {% endif %}
-                </div>
+              {# CHANGED: card is now a container; only thumb+title link, so edit/delete actions work. #}
+              <div class="sp-video-card">
+                <a href="{% url 'videos:detail' video.pk %}" aria-label="{{ video.title|default:'Video' }}">
+                  <div class="sp-video-thumb">
+                    {% if video.thumbnail %}
+                      <img src="{{ video.thumbnail.url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                    {% elif video.thumbnail_url %}
+                      <img src="{{ video.thumbnail_url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                    {% else %}
+                      <div class="sp-video-placeholder">Video thumbnail</div>
+                    {% endif %}
+                  </div>
+                </a>
                 <div class="sp-video-body">
-                  <h3 class="sp-video-title">{{ video.title|default:"Untitled video" }}</h3>
+                  <a href="{% url 'videos:detail' video.pk %}">
+                    <h3 class="sp-video-title">{{ video.title|default:"Untitled video" }}</h3>
+                  </a>
                   <div class="sp-video-meta">
                     {% if video.created_at %}<span>{{ video.created_at|date:"M j, Y" }}</span>{% endif %}
                     <span>{{ video.views|default:0 }} views</span>
                   </div>
+
+                  {# CHANGED: only the creator sees edit/delete. #}
+                  {% if request.user == video.creator %}
+                    <div class="sp-video-actions">
+                      <a class="sp-btn sp-btn-secondary sp-btn-sm"
+                         href="{% url 'videos:edit' video.pk %}">Edit</a>
+                      <form method="post" action="{% url 'videos:delete' video.pk %}"
+                            onsubmit="return confirm('Delete this video? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="sp-btn sp-btn-danger sp-btn-sm">Delete</button>
+                      </form>
+                    </div>
+                  {% endif %}
                 </div>
-              </a>
+              </div>
             {% empty %}
               <div class="sp-empty">
                 <h3>No videos yet</h3>
                 <p>Uploaded videos will appear here when they are available.</p>
-                {% if request.user == profile_user %}
+                {% if is_owner %}
                   <a class="sp-btn sp-btn-secondary" href="{% url 'home' %}">Explore StreamSphere</a>
                 {% endif %}
               </div>
@@ -342,12 +370,26 @@
           </div>
         </section>
 
-        {% if request.user == profile_user %}
+        {% if is_owner %}
         <section class="sp-card sp-card-pad">
           <span class="sp-eyebrow">Make it yours</span>
           <h2>Keep your profile fresh</h2>
           <p class="sp-help">A clear profile photo, useful bio, and current details help people connect with your content.</p>
           <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Update profile</a>
+        </section>
+
+        {# CHANGED: owner-only danger zone with POST-only account deletion. #}
+        <section class="sp-card sp-card-pad">
+          <span class="sp-eyebrow">Danger zone</span>
+          <h2>Delete account</h2>
+          <p class="sp-help">Permanently delete your account and all associated content. This cannot be undone.</p>
+          <div class="sp-danger-zone">
+            <form method="post" action="{% url 'accounts:profile_delete' %}"
+                  onsubmit="return confirm('Delete your account permanently? This cannot be undone.');">
+              {% csrf_token %}
+              <button type="submit" class="sp-btn sp-btn-danger">Delete account</button>
+            </form>
+          </div>
         </section>
         {% endif %}
       </aside>
