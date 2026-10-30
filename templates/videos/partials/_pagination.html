@@ -1,0 +1,27 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+    <nav class="vl-pagination" aria-label="Video pages">
+        {% if page_obj.has_previous %}
+            <a class="vl-page-link" href="?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}sort={{ sort_by|urlencode }}&page={{ page_obj.previous_page_number }}" aria-label="Previous page">Previous</a>
+        {% else %}
+            <span class="vl-page-link is-disabled">Previous</span>
+        {% endif %}
+
+        {% for page_number in page_obj.paginator.page_range %}
+            {% if page_number == page_obj.number %}
+                <span class="vl-page-link is-current" aria-current="page">{{ page_number }}</span>
+            {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                <a class="vl-page-link" href="?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}sort={{ sort_by|urlencode }}&page={{ page_number }}">{{ page_number }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="vl-page-link" href="?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}sort={{ sort_by|urlencode }}&page={{ page_obj.next_page_number }}" aria-label="Next page">Next</a>
+        {% else %}
+            <span class="vl-page-link is-disabled">Next</span>
+        {% endif %}
+    </nav>
+
+    <p class="vl-page-summary">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </p>
+{% endif %}

@@ -1,0 +1,942 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Stream | StreamSphere{% endblock %}
+
+{% block meta_description %}
+Update your StreamSphere broadcast details, thumbnail and visibility settings.
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================
+   STREAMSPHERE — EDIT STREAM
+========================================================= */
+
+.stream-edit-page {
+    width: 100%;
+    max-width: 1450px;
+    margin: 0 auto;
+    padding-bottom: 45px;
+    color: var(--text-primary, #f0f3f6);
+}
+
+/* Breadcrumbs */
+
+.stream-edit-page .ss-breadcrumbs {
+    margin-bottom: 24px;
+}
+
+/* Header */
+
+.edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.edit-header-content {
+    min-width: 0;
+}
+
+.edit-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #ff7900;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+}
+
+.edit-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    background: #ff7900;
+    border-radius: 50%;
+}
+
+.edit-header .ss-page-title {
+    margin: 0;
+}
+
+.edit-header .ss-page-subtitle {
+    margin-top: 8px;
+    max-width: 620px;
+}
+
+.edit-header-action {
+    flex-shrink: 0;
+}
+
+/* Main layout */
+
+.stream-edit-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, .75fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.stream-edit-main,
+.stream-edit-sidebar {
+    min-width: 0;
+}
+
+/* Panels */
+
+.edit-panel {
+    background: var(--panel-bg, #151a21);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+
+.edit-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 19px 21px;
+    border-bottom: 1px solid var(--border-color, #30363d);
+}
+
+.edit-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.edit-panel-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: rgba(255, 121, 0, .10);
+    border: 1px solid rgba(255, 121, 0, .2);
+    color: #ff7900;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+.edit-panel-header h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 850;
+    color: var(--text-primary, #f0f3f6);
+}
+
+.edit-panel-header p {
+    margin: 4px 0 0;
+    color: var(--text-muted, #8b949e);
+    font-size: 11px;
+}
+
+.edit-panel-body {
+    padding: 22px;
+}
+
+/* Form */
+
+.stream-edit-form {
+    width: 100%;
+}
+
+.stream-edit-field {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 21px;
+}
+
+.stream-edit-field:last-child {
+    margin-bottom: 0;
+}
+
+.stream-edit-field > label {
+    color: var(--text-primary, #e6edf3);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.stream-edit-field input:not([type="checkbox"]):not([type="file"]),
+.stream-edit-field textarea,
+.stream-edit-field select {
+    width: 100%;
+    min-height: 45px;
+    padding: 11px 13px;
+    background: var(--input-bg, #090d12);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 7px;
+    color: var(--text-primary, #f0f3f6);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.stream-edit-field textarea {
+    min-height: 135px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.stream-edit-field input:focus,
+.stream-edit-field textarea:focus,
+.stream-edit-field select:focus {
+    border-color: #ff7900;
+    box-shadow: 0 0 0 3px rgba(255, 121, 0, .10);
+}
+
+.stream-edit-field input[type="file"] {
+    width: 100%;
+    padding: 11px;
+    background: var(--input-bg, #090d12);
+    border: 1px dashed var(--border-color, #39434f);
+    border-radius: 7px;
+    color: var(--text-muted, #a0aab6);
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.stream-edit-field input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 121, 0, .12);
+    border: 1px solid rgba(255, 121, 0, .25);
+    border-radius: 5px;
+    color: #ff9a43;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.edit-field-help {
+    color: var(--text-muted, #8b949e);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.stream-edit-field .errorlist {
+    list-style: none;
+    margin: 0;
+    padding: 9px 11px;
+    background: rgba(248, 81, 73, .08);
+    border: 1px solid rgba(248, 81, 73, .2);
+    border-radius: 6px;
+    color: #ff7770;
+    font-size: 11px;
+}
+
+.edit-form-errors {
+    margin-bottom: 20px;
+    padding: 13px 15px;
+    background: rgba(248, 81, 73, .08);
+    border: 1px solid rgba(248, 81, 73, .25);
+    border-radius: 7px;
+    color: #ff7770;
+    font-size: 12px;
+}
+
+.edit-form-errors ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+/* Visibility setting */
+
+.edit-visibility {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--input-bg, #090d12);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 8px;
+}
+
+.edit-visibility-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    min-width: 0;
+}
+
+.edit-visibility-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 121, 0, .10);
+    color: #ff9a43;
+    border-radius: 7px;
+    font-size: 15px;
+}
+
+.edit-visibility-info strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.edit-visibility-info small {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted, #8b949e);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.edit-visibility input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    accent-color: #ff7900;
+    cursor: pointer;
+}
+
+/* Form actions */
+
+.edit-form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 21px;
+    margin-top: 24px;
+    border-top: 1px solid var(--border-color, #30363d);
+}
+
+.edit-form-actions .ss-btn {
+    min-height: 43px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 19px;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* Thumbnail panel */
+
+.edit-thumbnail-preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #090d12;
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 8px;
+}
+
+.edit-thumbnail-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edit-thumbnail-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 9px;
+    color: #737d89;
+}
+
+.edit-thumbnail-empty-icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    background: #171d25;
+    border: 1px solid #30363d;
+    border-radius: 9px;
+    font-size: 19px;
+}
+
+.edit-thumbnail-empty span {
+    font-size: 10px;
+}
+
+.edit-thumbnail-label {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 6px 9px;
+    background: rgba(0, 0, 0, .75);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 5px;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.edit-thumbnail-caption {
+    margin-top: 12px;
+    color: var(--text-muted, #8b949e);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* Information cards */
+
+.edit-info-card {
+    padding: 16px;
+    margin-bottom: 11px;
+    background: var(--input-bg, #090d12);
+    border: 1px solid var(--border-color, #30363d);
+    border-radius: 8px;
+}
+
+.edit-info-top {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+}
+
+.edit-info-icon {
+    color: #ff7900;
+    font-size: 14px;
+}
+
+.edit-info-card strong {
+    color: var(--text-primary, #e6edf3);
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.edit-info-card p {
+    margin: 0;
+    color: var(--text-muted, #8b949e);
+    font-size: 10px;
+    line-height: 1.65;
+}
+
+/* Sidebar status */
+
+.edit-status-card {
+    padding: 17px;
+}
+
+.edit-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.edit-status-label {
+    color: var(--text-muted, #8b949e);
+    font-size: 11px;
+}
+
+.edit-status-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-primary, #e6edf3);
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.edit-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #8b949e;
+}
+
+.edit-status-dot.is-live {
+    background: #3fb950;
+    box-shadow: 0 0 8px rgba(63, 185, 80, .5);
+}
+
+.edit-status-dot.is-ended {
+    background: #f85149;
+}
+
+/* Responsive */
+
+@media (max-width: 950px) {
+    .stream-edit-layout {
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 15px;
+    }
+
+    .edit-panel-body {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 760px) {
+    .stream-edit-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .stream-edit-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        align-items: start;
+    }
+
+    .stream-edit-sidebar .edit-panel {
+        margin-bottom: 0;
+    }
+
+    .edit-header {
+        flex-direction: column;
+    }
+
+    .edit-header-action {
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .edit-panel-header {
+        padding: 15px;
+    }
+
+    .edit-panel-body {
+        padding: 15px;
+    }
+
+    .stream-edit-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .edit-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .edit-form-actions .ss-btn {
+        width: 100%;
+    }
+
+    .edit-visibility {
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stream-edit-page">
+
+    <!-- Breadcrumbs -->
+    <div class="ss-breadcrumbs">
+        <a href="{% url 'streaming:stream_list' %}">Live streams</a>
+        <span class="ss-breadcrumb-separator">/</span>
+        <a href="{% url 'streaming:studio' stream.id %}">Studio</a>
+        <span class="ss-breadcrumb-separator">/</span>
+        <span>Edit stream</span>
+    </div>
+
+    <!-- Page header -->
+    <header class="edit-header">
+        <div class="edit-header-content">
+            <div class="edit-eyebrow">
+                <span class="edit-eyebrow-dot"></span>
+                STREAM MANAGEMENT
+            </div>
+
+            <h1 class="ss-page-title">Edit your stream</h1>
+
+            <p class="ss-page-subtitle">
+                Manage your broadcast information, update its appearance
+                and control how viewers discover your stream.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'streaming:studio' stream.id %}"
+            class="ss-btn ss-btn-secondary edit-header-action"
+        >
+            ← Back to studio
+        </a>
+    </header>
+
+    <div class="stream-edit-layout">
+
+        <!-- Main form -->
+        <main class="stream-edit-main">
+
+            <section class="edit-panel">
+
+                <div class="edit-panel-header">
+                    <div class="edit-panel-heading">
+                        <div class="edit-panel-icon">✎</div>
+                        <div>
+                            <h2>Stream information</h2>
+                            <p>Update the details displayed to your viewers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-panel-body">
+
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        class="stream-edit-form"
+                        id="streamEditForm"
+                    >
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="edit-form-errors">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% if form.errors %}
+                            <div class="edit-form-errors">
+                                <strong>Please review the highlighted fields.</strong>
+                            </div>
+                        {% endif %}
+
+                        <!-- Title -->
+                        <div class="stream-edit-field">
+                            <label for="{{ form.title.id_for_label }}">
+                                Stream title
+                            </label>
+
+                            {{ form.title }}
+
+                            <small class="edit-field-help">
+                                Choose a clear title that tells viewers what your broadcast is about.
+                            </small>
+
+                            {{ form.title.errors }}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="stream-edit-field">
+                            <label for="{{ form.description.id_for_label }}">
+                                Stream description
+                            </label>
+
+                            {{ form.description }}
+
+                            <small class="edit-field-help">
+                                Give viewers more information about your broadcast.
+                            </small>
+
+                            {{ form.description.errors }}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="stream-edit-field">
+                            <label for="{{ form.category.id_for_label }}">
+                                Stream category
+                            </label>
+
+                            {{ form.category }}
+
+                            <small class="edit-field-help">
+                                Help viewers find your stream through its category.
+                            </small>
+
+                            {{ form.category.errors }}
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="stream-edit-field">
+                            <label for="{{ form.thumbnail.id_for_label }}">
+                                Update stream thumbnail
+                            </label>
+
+                            {{ form.thumbnail }}
+
+                            <small class="edit-field-help">
+                                Select a new image if you want to replace the existing thumbnail.
+                                Recommended aspect ratio: 16:9.
+                            </small>
+
+                            {{ form.thumbnail.errors }}
+                        </div>
+
+                        <!-- Visibility -->
+                        {% if form.is_public %}
+                        <div class="stream-edit-field">
+                            <label>Stream visibility</label>
+
+                            <div class="edit-visibility">
+                                <div class="edit-visibility-info">
+                                    <div class="edit-visibility-icon">◉</div>
+
+                                    <div>
+                                        <strong>Publicly discoverable</strong>
+                                        <small>
+                                            Allow viewers to discover this stream on StreamSphere.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                {{ form.is_public }}
+                            </div>
+
+                            {{ form.is_public.errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Actions -->
+                        <div class="edit-form-actions">
+
+                            <button
+                                type="submit"
+                                class="ss-btn ss-btn-primary"
+                                id="saveStreamChanges"
+                            >
+                                <span>✓</span>
+                                Save changes
+                            </button>
+
+                            <a
+                                href="{% url 'streaming:studio' stream.id %}"
+                                class="ss-btn ss-btn-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="stream-edit-sidebar">
+
+            <!-- Thumbnail preview -->
+            <section class="edit-panel">
+
+                <div class="edit-panel-header">
+                    <div class="edit-panel-heading">
+                        <div class="edit-panel-icon">▧</div>
+                        <div>
+                            <h2>Thumbnail preview</h2>
+                            <p>Your stream's cover image.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-panel-body">
+
+                    <div class="edit-thumbnail-preview" id="editThumbnailPreview">
+
+                        {% if stream.thumbnail %}
+                            <img
+                                src="{{ stream.thumbnail.url }}"
+                                alt="{{ stream.title }}"
+                                id="editThumbnailImage"
+                            >
+                        {% else %}
+                            <div class="edit-thumbnail-empty" id="editThumbnailEmpty">
+                                <div class="edit-thumbnail-empty-icon">▧</div>
+                                <span>No thumbnail uploaded</span>
+                            </div>
+                        {% endif %}
+
+                        <span class="edit-thumbnail-label" id="editThumbnailLabel">
+                            {% if stream.thumbnail %}Current thumbnail{% else %}Preview{% endif %}
+                        </span>
+
+                    </div>
+
+                    <p class="edit-thumbnail-caption" id="editThumbnailCaption">
+                        {% if stream.thumbnail %}
+                            This is the thumbnail currently associated with your stream.
+                            Choose another image to preview your replacement.
+                        {% else %}
+                            Upload an image using the form to create a thumbnail for your stream.
+                        {% endif %}
+                    </p>
+
+                </div>
+            </section>
+
+            <!-- Stream status -->
+            <section class="edit-panel">
+                <div class="edit-panel-header">
+                    <div class="edit-panel-heading">
+                        <div class="edit-panel-icon">◉</div>
+                        <div>
+                            <h2>Broadcast status</h2>
+                            <p>Current stream information.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-status-card">
+                    <div class="edit-status-row">
+                        <span class="edit-status-label">Status</span>
+
+                        <span class="edit-status-value">
+                            <span
+                                class="edit-status-dot {% if stream.status == 'live' %}is-live{% elif stream.status == 'ended' %}is-ended{% endif %}"
+                            ></span>
+                            {{ stream.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tips -->
+            <section class="edit-panel">
+                <div class="edit-panel-header">
+                    <div class="edit-panel-heading">
+                        <div class="edit-panel-icon">✦</div>
+                        <div>
+                            <h2>Helpful tips</h2>
+                            <p>Make your stream stand out.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-panel-body">
+
+                    <div class="edit-info-card">
+                        <div class="edit-info-top">
+                            <span class="edit-info-icon">▣</span>
+                            <strong>Use a strong thumbnail</strong>
+                        </div>
+                        <p>
+                            Choose a clear, high-quality image that represents
+                            the content of your broadcast.
+                        </p>
+                    </div>
+
+                    <div class="edit-info-card">
+                        <div class="edit-info-top">
+                            <span class="edit-info-icon">✎</span>
+                            <strong>Write a useful description</strong>
+                        </div>
+                        <p>
+                            Explain what viewers can expect and give them a
+                            reason to join your stream.
+                        </p>
+                    </div>
+
+                    <div class="edit-info-card">
+                        <div class="edit-info-top">
+                            <span class="edit-info-icon">◎</span>
+                            <strong>Review visibility</strong>
+                        </div>
+                        <p>
+                            Check your public visibility setting so your
+                            intended audience can discover your broadcast.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+        </aside>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    "use strict";
+
+    const thumbnailInput = document.getElementById(
+        "{{ form.thumbnail.id_for_label|escapejs }}"
+    );
+
+    const preview = document.getElementById("editThumbnailPreview");
+    const caption = document.getElementById("editThumbnailCaption");
+    const label = document.getElementById("editThumbnailLabel");
+
+    if (!thumbnailInput || !preview) return;
+
+    let currentObjectUrl = null;
+
+    thumbnailInput.addEventListener("change", function () {
+        const file = this.files && this.files[0];
+
+        if (!file) return;
+
+        if (!file.type || !file.type.startsWith("image/")) {
+            this.value = "";
+
+            if (caption) {
+                caption.textContent = "Please select a valid image file.";
+            }
+
+            return;
+        }
+
+        if (currentObjectUrl) {
+            URL.revokeObjectURL(currentObjectUrl);
+        }
+
+        currentObjectUrl = URL.createObjectURL(file);
+
+        let image = document.getElementById("editThumbnailImage");
+
+        if (!image) {
+            preview.innerHTML = "";
+
+            image = document.createElement("img");
+            image.id = "editThumbnailImage";
+            image.alt = "New stream thumbnail preview";
+
+            preview.appendChild(image);
+
+            const previewLabel = document.createElement("span");
+            previewLabel.className = "edit-thumbnail-label";
+            previewLabel.id = "editThumbnailLabel";
+            previewLabel.textContent = "New thumbnail";
+            preview.appendChild(previewLabel);
+        }
+
+        image.src = currentObjectUrl;
+
+        const currentLabel = document.getElementById("editThumbnailLabel");
+
+        if (currentLabel) {
+            currentLabel.textContent = "New thumbnail";
+        }
+
+        if (caption) {
+            caption.textContent =
+                file.name + " — Your new thumbnail preview.";
+        }
+    });
+
+    window.addEventListener("beforeunload", function () {
+        if (currentObjectUrl) {
+            URL.revokeObjectURL(currentObjectUrl);
+        }
+    });
+
+})();
+</script>
+{% endblock %}

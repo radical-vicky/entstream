@@ -5,9 +5,6 @@
 
 {% block extra_css %}
 <style>
-    /* ==============================
-       PAGE VARIABLES
-    ============================== */
     .cp-page {
         --panel: #12151a;
         --border: #2b3039;
@@ -26,27 +23,21 @@
     .cp-page * { box-sizing: border-box; }
     .cp-page a { text-decoration: none; color: inherit; }
 
-    /* ==============================
-       PROFILE HEADER
-    ============================== */
+    /* PROFILE HEADER */
     .cp-header {
         position: relative;
         background: linear-gradient(135deg, #111419 0%, #1a1e26 100%);
         border: 1px solid var(--border);
-        border-radius: 0;
-        overflow: hidden;
         margin-bottom: 24px;
     }
 
     .cp-cover {
         height: 240px;
         width: 100%;
-        /* FIX: Added a fallback background image */
         background: url('{{ creator.profile.cover_image.url|default:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop" }}') center/cover no-repeat;
         position: relative;
     }
     
-    /* Fallback cover pattern if no image exists */
     .cp-cover::before {
         content: ''; position: absolute; inset: 0;
         background: radial-gradient(circle at 80% 20%, rgba(255,121,0,.15), transparent 32%),
@@ -74,7 +65,7 @@
         background: var(--panel); flex-shrink: 0;
         border: 2px solid var(--orange);
         position: relative; z-index: 2;
-        cursor: pointer; /* Make it clear it's clickable */
+        cursor: pointer;
         transition: transform 0.2s;
     }
     .cp-avatar-wrap:hover { transform: scale(1.05); }
@@ -99,7 +90,6 @@
         display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
     }
     
-    /* CSS Verified Badge */
     .cp-verified {
         display: inline-flex; align-items: center; justify-content: center;
         width: 20px; height: 20px; border-radius: 50%;
@@ -110,12 +100,10 @@
 
     .cp-actions { display: flex; gap: 12px; padding-bottom: 10px; }
 
-    /* ==============================
-       BUTTONS
-    ============================== */
+    /* BUTTONS */
     .ss-btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        padding: 12px 24px; border-radius: 0; font-size: 13px; font-weight: 700;
+        padding: 12px 24px; font-size: 13px; font-weight: 700;
         transition: all 0.2s; border: 1px solid transparent; cursor: pointer; text-decoration: none;
     }
     .ss-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -124,9 +112,7 @@
     .ss-btn-outline { background: transparent; color: #fff; border-color: var(--border); }
     .ss-btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #555; }
 
-    /* ==============================
-       BIO & STATS
-    ============================== */
+    /* BIO & STATS */
     .cp-bio {
         font-size: 15px; line-height: 1.6; color: #d1d5db;
         margin-bottom: 16px; max-width: 800px;
@@ -145,7 +131,6 @@
         border: 1px solid var(--border); background: var(--panel);
     }
     
-    /* FIX: Made stat boxes clickable links */
     .cp-stat-box {
         padding: 20px 24px; border-right: 1px solid var(--border);
         display: flex; flex-direction: column; text-decoration: none; color: inherit;
@@ -153,15 +138,14 @@
     }
     .cp-stat-box:hover { background: rgba(255,255,255,0.02); }
     .cp-stat-box:last-child { border-right: none; }
+    .cp-stat-box.is-active { border-bottom: 2px solid var(--orange); }
     
     .cp-stat-icon { margin-bottom: 8px; color: var(--orange); }
     .cp-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
     .cp-stat-val { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1; }
     .cp-stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 
-    /* ==============================
-       TABS NAVIGATION
-    ============================== */
+    /* TABS NAVIGATION */
     .cp-tabs {
         display: flex; gap: 32px; border-bottom: 1px solid var(--border);
         margin-bottom: 24px; overflow-x: auto; scrollbar-width: none;
@@ -176,27 +160,18 @@
     .cp-tab.active { color: var(--text); border-bottom-color: var(--orange); }
     .cp-tab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-    /* ==============================
-       VIDEO GRID
-    ============================== */
+    /* VIDEO GRID */
     .cp-grid-header {
         display: flex; align-items: center; justify-content: space-between;
         margin-bottom: 20px;
     }
     .cp-grid-title { margin: 0; font-size: 22px; font-weight: 800; }
-    
-    .cp-filter-btn {
-        background: var(--panel); border: 1px solid var(--border); color: var(--text);
-        padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 0;
-        display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
-    }
 
-    /* FIX: Reduced card size */
     .cp-video-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
     }
     .cp-video-card {
-        background: var(--panel); border: 1px solid var(--border); border-radius: 0;
+        background: var(--panel); border: 1px solid var(--border);
         display: flex; flex-direction: column; overflow: hidden; transition: border-color 0.2s;
     }
     .cp-video-card:hover { border-color: #555; }
@@ -214,12 +189,12 @@
     .cp-badge-premium {
         position: absolute; top: 12px; left: 12px;
         background: var(--orange); color: #111; font-size: 10px; font-weight: 800;
-        padding: 4px 8px; border-radius: 0; text-transform: uppercase;
+        padding: 4px 8px; text-transform: uppercase;
     }
     .cp-duration {
         position: absolute; bottom: 12px; right: 12px;
         background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; font-weight: 700;
-        padding: 4px 6px; border-radius: 0;
+        padding: 4px 6px;
     }
 
     .cp-video-info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
@@ -241,25 +216,31 @@
     }
     .cp-small-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .cp-author-name { font-size: 12px; font-weight: 600; color: #d1d5db; }
-    
-    /* FIX: Kebab menu (•••) style */
-    .cp-more-btn { 
-        color: var(--muted); cursor: pointer; letter-spacing: 1px; line-height: 1; 
-        background: transparent; border: none; font-size: 16px; padding: 0 4px;
-    }
-    .cp-more-btn:hover { color: #fff; }
 
-    /* ==============================
-       BOTTOM CTA BANNER
-    ============================== */
+    /* USER LIST GRID */
+    .cp-user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .cp-user-card {
+        display: flex; align-items: center; gap: 12px; padding: 16px;
+        background: var(--panel); border: 1px solid var(--border);
+    }
+    .cp-user-avatar {
+        width: 48px; height: 48px; border-radius: 50%; background: #252a32;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; font-weight: 800; color: var(--orange); flex-shrink: 0; overflow: hidden;
+    }
+    .cp-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .cp-user-info { flex: 1; min-width: 0; }
+    .cp-user-name { display: block; font-size: 14px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cp-user-username { display: block; font-size: 12px; color: var(--muted); }
+
+    /* BOTTOM CTA */
     .cp-cta-banner {
         margin-top: 50px; background: linear-gradient(90deg, #1a0f08 0%, #0b0d10 50%, #0b0d10 100%);
-        border: 1px solid var(--orange); border-radius: 0;
+        border: 1px solid var(--orange);
         padding: 40px; display: flex; align-items: center; gap: 40px;
         position: relative; overflow: hidden;
     }
     
-    /* Pure CSS illustration to replace the image */
     .cp-cta-graphic {
         width: 120px; height: 90px; position: relative; flex-shrink: 0;
     }
@@ -278,9 +259,7 @@
     .cp-cta-banner h2 { margin: 0 0 8px; font-size: 26px; font-weight: 800; color: #fff; }
     .cp-cta-banner p { margin: 0 0 24px; font-size: 14px; color: var(--muted); max-width: 550px; line-height: 1.6; }
 
-    /* ==============================
-       LIGHTBOX MODAL (For Avatar)
-    ============================== */
+    /* LIGHTBOX */
     .cp-lightbox {
         display: none; position: fixed; inset: 0; z-index: 9999;
         background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
@@ -292,9 +271,6 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    /* ==============================
-       RESPONSIVE
-    ============================== */
     @media (max-width: 900px) {
         .cp-top-row { flex-wrap: wrap; }
         .cp-name-area { width: 100%; flex: none; order: 3; }
@@ -302,7 +278,6 @@
         .cp-avatar-wrap { width: 120px; height: 120px; margin-top: -50px; }
         .cp-cover { height: 180px; }
         
-        /* FIX: Keep stats grid horizontal on mobile, just make it smaller */
         .cp-stats-grid { grid-template-columns: repeat(3, 1fr); }
         .cp-stat-box { padding: 12px 10px; }
         .cp-stat-val { font-size: 20px; }
@@ -317,7 +292,7 @@
 {% block content %}
 <div class="cp-page">
 
-    <!-- PROFILE HEADER BLOCK -->
+    <!-- PROFILE HEADER -->
     <section class="cp-header">
         <div class="cp-cover">
             {% if creator.profile.cover_image %}
@@ -327,7 +302,6 @@
         
         <div class="cp-profile-info-wrap">
             <div class="cp-top-row">
-                <!-- FIX: Added onclick to open lightbox -->
                 <div class="cp-avatar-wrap" onclick="openLightbox()" title="Click to view full size">
                     {% if creator.profile.avatar_image %}
                         <img id="profileAvatarImage" class="cp-avatar" src="{{ creator.profile.avatar_image.url }}" alt="{{ creator.username }}">
@@ -360,18 +334,20 @@
                                 Upload video
                             </a>
                         {% else %}
-                            <form method="post" action="{% url 'creators:toggle_follow' creator.username %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}">
-                                {% if following_creator %}
-                                    <button class="ss-btn ss-btn-outline" type="submit">Following</button>
-                                {% else %}
-                                    <button class="ss-btn ss-btn-primary" type="submit">
-                                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                                        Follow creator
-                                    </button>
-                                {% endif %}
-                            </form>
+                            <button 
+                                class="ss-btn {% if is_following %}ss-btn-outline{% else %}ss-btn-primary{% endif %}" 
+                                id="followBtn" 
+                                data-url="{% url 'creators:toggle_follow' creator.username %}"
+                            >
+                                <svg viewBox="0 0 24 24" id="followIcon">
+                                    {% if is_following %}
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    {% else %}
+                                        <path d="M12 5v14M5 12h14"/>
+                                    {% endif %}
+                                </svg>
+                                <span id="followBtnText">{% if is_following %}Following{% else %}Follow creator{% endif %}</span>
+                            </button>
                         {% endif %}
                     {% else %}
                         <a class="ss-btn ss-btn-primary" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
@@ -404,73 +380,109 @@
                 {% endif %}
             </div>
 
-            <!-- FIX: Wrapped the stat boxes in anchor tags -->
             <div class="cp-stats-grid">
-                <a href="?tab=videos" class="cp-stat-box">
+                <a href="?tab=videos" class="cp-stat-box {% if active_tab == 'videos' %}is-active{% endif %}">
                     <div class="cp-stat-icon">
                         <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
                     </div>
-                    <span class="cp-stat-val">{% if video_count != None %}{{ video_count }}{% else %}{{ videos|length }}{% endif %}</span>
+                    <span class="cp-stat-val">{{ video_count|default:0 }}</span>
                     <span class="cp-stat-lbl">Videos</span>
                 </a>
                 
-                <a href="?tab=followers" class="cp-stat-box">
+                <a href="?tab=followers" class="cp-stat-box {% if active_tab == 'followers' %}is-active{% endif %}">
                     <div class="cp-stat-icon">
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
-                    <span class="cp-stat-val">{{ follower_count|default:0 }}</span>
+                    <span class="cp-stat-val" id="followerCountDisplay">{{ followers_count|default:0 }}</span>
                     <span class="cp-stat-lbl">Followers</span>
                 </a>
                 
-                <a href="?tab=views" class="cp-stat-box">
+                <a href="?tab=following" class="cp-stat-box {% if active_tab == 'following' %}is-active{% endif %}">
                     <div class="cp-stat-icon">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     </div>
-                    <span class="cp-stat-val">{{ total_views|default:0 }}</span>
-                    <span class="cp-stat-lbl">Total views</span>
+                    <span class="cp-stat-val">{{ following_count|default:0 }}</span>
+                    <span class="cp-stat-lbl">Following</span>
                 </a>
             </div>
         </div>
     </section>
 
     <!-- TABS NAVIGATION -->
-    <!-- FIX: Added href links to the tabs -->
     <nav class="cp-tabs">
-        <a href="?tab=videos" class="cp-tab {% if not request.GET.tab or request.GET.tab == 'videos' %}active{% endif %}">
+        <a href="?tab=videos" class="cp-tab {% if active_tab == 'videos' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="m10 9 5 3-5 3Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
             Videos
         </a>
-        <a href="?tab=live" class="cp-tab {% if request.GET.tab == 'live' %}active{% endif %}">
-            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 0v10l4 4"/></svg>
-            Live streams
+        <a href="?tab=followers" class="cp-tab {% if active_tab == 'followers' %}active{% endif %}">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Followers
         </a>
-        <a href="?tab=playlists" class="cp-tab {% if request.GET.tab == 'playlists' %}active{% endif %}">
-            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Playlists
-        </a>
-        <a href="?tab=liked" class="cp-tab {% if request.GET.tab == 'liked' %}active{% endif %}">
+        <a href="?tab=following" class="cp-tab {% if active_tab == 'following' %}active{% endif %}">
             <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Liked videos
+            Following
         </a>
     </nav>
 
-    <!-- VIDEO GRID SECTION -->
+    <!-- GRID SECTION -->
     <section class="cp-videos-section">
         <div class="cp-grid-header">
-            <!-- You can dynamically change this title based on the tab -->
             <h2 class="cp-grid-title">
-                {% if request.GET.tab == 'live' %}Live Streams
-                {% elif request.GET.tab == 'playlists' %}Playlists
-                {% elif request.GET.tab == 'liked' %}Liked Videos
-                {% else %}Your Videos{% endif %}
+                {% if active_tab == 'followers' %}Followers
+                {% elif active_tab == 'following' %}Following
+                {% else %}Videos{% endif %}
             </h2>
-            <button class="cp-filter-btn">
-                <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                Latest
-            </button>
         </div>
 
-        {% if videos %}
+        {% if active_tab == 'followers' %}
+            <div class="cp-user-grid">
+                {% for follower in followers %}
+                    <div class="cp-user-card">
+                        <a href="{% url 'creators:profile' follower.username %}" class="cp-user-avatar">
+                            {% if follower.profile.avatar_image %}
+                                <img src="{{ follower.profile.avatar_image.url }}" alt="">
+                            {% else %}
+                                {{ follower.username|first|upper }}
+                            {% endif %}
+                        </a>
+                        <div class="cp-user-info">
+                            <a href="{% url 'creators:profile' follower.username %}" class="cp-user-name">{{ follower.get_full_name|default:follower.username }}</a>
+                            <span class="cp-user-username">@{{ follower.username }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel); grid-column: 1/-1;">
+                        <h3 style="margin: 0 0 8px; font-size: 18px;">No followers yet</h3>
+                        <p style="color: var(--muted); margin-bottom: 20px;">When someone follows this creator, they will appear here.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% elif active_tab == 'following' %}
+            <div class="cp-user-grid">
+                {% for followed_user in following %}
+                    <div class="cp-user-card">
+                        <a href="{% url 'creators:profile' followed_user.username %}" class="cp-user-avatar">
+                            {% if followed_user.profile.avatar_image %}
+                                <img src="{{ followed_user.profile.avatar_image.url }}" alt="">
+                            {% else %}
+                                {{ followed_user.username|first|upper }}
+                            {% endif %}
+                        </a>
+                        <div class="cp-user-info">
+                            <a href="{% url 'creators:profile' followed_user.username %}" class="cp-user-name">{{ followed_user.get_full_name|default:followed_user.username }}</a>
+                            <span class="cp-user-username">@{{ followed_user.username }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel); grid-column: 1/-1;">
+                        <h3 style="margin: 0 0 8px; font-size: 18px;">Not following anyone</h3>
+                        <p style="color: var(--muted); margin-bottom: 20px;">This creator hasn't followed anyone yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
             <div class="cp-video-grid">
                 {% for video in videos %}
                     <article class="cp-video-card">
@@ -506,8 +518,6 @@
                                     <a href="{% url 'creators:profile' video.creator.username %}" class="cp-small-avatar">
                                         {% if video.creator.profile.avatar_image %}
                                             <img src="{{ video.creator.profile.avatar_image.url }}" alt="">
-                                        {% elif video.creator.profile.avatar %}
-                                            <img src="{{ video.creator.profile.avatar }}" alt="">
                                         {% else %}
                                             {{ video.creator.username|first|upper }}
                                         {% endif %}
@@ -516,46 +526,24 @@
                                         @{{ video.creator.username }}
                                     </a>
                                 </div>
-                                <!-- FIX: Kebab menu button -->
                                 <button class="cp-more-btn" title="More options" type="button">&bull;&bull;&bull;</button>
                             </div>
                         </div>
                     </article>
+                {% empty %}
+                    <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel); grid-column: 1/-1;">
+                        <h3 style="margin: 0 0 8px; font-size: 18px;">No videos found</h3>
+                        <p style="color: var(--muted); margin-bottom: 20px;">This creator hasn't published any videos yet.</p>
+                        {% if request.user == creator %}
+                            <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload your first video</a>
+                        {% endif %}
+                    </div>
                 {% endfor %}
-            </div>
-
-            {% if page_obj and page_obj.paginator.num_pages > 1 %}
-                <nav class="cp-pagination" style="display:flex; justify-content:center; gap:8px; margin-top:32px;">
-                    {% if page_obj.has_previous %}
-                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}">Previous</a>
-                    {% endif %}
-                    <span class="ss-btn ss-btn-primary" style="cursor:default;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-                    {% if page_obj.has_next %}
-                        <a class="ss-btn ss-btn-outline" href="?page={{ page_obj.next_page_number }}{% if request.GET.tab %}&tab={{ request.GET.tab }}{% endif %}">Next</a>
-                    {% endif %}
-                </nav>
-            {% endif %}
-
-        {% else %}
-            <div style="text-align:center; padding: 60px 20px; border: 1px dashed var(--border); background: var(--panel);">
-                <h3 style="margin: 0 0 8px; font-size: 18px;">No videos found</h3>
-                <p style="color: var(--muted); margin-bottom: 20px;">
-                    {% if request.GET.tab == 'live' %}
-                        There are no live streams active right now.
-                    {% elif request.GET.tab == 'liked' %}
-                        There are no liked videos yet.
-                    {% else %}
-                        This creator hasn't published any videos yet.
-                    {% endif %}
-                </p>
-                {% if request.user == creator %}
-                    <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-primary">Upload your first video</a>
-                {% endif %}
             </div>
         {% endif %}
     </section>
 
-    <!-- BOTTOM CTA BANNER -->
+    <!-- BOTTOM CTA -->
     <section class="cp-cta-banner">
         <div class="cp-cta-graphic"></div>
         <div class="cp-cta-content">
@@ -572,27 +560,79 @@
 
 </div>
 
-<!-- FIX: Lightbox Container for Avatar Viewing -->
+<!-- Lightbox Container -->
 <div id="avatarLightbox" class="cp-lightbox" onclick="closeLightbox()">
     <img id="lightboxImg" src="" alt="Full size avatar">
 </div>
 
 <script>
-    // Simple script to handle the avatar lightbox
     function openLightbox() {
         const sourceImg = document.getElementById('profileAvatarImage');
-        if (!sourceImg) return; // If user has no image, do nothing
-
-        const lightbox = document.getElementById('avatarLightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        
-        lightboxImg.src = sourceImg.src;
-        lightbox.classList.add('is-active');
+        if (!sourceImg) return;
+        document.getElementById('lightboxImg').src = sourceImg.src;
+        document.getElementById('avatarLightbox').classList.add('is-active');
+        document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
-        const lightbox = document.getElementById('avatarLightbox');
-        lightbox.classList.remove('is-active');
+        document.getElementById('avatarLightbox').classList.remove('is-active');
+        document.body.style.overflow = '';
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const followBtn = document.getElementById('followBtn');
+        if (!followBtn) return;
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrfToken = getCookie('csrftoken');
+
+        followBtn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const btn = document.getElementById('followBtn');
+                const txt = document.getElementById('followBtnText');
+                const icon = document.getElementById('followIcon');
+                const followerCount = document.getElementById('followerCountDisplay');
+
+                if (data.following) {
+                    btn.classList.remove('ss-btn-primary');
+                    btn.classList.add('ss-btn-outline');
+                    txt.textContent = 'Following';
+                    icon.innerHTML = '<path d="M20 6L9 17l-5-5"/>';
+                } else {
+                    btn.classList.remove('ss-btn-outline');
+                    btn.classList.add('ss-btn-primary');
+                    txt.textContent = 'Follow creator';
+                    icon.innerHTML = '<path d="M12 5v14M5 12h14"/>';
+                }
+                followerCount.textContent = data.count;
+            })
+            .catch(err => {
+                console.error('Follow error:', err);
+                alert('Could not update follow status. Please try again.');
+            });
+        });
+    });
 </script>
 {% endblock %}

@@ -1,5 +1,9 @@
 import cloudinary
 import cloudinary.utils
+import os
+import requests
+from urllib.parse import urlparse
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,17 +11,15 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import F, Q
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
-from .forms import VideoForm
 
 from accounts.models import Notification
 from creators.models import Follow
-
 from .access import can_user_watch_video
-from .forms import VideoUploadForm
+from .forms import VideoForm, VideoUploadForm
 from .models import Video, VideoLike, VideoComment
 from .purchase_services import create_video_purchase_payment
 
@@ -42,6 +44,7 @@ def home(request):
             "total_videos": published_videos.count(),
         },
     )
+
 
 
 def video_list(request):
@@ -69,17 +72,35 @@ def video_list(request):
     paginator = Paginator(videos, 24)
     page_obj = paginator.get_page(request.GET.get("page"))
 
-    return render(
-        request,
-        "videos/video_list.html",
-        {
-            "videos": page_obj.object_list,
-            "page_obj": page_obj,
+    context = {
+        "videos": page_obj.object_list,
+        "page_obj": page_obj,
+        "search_query": search_query,
+        "sort_by": sort_by,
+        "total_videos": paginator.count,
+    }
+
+    # AJAX: Return only the changed parts as JSON
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        grid_html = render_to_string(
+            "videos/partials/_video_grid.html",
+            context,
+            request=request,
+        )
+        pagination_html = render_to_string(
+            "videos/partials/_pagination.html",
+            context,
+            request=request,
+        )
+        return JsonResponse({
+            "grid_html": grid_html,
+            "pagination_html": pagination_html,
+            "total_videos": paginator.count,
             "search_query": search_query,
             "sort_by": sort_by,
-            "total_videos": paginator.count,
-        },
-    )
+        })
+
+    return render(request, "videos/video_list.html", context)
 
 
 def video_detail(request, pk):
@@ -101,7 +122,6 @@ def video_detail(request, pk):
     )
 
     can_watch = can_user_watch_video(request.user, video)
-
     liked = False
     following_creator = False
 
@@ -148,8 +168,10 @@ def toggle_like(request, pk):
 
         if existing.exists():
             existing.delete()
+            liked = False
         else:
             VideoLike.objects.create(video=video, user=request.user)
+            liked = True
 
             if video.creator_id != request.user.pk:
                 Notification.objects.create(
@@ -159,6 +181,13 @@ def toggle_like(request, pk):
                     video=video,
                 )
 
+    # AJAX response
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({
+            "liked": liked,
+            "count": video.likes.count()
+        })
+
     return redirect("videos:detail", pk=video.pk)
 
 
@@ -166,25 +195,42 @@ def toggle_like(request, pk):
 @require_POST
 def add_comment(request, pk):
     video = get_object_or_404(Video, pk=pk, status=Video.Status.PUBLISHED)
-    text = request.POST.get("text", "").strip()
+    text = request.POST.get("text", request.POST.get("content", "")).strip()
 
     if not text:
-        messages.error(request, "Write a comment before submitting.")
+        return JsonResponse({"error": "Write a comment before submitting."}, status=400)
     elif len(text) > 2000:
-        messages.error(request, "Comments must be 2,000 characters or fewer.")
-    else:
-        comment = VideoComment.objects.create(
-            video=video, user=request.user, text=text
+        return JsonResponse({"error": "Comments must be 2,000 characters or fewer."}, status=400)
+
+    comment = VideoComment.objects.create(
+        video=video, user=request.user, text=text
+    )
+
+    if video.creator_id != request.user.pk:
+        Notification.objects.create(
+            recipient=video.creator,
+            actor=request.user,
+            notification_type=Notification.Type.COMMENT,
+            video=video,
+            comment=comment,
         )
 
-        if video.creator_id != request.user.pk:
-            Notification.objects.create(
-                recipient=video.creator,
-                actor=request.user,
-                notification_type=Notification.Type.COMMENT,
-                video=video,
-                comment=comment,
-            )
+    # AJAX response
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        avatar_url = (
+            request.user.profile.avatar_image.url
+            if hasattr(request.user, "profile") and request.user.profile.avatar_image
+            else None
+        )
+        return JsonResponse({
+            "success": True,
+            "comment_id": comment.pk,
+            "text": comment.text,
+            "username": request.user.username,
+            "avatar": avatar_url,
+            "created_at": comment.created_at.strftime("%b %d, %Y"),
+            "comment_count": video.comments.count(),
+        })
 
     return redirect("videos:detail", pk=video.pk)
 
@@ -214,7 +260,7 @@ def get_cloudinary_signature(request):
         "timestamp": timestamp,
         "folder": "streamsphere/videos",
     }
-    
+
     signature = cloudinary.utils.api_sign_request(params, settings.CLOUDINARY_API_SECRET)
 
     return JsonResponse({
@@ -229,7 +275,7 @@ def get_cloudinary_signature(request):
 @login_required
 def upload_video(request):
     if request.method == "POST":
-        form = VideoUploadForm(request.POST) 
+        form = VideoUploadForm(request.POST)
 
         if form.is_valid():
             video = form.save(commit=False)
@@ -281,7 +327,6 @@ def watch_video(request, pk):
         messages.info(request, "Purchase this premium video to watch it.")
         return redirect("videos:purchase", pk=video.pk)
 
-    # FIXED: video_file is now a URL string, not a Cloudinary file object
     media_url = video.video_file
 
     if not media_url:
@@ -289,6 +334,37 @@ def watch_video(request, pk):
         return redirect("videos:detail", pk=video.pk)
 
     return redirect(media_url)
+
+
+# NEW VIEW: Force download of the video
+@login_required
+def video_download(request, pk):
+    video = get_object_or_404(Video, pk=pk, status=Video.Status.PUBLISHED)
+
+    if not can_user_watch_video(request.user, video):
+        messages.error(request, "You do not have permission to download this video.")
+        return redirect("videos:detail", pk=video.pk)
+
+    media_url = video.video_file
+    if not media_url:
+        messages.error(request, "The video file is unavailable.")
+        return redirect("videos:detail", pk=video.pk)
+
+    try:
+        # Stream the file from the source to the user as an attachment
+        response = requests.get(media_url, stream=True)
+        response.raise_for_status()
+
+        filename = os.path.basename(urlparse(media_url).path) or f"{video.title}.mp4"
+
+        return FileResponse(
+            response.raw,
+            as_attachment=True,
+            filename=filename,
+        )
+    except requests.RequestException:
+        messages.error(request, "Could not download the video at this time.")
+        return redirect("videos:detail", pk=video.pk)
 
 
 @login_required
@@ -299,13 +375,8 @@ def my_videos(request):
 
 @login_required
 def video_edit(request, pk):
-    """
-    Edit a video. Only the creator may edit.
-    # CHANGED: new view.
-    """
     video = get_object_or_404(Video, pk=pk)
 
-    # Ownership check
     if video.creator != request.user:
         messages.error(request, "You can only edit your own videos.")
         return redirect("videos:detail", pk=video.pk)
@@ -329,13 +400,8 @@ def video_edit(request, pk):
 @login_required
 @require_POST
 def video_delete(request, pk):
-    """
-    Delete a video. Only the creator may delete, and only via POST.
-    # CHANGED: new view.
-    """
     video = get_object_or_404(Video, pk=pk)
 
-    # Ownership check
     if video.creator != request.user:
         messages.error(request, "You can only delete your own videos.")
         return redirect("videos:detail", pk=video.pk)

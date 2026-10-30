@@ -1,6 +1,9 @@
 from django import forms
 from .models import Profile
 
+from django import forms
+from .models import Profile
+
 
 class ProfileForm(forms.ModelForm):
     avatar_upload = forms.FileField(
@@ -9,7 +12,7 @@ class ProfileForm(forms.ModelForm):
         widget=forms.ClearableFileInput(
             attrs={
                 "accept": "image/jpeg,image/png,image/webp,image/gif",
-                "class": "sp-avatar-input",
+                "class": "ep-file-input",
                 "id": "id_avatar_upload",
             }
         ),
@@ -17,19 +20,24 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ["bio", "location", "website"]
+        # CHANGED: Added cover_image to the fields
+        fields = ["bio", "location", "website", "cover_image"]
         widgets = {
             "bio": forms.Textarea(
                 attrs={
                     "rows": 4,
                     "placeholder": "Tell people about yourself",
+                    "class": "ep-input",
                 }
             ),
             "location": forms.TextInput(
-                attrs={"placeholder": "Your location"}
+                attrs={"placeholder": "Your location", "class": "ep-input"}
             ),
             "website": forms.URLInput(
-                attrs={"placeholder": "https://example.com"}
+                attrs={"placeholder": "https://example.com", "class": "ep-input"}
+            ),
+            "cover_image": forms.ClearableFileInput(
+                attrs={"class": "ep-file-input"}
             ),
         }
 

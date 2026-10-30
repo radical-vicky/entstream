@@ -1,0 +1,1073 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Creator Studio | {{ stream.title }} | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =====================================================
+   STREAMSPHERE CREATOR STUDIO
+   Sharp corners | Dark interface | Orange accent
+===================================================== */
+
+.studio-page {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    color: #f0f3f6;
+}
+
+.studio-page,
+.studio-page * {
+    border-radius: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Breadcrumb */
+
+.studio-page .ss-breadcrumbs {
+    margin-bottom: 22px;
+}
+
+/* Header */
+
+.studio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #30363d;
+}
+
+.studio-heading {
+    min-width: 0;
+}
+
+.studio-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #ff7900;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.studio-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    background: #ff7900;
+}
+
+.studio-heading h1 {
+    margin: 0;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 850;
+    letter-spacing: -1.2px;
+    line-height: 1.15;
+}
+
+.studio-heading p {
+    margin: 8px 0 0;
+    color: #929eaa;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.studio-header-actions {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+/* General panels */
+
+.studio-panel {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    min-width: 0;
+}
+
+.studio-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #30363d;
+}
+
+.studio-panel-title {
+    margin: 0;
+    color: #f0f3f6;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.studio-panel-body {
+    padding: 18px;
+}
+
+/* Main layout */
+
+.studio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, .8fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.studio-main,
+.studio-sidebar {
+    min-width: 0;
+}
+
+.studio-main {
+    display: grid;
+    gap: 17px;
+}
+
+.studio-sidebar {
+    display: grid;
+    gap: 17px;
+}
+
+/* Preview */
+
+.studio-preview {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 300px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at center, #151b23 0%, #080b10 68%);
+    border: 1px solid #30363d;
+}
+
+.studio-preview video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 650px;
+    object-fit: contain;
+    background: #050709;
+    z-index: 1;
+}
+
+.studio-preview-placeholder {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 390px;
+    padding: 25px;
+    text-align: center;
+    color: #929eaa;
+    pointer-events: none;
+}
+
+.studio-placeholder-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 17px;
+    border: 1px solid #3a424d;
+    background: #151b23;
+    color: #ff7900;
+    font-size: 23px;
+}
+
+.studio-preview-placeholder strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #f0f3f6;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.studio-preview-placeholder p {
+    margin: 0;
+    color: #8b949e;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* Live badge */
+
+.studio-live-label {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    background: #e53935;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .8px;
+}
+
+/* Preview footer */
+
+.studio-preview-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-height: 48px;
+    padding: 11px 15px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-top: 0;
+}
+
+.studio-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #c9d1d9;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.studio-status-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    background: #d29922;
+}
+
+.studio-status-dot.live {
+    background: #3fb950;
+    box-shadow: 0 0 9px rgba(63, 185, 80, .7);
+}
+
+.studio-preview-type {
+    color: #8b949e;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+/* Metrics */
+
+.studio-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.studio-metric {
+    min-width: 0;
+    padding: 17px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+}
+
+.studio-metric-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8b949e;
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.studio-metric-value {
+    display: block;
+    margin-top: 10px;
+    color: #f0f3f6;
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 850;
+    letter-spacing: -1px;
+    overflow-wrap: anywhere;
+}
+
+.studio-metric:first-child .studio-metric-value {
+    color: #ff7900;
+}
+
+/* Controls */
+
+.studio-description {
+    margin: 0 0 17px;
+    color: #929eaa;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.studio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.studio-actions .ss-btn {
+    min-height: 40px;
+}
+
+.studio-message {
+    margin: 13px 0 0;
+    color: #a0aab6;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.studio-error {
+    margin-top: 10px;
+    color: #f85149;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Sidebar information */
+
+.studio-info-list {
+    display: grid;
+    gap: 0;
+}
+
+.studio-info-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #252c35;
+    font-size: 11px;
+}
+
+.studio-info-row:first-child {
+    padding-top: 0;
+}
+
+.studio-info-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.studio-info-label {
+    color: #8b949e;
+    flex-shrink: 0;
+}
+
+.studio-info-value {
+    color: #f0f3f6;
+    font-weight: 700;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.studio-info-value.public {
+    color: #3fb950;
+}
+
+.studio-info-value.private {
+    color: #d29922;
+}
+
+/* OBS connection */
+
+.studio-field {
+    margin-top: 15px;
+}
+
+.studio-field:first-of-type {
+    margin-top: 0;
+}
+
+.studio-field label {
+    display: block;
+    margin-bottom: 7px;
+    color: #a0aab6;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.studio-code {
+    display: flex;
+    min-width: 0;
+    gap: 0;
+}
+
+.studio-code input {
+    width: 100%;
+    min-width: 0;
+    height: 39px;
+    padding: 0 10px;
+    background: #080b10;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    outline: none;
+    font-family: monospace;
+    font-size: 10px;
+}
+
+.studio-code input:focus {
+    border-color: #ff7900;
+}
+
+.studio-code .ss-btn {
+    flex-shrink: 0;
+    min-height: 39px;
+}
+
+.studio-notice {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(255, 121, 0, .07);
+    border: 1px solid rgba(255, 121, 0, .25);
+    border-left: 3px solid #ff7900;
+    color: #a0aab6;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+/* Checklist */
+
+.studio-checklist {
+    display: grid;
+    gap: 13px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.studio-checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #a0aab6;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.studio-check-icon {
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    border: 1px solid #3fb950;
+    color: #3fb950;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+    .studio-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .studio-sidebar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .studio-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 19px;
+    }
+
+    .studio-header-actions {
+        width: 100%;
+    }
+
+    .studio-header-actions .ss-btn {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .studio-layout {
+        gap: 14px;
+    }
+
+    .studio-sidebar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .studio-preview {
+        min-height: 210px;
+    }
+
+    .studio-preview-placeholder {
+        padding: 15px;
+    }
+
+    .studio-placeholder-icon {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 12px;
+        font-size: 19px;
+    }
+
+    .studio-preview-placeholder strong {
+        font-size: 14px;
+    }
+
+    .studio-preview-placeholder p {
+        font-size: 11px;
+    }
+
+    .studio-metrics {
+        gap: 8px;
+    }
+
+    .studio-metric {
+        padding: 12px 10px;
+    }
+
+    .studio-metric-label {
+        font-size: 9px;
+    }
+
+    .studio-metric-value {
+        font-size: 21px;
+    }
+
+    .studio-panel-body {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 380px) {
+    .studio-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .studio-metric {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .studio-metric-value {
+        margin-top: 0;
+    }
+
+    .studio-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .studio-actions .ss-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="studio-page">
+
+    <!-- Breadcrumb -->
+    <div class="ss-breadcrumbs">
+        <a href="{% url 'streaming:stream_list' %}">Live streams</a>
+        <span class="ss-breadcrumb-separator">/</span>
+        <span>Creator studio</span>
+    </div>
+
+    <!-- Header -->
+    <header class="studio-header">
+        <div class="studio-heading">
+            <div class="studio-eyebrow">
+                <span class="studio-eyebrow-dot"></span>
+                STREAMSPHERE BROADCAST
+            </div>
+
+            <h1>Creator studio</h1>
+            <p>{{ stream.title }}</p>
+        </div>
+
+        <div class="studio-header-actions">
+            <a href="{% url 'streaming:edit_stream' stream.id %}"
+               class="ss-btn ss-btn-secondary">
+                Edit stream
+            </a>
+
+           <a href="{% url 'streaming:watch_stream' stream.id %}"
+   target="_blank"
+   rel="noopener"
+   class="ss-btn ss-btn-outline">
+    View watch page
+</a>
+        </div>
+    </header>
+
+
+    <!-- Main studio -->
+    <div class="studio-layout">
+
+        <!-- Main column -->
+        <main class="studio-main">
+
+            <!-- Preview panel -->
+            <section class="studio-panel">
+
+                <div class="studio-panel-header">
+                    <h2 class="studio-panel-title">Broadcast preview</h2>
+
+                    {% if stream.status == "live" %}
+                        <span class="studio-preview-type" style="color: #e53935;">
+                            ● LIVE
+                        </span>
+                    {% else %}
+                        <span class="studio-preview-type">
+                            LIVE PREVIEW
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="studio-preview"
+                     id="studioPreview"
+                     data-stream-id="{{ stream.id }}"
+                     data-token-url="{% url 'streaming:stream_token' stream.id %}"
+                     data-start-url="{% url 'streaming:start_stream' stream.id %}"
+                     data-end-url="{% url 'streaming:end_stream' stream.id %}"
+                     data-livekit-url="{{ livekit_url|default:'' }}"
+                     data-broadcast-type="{{ stream.broadcast_type }}">
+
+                    <!-- Removed the inline position:static that was breaking the layout -->
+                    {% if stream.status == "live" %}
+                        <span class="studio-live-label">● LIVE</span>
+                    {% endif %}
+
+                    <video id="studioVideo"
+                           autoplay
+                           muted
+                           playsinline></video>
+
+                    <div class="studio-preview-placeholder"
+                         id="studioPlaceholder">
+
+                        <div class="studio-placeholder-icon">
+                            <span aria-hidden="true">▶</span>
+                        </div>
+
+                        <strong>Your broadcast preview</strong>
+
+                        <p>
+                            Your camera or incoming broadcast will appear here.
+                            Connect your broadcast source to get started.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="studio-preview-footer">
+                    <span class="studio-status">
+                        <span class="studio-status-dot {% if stream.status == 'live' %}live{% endif %}"
+                              id="studioStatusDot"></span>
+
+                        <span id="studioStatusText">
+                            {{ stream.get_status_display }}
+                        </span>
+                    </span>
+
+                    <span class="studio-preview-type">
+                        {{ stream.get_broadcast_type_display }}
+                    </span>
+                </div>
+            </section>
+
+
+            <!-- Statistics -->
+            <section class="studio-metrics">
+
+                <div class="studio-metric">
+                    <span class="studio-metric-label">
+                        <span>◉</span> Current viewers
+                    </span>
+                    <strong class="studio-metric-value"
+                            id="studioViewerCount">
+                        {{ stream.viewer_count }}
+                    </strong>
+                </div>
+
+                <div class="studio-metric">
+                    <span class="studio-metric-label">
+                        <span>↗</span> Peak viewers
+                    </span>
+                    <strong class="studio-metric-value">
+                        {{ stream.peak_viewers }}
+                    </strong>
+                </div>
+
+                <div class="studio-metric">
+                    <span class="studio-metric-label">
+                        <span>◷</span> Total views
+                    </span>
+                    <strong class="studio-metric-value">
+                        {{ stream.total_views }}
+                    </strong>
+                </div>
+
+            </section>
+
+
+            <!-- Broadcast controls -->
+            <section class="studio-panel">
+
+                <div class="studio-panel-header">
+                    <h2 class="studio-panel-title">Broadcast controls</h2>
+                </div>
+
+                <div class="studio-panel-body">
+
+                    {% if stream.broadcast_type == "browser" %}
+
+                        <p class="studio-description">
+                            Broadcast directly from your browser using your
+                            computer's camera and microphone.
+                        </p>
+
+                        <div class="studio-actions">
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-secondary"
+                                    id="studioEnableCamera">
+                                Enable camera
+                            </button>
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-primary"
+                                    id="studioGoLive">
+                                Go live
+                            </button>
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-danger"
+                                    id="studioStopLive"
+                                    {% if stream.status != "live" %}disabled{% endif %}>
+                                End stream
+                            </button>
+
+                        </div>
+
+                        <p class="studio-message"
+                           id="studioMessage"
+                           aria-live="polite"></p>
+
+                        <div class="studio-error"
+                             id="studioError"
+                             role="alert"></div>
+
+                    {% else %}
+
+                        <p class="studio-description">
+                            Your broadcast is configured for OBS / RTMP.
+                            Use the connection details in the OBS section
+                            to send your video to StreamSphere.
+                        </p>
+
+                        <div class="studio-actions">
+                            <button type="button"
+                                    class="ss-btn ss-btn-danger"
+                                    id="studioStopLive"
+                                    {% if stream.status != "live" %}disabled{% endif %}>
+                                End stream
+                            </button>
+                        </div>
+
+                        <p class="studio-message">
+                            Your OBS broadcast needs to connect to the
+                            configured media ingress before viewers can
+                            receive video.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+            </section>
+
+        </main>
+
+
+        <!-- Sidebar -->
+        <aside class="studio-sidebar">
+
+            <!-- Stream information -->
+            <section class="studio-panel">
+
+                <div class="studio-panel-header">
+                    <h2 class="studio-panel-title">Stream information</h2>
+                </div>
+
+                <div class="studio-panel-body">
+
+                    <div class="studio-info-list">
+
+                        <div class="studio-info-row">
+                            <span class="studio-info-label">Title</span>
+                            <span class="studio-info-value">
+                                {{ stream.title }}
+                            </span>
+                        </div>
+
+                        <div class="studio-info-row">
+                            <span class="studio-info-label">Category</span>
+                            <span class="studio-info-value">
+                                {{ stream.category|default:"Not set" }}
+                            </span>
+                        </div>
+
+                        <div class="studio-info-row">
+                            <span class="studio-info-label">Visibility</span>
+                            <span class="studio-info-value {% if stream.is_public %}public{% else %}private{% endif %}">
+                                {% if stream.is_public %}Public{% else %}Private{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="studio-info-row">
+                            <span class="studio-info-label">Broadcast</span>
+                            <span class="studio-info-value">
+                                {{ stream.get_broadcast_type_display }}
+                            </span>
+                        </div>
+
+                        <div class="studio-info-row">
+                            <span class="studio-info-label">Status</span>
+                            <span class="studio-info-value">
+                                {{ stream.get_status_display }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <a href="{% url 'streaming:edit_stream' stream.id %}"
+                       class="ss-btn ss-btn-outline ss-btn-block"
+                       style="margin-top:18px;">
+                        Edit stream details
+                    </a>
+
+                </div>
+            </section>
+
+
+            <!-- OBS details -->
+            {% if stream.broadcast_type == "obs" %}
+
+            <section class="studio-panel">
+
+                <div class="studio-panel-header">
+                    <h2 class="studio-panel-title">OBS connection</h2>
+                </div>
+
+                <div class="studio-panel-body">
+
+                    <p class="studio-description">
+                        Enter these details in OBS under
+                        Settings → Stream.
+                    </p>
+
+                    <div class="studio-field">
+                        <label for="obsServer">Server URL</label>
+
+                        <div class="studio-code">
+                            <input id="obsServer"
+                                   type="text"
+                                   readonly
+                                   value="{{ stream.ingress_url|default:'' }}">
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-secondary ss-btn-sm"
+                                    data-copy-target="obsServer">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="studio-field">
+                        <label for="obsStreamKey">Stream key</label>
+
+                        <div class="studio-code">
+                            <input id="obsStreamKey"
+                                   class="studio-secret"
+                                   type="password"
+                                   readonly
+                                   value="{{ stream.ingress_stream_key|default:stream.stream_key }}">
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-secondary ss-btn-sm"
+                                    data-copy-target="obsStreamKey">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+
+                    {% if stream.ingress_username %}
+                    <div class="studio-field">
+                        <label for="obsUsername">Username</label>
+
+                        <div class="studio-code">
+                            <input id="obsUsername"
+                                   type="text"
+                                   readonly
+                                   value="{{ stream.ingress_username }}">
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-secondary ss-btn-sm"
+                                    data-copy-target="obsUsername">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if stream.ingress_password %}
+                    <div class="studio-field">
+                        <label for="obsPassword">Password</label>
+
+                        <div class="studio-code">
+                            <input id="obsPassword"
+                                   class="studio-secret"
+                                   type="password"
+                                   readonly
+                                   value="{{ stream.ingress_password }}">
+
+                            <button type="button"
+                                    class="ss-btn ss-btn-secondary ss-btn-sm"
+                                    data-copy-target="obsPassword">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="studio-notice">
+                        Keep your OBS stream key and password private.
+                        Anyone with these credentials may be able to
+                        broadcast to your stream.
+                    </div>
+
+                </div>
+            </section>
+
+            {% endif %}
+
+
+            <!-- Checklist -->
+            <section class="studio-panel">
+
+                <div class="studio-panel-header">
+                    <h2 class="studio-panel-title">Before you go live</h2>
+                </div>
+
+                <div class="studio-panel-body">
+
+                    <ul class="studio-checklist">
+
+                        <li>
+                            <span class="studio-check-icon">✓</span>
+                            Check your camera and microphone.
+                        </li>
+
+                        <li>
+                            <span class="studio-check-icon">✓</span>
+                            Confirm your internet connection is stable.
+                        </li>
+
+                        <li>
+                            <span class="studio-check-icon">✓</span>
+                            Make sure your stream title is correct.
+                        </li>
+
+                        <li>
+                            <span class="studio-check-icon">✓</span>
+                            Keep your stream credentials private.
+                        </li>
+
+                    </ul>
+
+                </div>
+            </section>
+
+        </aside>
+
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'streaming/js/studio.js' %}"></script>
+
+<script>
+document.querySelectorAll("[data-copy-target]").forEach(function(button) {
+
+    button.addEventListener("click", async function() {
+
+        const input = document.getElementById(button.dataset.copyTarget);
+
+        if (!input) return;
+
+        try {
+
+            await navigator.clipboard.writeText(input.value);
+
+            const originalText = button.textContent;
+
+            button.textContent = "Copied";
+
+            setTimeout(function() {
+                button.textContent = originalText;
+            }, 1500);
+
+        } catch (error) {
+
+            input.type = "text";
+            input.select();
+            document.execCommand("copy");
+
+            if (input.classList.contains("studio-secret")) {
+                input.type = "password";
+            }
+
+            const originalText = button.textContent;
+
+            button.textContent = "Copied";
+
+            setTimeout(function() {
+                button.textContent = originalText;
+            }, 1500);
+        }
+
+    });
+
+});
+</script>
+
+{% endblock %}

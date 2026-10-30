@@ -1,100 +1,73 @@
-
 from django import forms
-from django.utils import timezone
 
-from .models import LiveStream
+from .models import Stream
 
 
-class LiveStreamForm(forms.ModelForm):
+class StreamForm(forms.ModelForm):
+
     class Meta:
-        model = LiveStream
+        model = Stream
+
         fields = [
             "title",
             "description",
             "category",
-            "scheduled_at",
-            "thumbnail_url",
+            "thumbnail",
+            "broadcast_type",
             "is_public",
         ]
+
         widgets = {
             "title": forms.TextInput(attrs={
-                "placeholder": "Give your stream a clear title",
-                "maxlength": 160,
-                "autocomplete": "off",
+                "class": "form-control",
+                "placeholder": "Enter your stream title",
+                "maxlength": 200,
             }),
+
             "description": forms.Textarea(attrs={
-                "rows": 5,
-                "placeholder": "What will you be streaming?",
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Tell viewers what your stream is about",
             }),
+
             "category": forms.TextInput(attrs={
-                "placeholder": "Gaming, education, music...",
-                "maxlength": 80,
+                "class": "form-control",
+                "placeholder": "e.g. Technology, Gaming, Education",
             }),
-            "scheduled_at": forms.DateTimeInput(
-                format="%Y-%m-%dT%H:%M",
-                attrs={
-                    "type": "datetime-local",
-                },
-            ),
-            "thumbnail_url": forms.URLInput(attrs={
-                "placeholder": "https://example.com/thumbnail.jpg",
-                "autocomplete": "url",
+
+            "thumbnail": forms.ClearableFileInput(attrs={
+                "class": "form-control",
+                "accept": "image/*",
             }),
-            "is_public": forms.CheckboxInput(),
+
+            "broadcast_type": forms.Select(attrs={
+                "class": "form-control",
+            }),
+
+            "is_public": forms.CheckboxInput(attrs={
+                "class": "form-check-input",
+            }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def clean_thumbnail(self):
 
-        # Ensure datetime-local inputs display existing scheduled dates.
-        self.fields["scheduled_at"].input_formats = [
-            "%Y-%m-%dT%H:%M",
-            "%Y-%m-%d %H:%M:%S",
-            "%Y-%m-%d %H:%M",
-        ]
+        image = self.cleaned_data.get("thumbnail")
 
-        # Add consistent CSS hooks for the StreamSphere form template.
-        for name, field in self.fields.items():
-            field.widget.attrs.setdefault("class", "stream-input")
-
-        self.fields["title"].help_text = (
-            "Use a clear title so viewers know what to expect."
-        )
-        self.fields["description"].help_text = (
-            "Explain what your stream is about."
-        )
-        self.fields["category"].help_text = (
-            "Optional. For example, gaming, education, or music."
-        )
-        self.fields["scheduled_at"].help_text = (
-            "Choose the date and time you plan to stream."
-        )
-        self.fields["thumbnail_url"].help_text = (
-            "Optional. Enter a publicly accessible thumbnail image URL."
-        )
-        self.fields["is_public"].help_text = (
-            "Public streams can appear in the stream discovery page."
-        )
-
-    def clean_title(self):
-        title = self.cleaned_data["title"].strip()
-
-        if len(title) < 3:
+        if image and image.size > 5 * 1024 * 1024:
             raise forms.ValidationError(
-                "The stream title must contain at least 3 characters."
+                "Thumbnail must not exceed 5MB."
             )
 
-        return title
+        if image:
+            allowed_types = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+            ]
 
-    def clean_category(self):
-        return self.cleaned_data["category"].strip()
+            if getattr(image, "content_type", "") not in allowed_types:
+                raise forms.ValidationError(
+                    "Upload a JPG, PNG or WebP image."
+                )
 
-    def clean_scheduled_at(self):
-        scheduled_at = self.cleaned_data["scheduled_at"]
-
-        if scheduled_at < timezone.now():
-            raise forms.ValidationError(
-                "Choose a current or future date and time."
-            )
-
-        return scheduled_at
+        return image

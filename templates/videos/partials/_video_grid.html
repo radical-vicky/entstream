@@ -1,0 +1,97 @@
+{% if videos %}
+    <section class="vl-video-grid" aria-label="Video results">
+        {% for video in videos %}
+            <article class="vl-video-card">
+                <a class="vl-thumb-link" href="{% url 'videos:detail' pk=video.pk %}" aria-label="Watch {{ video.title }}">
+                    {% if video.thumbnail_url %}
+                        <img class="vl-thumb" src="{{ video.thumbnail_url }}" alt="{{ video.title }}" loading="lazy" decoding="async">
+                    {% elif video.thumbnail %}
+                        <img class="vl-thumb" src="{{ video.thumbnail.url }}" alt="{{ video.title }}" loading="lazy" decoding="async">
+                    {% else %}
+                        <div class="vl-thumb-placeholder">
+                            <span class="vl-play-symbol" aria-hidden="true">&#9654;</span>
+                        </div>
+                    {% endif %}
+
+                    <span class="vl-thumb-shade"></span>
+
+                    {% if video.is_premium %}
+                        <span class="vl-premium-badge">Premium</span>
+                    {% else %}
+                        <span class="vl-free-badge">Free</span>
+                    {% endif %}
+
+                    {% if video.duration %}
+                        <span class="vl-duration">
+                            {% if ":" in video.duration %}
+                                {{ video.duration }}
+                            {% else %}
+                                {{ video.duration }}s
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </a>
+
+                <div class="vl-video-info">
+                    <!-- FIXED: Circular Avatar with actual image -->
+                    <a href="{% url 'creators:profile' video.creator.username %}" class="vl-avatar" aria-hidden="true">
+                        {% if video.creator.profile.avatar_image %}
+                            <img src="{{ video.creator.profile.avatar_image.url }}" alt="{{ video.creator.username }}">
+                        {% elif video.creator.profile.avatar %}
+                            <img src="{{ video.creator.profile.avatar }}" alt="{{ video.creator.username }}">
+                        {% else %}
+                            {{ video.creator.username|first|upper }}
+                        {% endif %}
+                    </a>
+
+                    <div class="vl-video-details">
+                        <h2 class="vl-video-title">
+                            <a href="{% url 'videos:detail' pk=video.pk %}">
+                                {{ video.title }}
+                            </a>
+                        </h2>
+
+                        <p class="vl-creator">
+                            {{ video.creator.get_full_name|default:video.creator.username }}
+                        </p>
+
+                        <div class="vl-video-meta">
+                            <!-- DYNAMIC: Views from database -->
+                            <span>{{ video.views|default:0 }} views</span>
+                            <span class="vl-meta-dot" aria-hidden="true">•</span>
+                            <span>{{ video.created_at|timesince }} ago</span>
+                            {% if video.is_premium %}
+                                <span class="vl-meta-dot" aria-hidden="true">•</span>
+                                <span>KES {{ video.price|floatformat:2 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <section class="vl-empty">
+        <div class="vl-empty-icon" aria-hidden="true">&#9654;</div>
+
+        {% if search_query %}
+            <h2 class="vl-empty-title">No videos found</h2>
+            <p class="vl-empty-text">
+                We couldn't find videos matching "{{ search_query }}". Try another search term.
+            </p>
+            <a class="vl-empty-action" href="{% url 'videos:list' %}">
+                Explore all videos
+            </a>
+        {% else %}
+            <h2 class="vl-empty-title">Nothing to watch yet</h2>
+            <p class="vl-empty-text">
+                There are no videos to display right now. Check back soon or upload the first video.
+            </p>
+            {% if user.is_authenticated %}
+                <a class="vl-empty-action" href="{% url 'videos:upload' %}">
+                    Upload the first video
+                </a>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endif %}

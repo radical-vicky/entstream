@@ -14,32 +14,36 @@ from videos.models import Video
 
 @login_required
 def profile_view(request, username=None):
-    """
-    Display a user's profile. If no username is supplied, show the
-    logged-in user's own profile. Works for viewing other users too.
-    # CHANGED: generalized from my_profile so other users' profiles can be viewed.
-    """
     if username:
         profile_user = get_object_or_404(User, username=username)
     else:
         profile_user = request.user
 
     profile, _ = Profile.objects.get_or_create(user=profile_user)
+    active_tab = request.GET.get("tab", "videos")
 
-    videos = (
+    videos_qs = (
         Video.objects
         .filter(creator=profile_user)
         .order_by("-created_at")
     )
+    
+    followers_qs = profile.followers.all()
+    following_qs = profile.following.all()
 
     context = {
         "profile": profile,
         "profile_user": profile_user,
         "viewed_user": profile_user,
-        "videos": videos,
-        "video_count": videos.count(),
-        "total_views": sum(video.views or 0 for video in videos),
-        "is_owner": request.user == profile_user,  # CHANGED
+        "is_owner": request.user == profile_user,
+        "active_tab": active_tab,
+        "video_count": videos_qs.count(),
+        "total_views": sum(video.views or 0 for video in videos_qs),
+        
+        # Only pass the active tab's data
+        "videos": videos_qs if active_tab == "videos" else [],
+        "followers": followers_qs if active_tab == "followers" else [],
+        "following": following_qs if active_tab == "following" else [],
     }
 
     return render(request, "accounts/profile.html", context)
@@ -47,24 +51,61 @@ def profile_view(request, username=None):
 
 @login_required
 def my_profile(request):
-    """Shortcut: show the logged-in user's own profile. # CHANGED: delegates."""
     return profile_view(request)
 
 
 @login_required
+@require_POST
+def toggle_follow(request, username):
+    target_user = get_object_or_404(User, username=username)
+    
+    if target_user == request.user:
+        messages.error(request, "You cannot follow yourself.")
+        return redirect("accounts:profile_detail", username=username)
+        
+    target_profile = get_object_or_404(Profile, user=target_user)
+    my_profile = get_object_or_404(Profile, user=request.user)
+    
+    if target_profile in my_profile.following.all():
+        my_profile.following.remove(target_profile)
+        messages.success(request, f"You unfollowed @{target_user.username}.")
+    else:
+        my_profile.following.add(target_profile)
+        messages.success(request, f"You are now following @{target_user.username}.")
+        
+    return redirect("accounts:profile_detail", username=username)
+
+
+
+
+@login_required
+def my_profile(request):
+    return profile_view(request)
+
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+from .models import Profile
+from .forms import ProfileForm
+
+@login_required
 def profile_edit(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
-    User = request.user.__class__
+    UserModel = request.user.__class__
 
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
+        
+        # Get User fields from the form submission
         username = request.POST.get("username", "").strip()
         first_name = request.POST.get("first_name", "").strip()
         last_name = request.POST.get("last_name", "").strip()
         email = request.POST.get("email", "").strip()
 
         username_ok = bool(username) and not (
-            User.objects.filter(username=username)
+            UserModel.objects.filter(username=username)
             .exclude(pk=request.user.pk).exists()
         )
 
@@ -74,7 +115,7 @@ def profile_edit(request):
             messages.error(request, "That username is already taken.")
 
         if form.is_valid() and username_ok:
-            # Update User fields
+            # 1. Update User fields
             request.user.username = username
             request.user.first_name = first_name
             request.user.last_name = last_name
@@ -83,15 +124,15 @@ def profile_edit(request):
                 update_fields=["username", "first_name", "last_name", "email"]
             )
 
-            # Update Profile fields
-            profile = form.save(commit=False)
+            # 2. Update Profile fields
+            profile_instance = form.save(commit=False)
 
+            # Handle the custom avatar upload field
             upload = form.cleaned_data.get("avatar_upload")
             if upload:
-                profile.avatar_image = upload
+                profile_instance.avatar_image = upload
 
-            profile.save()
-
+            profile_instance.save()
             messages.success(request, "Your profile has been updated.")
             return redirect("accounts:profile")
         else:
@@ -115,12 +156,7 @@ def profile_edit(request):
 @login_required
 @require_POST
 def profile_delete(request):
-    """
-    Permanently delete the logged-in user's account.
-    # CHANGED: new view so users can delete their own account.
-    """
     user = request.user
-    # Log out before deletion to avoid dangling session state.
     logout(request)
     user.delete()
     messages.success(request, "Your account has been deleted.")

@@ -1,1488 +1,889 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ video.title }} | StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --vd-bg: #080808;
-        --vd-panel: #111111;
-        --vd-panel-2: #171717;
-        --vd-border: #292929;
-        --vd-text: #f5f5f5;
-        --vd-muted: #999999;
-        --vd-orange: #ff7900;
-        --vd-orange-light: #ff9a3c;
-        --vd-danger: #ff4d4d;
-        --vd-radius: 3px;
-    }
-
-    .vd-page,
-    .vd-page * {
-        box-sizing: border-box;
-    }
-
     .vd-page {
-        width: min(1500px, 100%);
+        --bg: #0b0d10;
+        --panel: #12151a;
+        --panel2: #191d24;
+        --line: #2b3039;
+        --text: #f4f6f8;
+        --muted: #9ba3af;
+        --orange: #ff7900;
+        --orange-hover: #e86e00;
+        --red: #ef4444;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 24px;
-        color: var(--vd-text);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .vd-breadcrumbs {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 9px;
-        margin-bottom: 18px;
-        color: var(--vd-muted);
-        font-size: 12px;
+    .vd-page * { box-sizing: border-box; }
+    .vd-page a { text-decoration: none; color: inherit; }
+    .vd-page button, .vd-page input, .vd-page textarea { font: inherit; }
+
+    .vd-top-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
     }
 
-    .vd-breadcrumbs a {
-        color: var(--vd-muted);
-        text-decoration: none;
+    .vd-back-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--panel); border: 1px solid var(--line);
+        color: var(--text); padding: 8px 16px; font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: background 0.2s;
     }
+    .vd-back-btn:hover { background: var(--panel2); border-color: #555; }
+    .vd-back-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-    .vd-breadcrumbs a:hover {
-        color: var(--vd-orange);
+    .vd-breadcrumb {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 13px; color: var(--muted);
     }
+    .vd-breadcrumb a:hover { color: var(--orange); }
+    .vd-breadcrumb span { font-size: 10px; }
 
     .vd-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 320px;
-        gap: 28px;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 24px;
         align-items: start;
     }
 
-    .vd-main,
-    .vd-sidebar {
-        min-width: 0;
+    .vd-player-wrap {
+        position: relative; background: #000; border: 1px solid var(--line);
+        aspect-ratio: 16/9; display: flex; flex-direction: column;
+        overflow: hidden;
+    }
+    
+    /* Added cursor pointer so users know they can click the video */
+    .vd-player-wrap video { 
+        width: 100%; height: 100%; object-fit: contain; 
+        cursor: pointer;
     }
 
-    .vd-player {
+    .vd-badge-hd {
+        position: absolute; top: 16px; left: 16px;
+        background: var(--orange); color: #111;
+        padding: 4px 8px; font-size: 11px; font-weight: 800;
+        z-index: 10;
+    }
+
+    .vd-controls {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        padding: 20px 16px 12px;
+        display: flex; flex-direction: column; gap: 12px;
+        z-index: 10; opacity: 0; transition: opacity 0.3s;
+    }
+    .vd-player-wrap:hover .vd-controls { opacity: 1; }
+
+    .vd-progress-bar {
+        width: 100%; height: 4px; background: rgba(255,255,255,0.2);
+        position: relative; cursor: pointer;
+    }
+    .vd-progress-fill {
+        position: absolute; left: 0; top: 0; bottom: 0;
+        background: var(--orange); width: 0%;
+    }
+    .vd-progress-fill::after {
+        content: ''; position: absolute; right: -6px; top: -4px;
+        width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    }
+
+    .vd-controls-row {
+        display: flex; align-items: center; justify-content: space-between; color: #fff;
+    }
+    .vd-controls-left, .vd-controls-right { display: flex; align-items: center; gap: 16px; }
+    .vd-controls button {
+        background: transparent; border: none; color: #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0; opacity: 0.8; transition: opacity 0.2s;
+    }
+    .vd-controls button:hover { opacity: 1; }
+    .vd-controls svg { width: 20px; height: 20px; fill: currentColor; }
+    .vd-time { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .vd-up-next-overlay {
+        position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+        display: none; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 50; text-align: center; padding: 20px;
+    }
+    .vd-up-next-overlay.is-active { display: flex; }
+    .vd-up-next-overlay h2 { margin: 0 0 16px; font-size: 20px; font-weight: 800; color: #fff; }
+    .vd-up-next-card {
+        display: flex; gap: 16px; background: var(--panel);
+        padding: 12px; border: 1px solid var(--line); max-width: 400px; width: 100%;
+        margin-bottom: 20px; text-align: left;
+    }
+    .vd-up-next-card img { width: 140px; aspect-ratio: 16/9; object-fit: cover; }
+    .vd-up-next-info { display: flex; flex-direction: column; justify-content: center; }
+    .vd-up-next-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .vd-up-next-channel { font-size: 12px; color: var(--muted); }
+    .vd-up-next-actions { display: flex; gap: 12px; }
+    .vd-up-next-actions button { padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+    .vd-btn-cancel { background: transparent; color: #fff; border: 1px solid var(--line) !important; }
+    .vd-btn-play-next { background: var(--orange); color: #111; }
+
+    .vd-info-section { margin-top: 20px; }
+    .vd-title { margin: 0 0 12px; font-size: 24px; font-weight: 800; line-height: 1.3; }
+
+    .vd-meta-row {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
+        color: var(--muted); font-size: 13px; margin-bottom: 20px;
+    }
+    .vd-meta-item { display: flex; align-items: center; gap: 6px; }
+    .vd-meta-item svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+    .vd-actions-row {
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+    }
+    .vd-actions-left { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .vd-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 10px 18px; background: var(--panel2); border: 1px solid var(--line);
+        color: var(--text); font-size: 13px; font-weight: 700;
+        cursor: pointer; transition: all 0.2s; text-decoration: none;
         position: relative;
-        width: 100%;
-        overflow: hidden;
-        background: #000;
-        border: 1px solid var(--vd-border);
-        aspect-ratio: 16 / 9;
     }
+    .vd-btn:hover { background: #2a3039; border-color: #555; }
+    .vd-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .vd-btn-active { color: var(--orange); border-color: var(--orange); }
+    .vd-btn-active svg { fill: var(--orange); stroke: none; }
 
-    .vd-player video {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background: #000;
+    .vd-btn-subscribe {
+        background: var(--orange); color: #111; border-color: var(--orange); padding: 10px 24px;
     }
+    .vd-btn-subscribe:hover { background: var(--orange-hover); border-color: var(--orange-hover); }
 
-    .vd-access-gate {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 280px;
-        padding: 30px;
-        text-align: center;
-        background:
-            radial-gradient(ellipse at center, #24170c 0%, #0b0b0b 68%);
+    .vd-share-menu {
+        position: absolute; top: 100%; left: 0; margin-top: 8px;
+        background: var(--panel); border: 1px solid var(--line);
+        min-width: 220px; display: none; flex-direction: column;
+        z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
-
-    .vd-lock {
-        display: grid;
-        place-items: center;
-        width: 54px;
-        height: 54px;
-        margin-bottom: 18px;
-        border: 1px solid #78400e;
-        color: var(--vd-orange);
-        font-size: 24px;
+    .vd-share-menu.is-open { display: flex; }
+    .vd-share-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px; font-size: 13px; color: var(--text);
+        background: transparent; border: none; text-align: left;
+        cursor: pointer; transition: background 0.2s; width: 100%;
     }
+    .vd-share-item:hover { background: var(--panel2); }
+    .vd-share-item svg { width: 18px; height: 18px; fill: currentColor; }
+    .vd-share-item.copied { color: #8be4bb; }
 
-    .vd-access-gate h2 {
-        margin: 0 0 10px;
-        font-size: clamp(20px, 3vw, 28px);
+    .vd-channel-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+        margin-bottom: 24px;
     }
-
-    .vd-access-gate p {
-        max-width: 420px;
-        margin: 0 0 22px;
-        color: var(--vd-muted);
-        line-height: 1.7;
-        font-size: 14px;
+    .vd-channel-info { display: flex; align-items: center; gap: 14px; }
+    .vd-channel-avatar {
+        width: 48px; height: 48px; border-radius: 50%; background: #252a32;
+        overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        font-weight: 800; color: var(--orange);
     }
+    .vd-channel-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .vd-channel-name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .vd-channel-subs { color: var(--muted); font-size: 13px; }
 
-    .vd-button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        min-height: 42px;
-        padding: 11px 17px;
-        border: 1px solid transparent;
-        border-radius: var(--vd-radius);
-        background: var(--vd-orange);
-        color: #111;
-        font-size: 13px;
-        font-weight: 800;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background .18s ease, border-color .18s ease;
+    .vd-box {
+        background: var(--panel); border: 1px solid var(--line);
+        padding: 20px; margin-bottom: 24px;
     }
+    .vd-box h3 { margin: 0 0 12px; font-size: 16px; font-weight: 800; }
+    .vd-box p { margin: 0; font-size: 14px; line-height: 1.6; color: #d1d5db; }
 
-    .vd-button:hover {
-        background: var(--vd-orange-light);
-        color: #111;
+    .vd-comments-header {
+        display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
     }
+    .vd-comments-header h3 { margin: 0; }
 
-    .vd-button-secondary {
-        border-color: var(--vd-border);
-        background: var(--vd-panel-2);
-        color: var(--vd-text);
-    }
-
-    .vd-button-secondary:hover {
-        border-color: var(--vd-orange);
-        background: #20170f;
-        color: var(--vd-text);
-    }
-
-    .vd-video-heading {
-        padding: 22px 0 17px;
-        border-bottom: 1px solid var(--vd-border);
-    }
-
-    .vd-title {
-        margin: 0 0 12px;
-        overflow-wrap: anywhere;
-        font-size: clamp(22px, 3vw, 30px);
-        font-weight: 800;
-        line-height: 1.3;
-    }
-
-    .vd-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 15px;
-        color: var(--vd-muted);
-        font-size: 12px;
-    }
-
-    .vd-meta-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .vd-meta-dot {
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        background: var(--vd-orange);
-    }
-
-    .vd-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 9px;
-        padding: 16px 0;
-        border-bottom: 1px solid var(--vd-border);
-    }
-
-    .vd-action-form {
-        display: inline-flex;
-        margin: 0;
-    }
-
-    .vd-action-button {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        min-height: 39px;
-        padding: 9px 13px;
-        border: 1px solid var(--vd-border);
-        border-radius: var(--vd-radius);
-        background: var(--vd-panel);
-        color: var(--vd-text);
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .vd-action-button:hover {
-        border-color: var(--vd-orange);
-        color: var(--vd-orange);
-    }
-
-    .vd-action-button.is-active {
-        border-color: #75400f;
-        background: #24170c;
-        color: var(--vd-orange);
-    }
-
-    .vd-action-button:disabled {
-        opacity: .55;
-        cursor: not-allowed;
-    }
-
-    .vd-action-count {
-        color: var(--vd-muted);
-        font-weight: 500;
-    }
-
-    .vd-creator {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 19px 0;
-        border-bottom: 1px solid var(--vd-border);
-    }
-
-    .vd-creator-info {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        min-width: 0;
-    }
-
-    .vd-avatar {
-        display: grid;
-        place-items: center;
-        flex: 0 0 auto;
-        width: 48px;
-        height: 48px;
-        overflow: hidden;
-        border: 1px solid #5a3518;
-        border-radius: 50%;
-        background: #21160d;
-        color: var(--vd-orange);
-        font-size: 17px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
-
-    .vd-avatar img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: inherit;
-        object-fit: cover;
-    }
-
+    .vd-comment-form { display: flex; gap: 16px; margin-bottom: 32px; }
     .vd-avatar-small {
-        width: 35px;
-        height: 35px;
-        font-size: 12px;
+        width: 40px; height: 40px; border-radius: 50%; background: #252a32;
+        flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        font-weight: 800; color: var(--orange); overflow: hidden;
     }
+    .vd-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
 
-    .vd-avatar-card {
-        width: 25px;
-        height: 25px;
-        font-size: 10px;
-    }
-
-    .vd-creator-copy {
-        min-width: 0;
-    }
-
-    .vd-creator-name {
-        display: block;
-        overflow: hidden;
-        color: var(--vd-text);
-        font-size: 14px;
-        font-weight: 800;
-        text-decoration: none;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .vd-creator-name:hover {
-        color: var(--vd-orange);
-    }
-
-    .vd-creator-subtitle {
-        margin-top: 5px;
-        color: var(--vd-muted);
-        font-size: 11px;
-    }
-
-    .vd-description {
-        margin-top: 20px;
-        padding: 20px;
-        border: 1px solid var(--vd-border);
-        background: var(--vd-panel);
-    }
-
-    .vd-section-title {
-        margin: 0 0 17px;
-        font-size: 16px;
-        font-weight: 800;
-    }
-
-    .vd-description-text {
-        color: #c7c7c7;
-        font-size: 13px;
-        line-height: 1.8;
-        overflow-wrap: anywhere;
-        white-space: pre-line;
-    }
-
-    .vd-description-empty {
-        color: var(--vd-muted);
-    }
-
-    .vd-comments {
-        margin-top: 24px;
-        padding: 20px;
-        border: 1px solid var(--vd-border);
-        background: var(--vd-panel);
-    }
-
-    .vd-comments-count {
-        color: var(--vd-muted);
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .vd-comment-form {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 25px;
-    }
-
-    .vd-comment-form-main {
-        flex: 1;
-        min-width: 0;
-    }
-
+    .vd-comment-input-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; }
     .vd-comment-input {
-        display: block;
-        width: 100%;
-        min-height: 88px;
-        padding: 13px;
-        resize: vertical;
-        border: 1px solid var(--vd-border);
-        border-radius: var(--vd-radius);
-        outline: none;
-        background: #090909;
-        color: var(--vd-text);
-        font: inherit;
-        font-size: 13px;
+        width: 100%; padding: 12px; background: transparent;
+        border: 1px solid var(--line); color: var(--text);
+        font-size: 14px; resize: vertical; min-height: 48px; outline: none;
+    }
+    .vd-comment-input:focus { border-bottom-color: var(--orange); }
+    .vd-comment-submit-row { display: flex; justify-content: flex-end; }
+    .vd-btn-post {
+        background: var(--orange); color: #111; border-color: var(--orange);
+        padding: 8px 20px; font-weight: 800;
+    }
+    .vd-btn-post:hover { background: var(--orange-hover); }
+
+    .vd-no-comments { text-align: center; padding: 40px 0; color: var(--muted); }
+    .vd-no-comments svg { width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 1.5; margin-bottom: 16px; }
+    .vd-no-comments h4 { margin: 0 0 8px; font-size: 16px; color: var(--text); }
+    .vd-no-comments p { margin: 0; font-size: 13px; }
+
+    .vd-sidebar { background: var(--panel); border: 1px solid var(--line); }
+    .vd-sidebar-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 20px; border-bottom: 1px solid var(--line);
+    }
+    .vd-sidebar-header h2 { margin: 0; font-size: 18px; font-weight: 800; }
+    .vd-sidebar-header a { color: var(--orange); font-size: 12px; font-weight: 600; }
+
+    .vd-sidebar-list { display: flex; flex-direction: column; }
+    .vd-sidebar-item {
+        display: flex; gap: 12px; padding: 12px 20px;
+        transition: background 0.2s; border-bottom: 1px solid var(--line);
+    }
+    .vd-sidebar-item:last-child { border-bottom: none; }
+    .vd-sidebar-item:hover { background: var(--panel2); }
+
+    .vd-sidebar-thumb {
+        width: 140px; aspect-ratio: 16/9; background: #000;
+        position: relative; flex-shrink: 0; overflow: hidden;
+    }
+    .vd-sidebar-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .vd-sidebar-duration {
+        position: absolute; bottom: 4px; right: 4px;
+        background: rgba(0,0,0,0.8); color: #fff;
+        padding: 2px 4px; font-size: 10px; font-weight: 700;
     }
 
-    .vd-comment-input:focus {
-        border-color: var(--vd-orange);
+    .vd-sidebar-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .vd-sidebar-title {
+        margin: 0 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
+    .vd-sidebar-channel { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .vd-sidebar-meta { font-size: 11px; color: var(--muted); }
 
-    .vd-comment-input::placeholder {
-        color: #777;
+    @media (max-width: 1024px) {
+        .vd-layout { grid-template-columns: 1fr; }
+        .vd-sidebar { margin-top: 24px; }
     }
-
-    .vd-comment-submit-row {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 10px;
+    @media (max-width: 600px) {
+        .vd-page { padding: 12px; }
+        .vd-title { font-size: 20px; }
+        .vd-actions-row { flex-direction: column; align-items: flex-start; }
+        .vd-btn-subscribe { width: 100%; }
+        .vd-sidebar-thumb { width: 120px; }
+        .vd-top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
-
-    .vd-login-prompt {
-        margin-bottom: 23px;
-        padding: 15px;
-        border: 1px solid var(--vd-border);
-        color: var(--vd-muted);
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .vd-login-prompt a {
-        color: var(--vd-orange);
-        text-decoration: none;
-    }
-
-    .vd-comment-list {
-        display: flex;
-        flex-direction: column;
-        gap: 21px;
-    }
-
-    .vd-comment {
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-    }
-
-    .vd-comment-main {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .vd-comment-header {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 7px 10px;
-        margin-bottom: 7px;
-    }
-
-    .vd-comment-author {
-        color: var(--vd-text);
-        font-size: 12px;
-        font-weight: 800;
-        text-decoration: none;
-    }
-
-    .vd-comment-author:hover {
-        color: var(--vd-orange);
-    }
-
-    .vd-comment-date {
-        color: var(--vd-muted);
-        font-size: 10px;
-    }
-
-    .vd-comment-text {
-        margin: 0;
-        color: #d0d0d0;
-        font-size: 13px;
-        line-height: 1.7;
-        overflow-wrap: anywhere;
-        white-space: pre-line;
-    }
-
-    .vd-comment-footer {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 7px;
-    }
-
-    .vd-delete-button {
-        padding: 4px 0;
-        border: 0;
-        background: transparent;
-        color: var(--vd-danger);
-        font-size: 11px;
-        cursor: pointer;
-    }
-
-    .vd-delete-button:hover {
-        text-decoration: underline;
-    }
-
-    .vd-empty-comments {
-        padding: 24px 10px;
-        color: var(--vd-muted);
-        text-align: center;
-        font-size: 13px;
-    }
-
-    .vd-sidebar-heading {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        margin: 0 0 15px;
-        font-size: 16px;
-        font-weight: 800;
-    }
-
-    .vd-sidebar-count {
-        color: var(--vd-muted);
-        font-size: 11px;
-        font-weight: 500;
-    }
-
-    .vd-related-list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .vd-related-card {
-        display: grid;
-        grid-template-columns: 132px minmax(0, 1fr);
-        gap: 11px;
-        min-width: 0;
-        text-decoration: none;
-    }
-
-    .vd-related-thumb {
-        position: relative;
-        overflow: hidden;
-        aspect-ratio: 16 / 9;
-        background: #1a1a1a;
-    }
-
-    .vd-related-thumb img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform .2s ease;
-    }
-
-    .vd-related-card:hover .vd-related-thumb img {
-        transform: scale(1.04);
-    }
-
-    .vd-no-thumbnail {
-        display: grid;
-        place-items: center;
-        width: 100%;
-        height: 100%;
-        min-height: 70px;
-        background: linear-gradient(135deg, #22160d, #111);
-        color: var(--vd-orange);
-        font-size: 10px;
-        font-weight: 800;
-    }
-
-    .vd-duration {
-        position: absolute;
-        right: 5px;
-        bottom: 5px;
-        padding: 3px 5px;
-        background: rgba(0, 0, 0, .85);
-        color: #fff;
-        font-size: 10px;
-    }
-
-    .vd-premium-tag {
-        display: inline-block;
-        margin-bottom: 6px;
-        padding: 3px 5px;
-        background: #36200e;
-        color: var(--vd-orange-light);
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
-
-    .vd-related-info {
-        min-width: 0;
-    }
-
-    .vd-related-title {
-        display: -webkit-box;
-        overflow: hidden;
-        margin: 0 0 8px;
-        color: var(--vd-text);
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1.5;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-    }
-
-    .vd-related-card:hover .vd-related-title {
-        color: var(--vd-orange);
-    }
-
-    .vd-related-creator-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        min-width: 0;
-        margin-bottom: 6px;
-    }
-
-    .vd-related-creator-name {
-        overflow: hidden;
-        color: #b0b0b0;
-        font-size: 10px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .vd-related-meta {
-        color: var(--vd-muted);
-        font-size: 10px;
-        line-height: 1.6;
-    }
-
-    .vd-related-empty {
-        padding: 18px;
-        border: 1px solid var(--vd-border);
-        color: var(--vd-muted);
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    .vd-mobile-related {
-        display: none;
-        margin-top: 24px;
-        padding: 20px;
-        border: 1px solid var(--vd-border);
-        background: var(--vd-panel);
-    }
-
-    .vd-mobile-related .vd-related-card {
-        grid-template-columns: 145px minmax(0, 1fr);
-    }
-
-    .vd-mobile-related .vd-related-title {
-        font-size: 13px;
-    }
-
-    .vd-mobile-related .vd-related-meta {
-        font-size: 11px;
-    }
-
-    .vd-share-status {
-        min-height: 16px;
-        margin-left: 4px;
-        color: var(--vd-orange-light);
-        font-size: 11px;
-    }
-
-    .vd-notification-link {
-        margin-left: auto;
-    }
-
-    @media (max-width: 1050px) {
-        .vd-page {
-            padding: 18px;
-        }
-
-        .vd-layout {
-            grid-template-columns: minmax(0, 1fr) 275px;
-            gap: 20px;
-        }
-
-        .vd-related-card {
-            grid-template-columns: 108px minmax(0, 1fr);
-            gap: 9px;
-        }
-    }
-
-    @media (max-width: 800px) {
-        .vd-layout {
-            display: block;
-        }
-
-        .vd-sidebar {
-            display: none;
-        }
-
-        .vd-mobile-related {
-            display: block;
-        }
-
-        .vd-notification-link {
-            margin-left: 0;
-        }
-    }
-
-    @media (max-width: 520px) {
-        .vd-page {
-            padding: 12px;
-        }
-
-        .vd-breadcrumbs {
-            margin-bottom: 12px;
-            font-size: 11px;
-        }
-
-        .vd-player {
-            margin: 0 -12px;
-            width: calc(100% + 24px);
-            border-right: 0;
-            border-left: 0;
-        }
-
-        .vd-access-gate {
-            min-height: 240px;
-            padding: 22px 16px;
-        }
-
-        .vd-video-heading {
-            padding-top: 17px;
-        }
-
-        .vd-title {
-            font-size: 21px;
-        }
-
-        .vd-actions {
-            gap: 7px;
-        }
-
-        .vd-action-button {
-            min-height: 37px;
-            padding: 8px 10px;
-            font-size: 11px;
-        }
-
-        .vd-creator {
-            align-items: flex-start;
-        }
-
-        .vd-creator .vd-button {
-            min-height: 36px;
-            padding: 9px 11px;
-            font-size: 11px;
-        }
-
-        .vd-description,
-        .vd-comments,
-        .vd-mobile-related {
-            padding: 15px;
-        }
-
-        .vd-comment-form {
-            gap: 9px;
-        }
-
-        .vd-avatar {
-            width: 41px;
-            height: 41px;
-            font-size: 14px;
-        }
-
-        .vd-avatar-small {
-            width: 32px;
-            height: 32px;
-            font-size: 11px;
-        }
-
-        .vd-mobile-related .vd-related-card {
-            grid-template-columns: 115px minmax(0, 1fr);
-            gap: 10px;
-        }
-
-        .vd-mobile-related .vd-related-title {
-            font-size: 12px;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .vd-actions {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .vd-action-form,
-        .vd-action-button {
-            width: 100%;
-        }
-
-        .vd-mobile-related .vd-related-card {
-            grid-template-columns: 100px minmax(0, 1fr);
-        }
-    }
-
-    /* Sharp-corner visual system: no rounded video cards, buttons or panels. */
-    .vd-page,
-    .vd-player,
-    .vd-player video,
-    .vd-access-gate,
-    .vd-description,
-    .vd-comments,
-    .vd-mobile-related,
-    .vd-related-card,
-    .vd-related-thumb,
-    .vd-button,
-    .vd-action-button,
-    .vd-comment-input,
-    .vd-avatar,
-    .vd-premium-tag,
-    .vd-duration,
-    .vd-sidebar,
-    .vd-creator,
-    .vd-comment,
-    .vd-comment-form,
-    .vd-login-prompt {
-        border-radius: 0 !important;
-    }
-
-    .vd-related-card {
-        border: 0;
-    }
-
-    .vd-related-thumb,
-    .vd-player {
-        overflow: hidden;
-    }
-
-    .vd-ajax-status {
-        min-height: 18px;
-        margin-top: 8px;
-        color: var(--vd-muted);
-        font-size: 12px;
-    }
-
-    .vd-ajax-status.is-error { color: var(--vd-danger); }
-    .vd-ajax-status.is-success { color: var(--vd-orange-light); }
-
-    .vd-button:disabled,
-    .vd-action-button:disabled,
-    .vd-delete-button:disabled {
-        opacity: .55;
-        cursor: wait;
-    }
-
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="vd-page">
-    <nav class="vd-breadcrumbs" aria-label="Breadcrumb">
-        <a href="{% url 'home' %}">Home</a>
-        <span>/</span>
-        <a href="{% url 'videos:list' %}">Videos</a>
-        <span>/</span>
-        <span>{{ video.title|truncatechars:45 }}</span>
-    </nav>
+<div class="vd-page">
+
+    <div class="vd-top-bar">
+        <button class="vd-back-btn" onclick="handleBackButton()">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back
+        </button>
+
+        <nav class="vd-breadcrumb">
+            <a href="{% url 'home' %}">Home</a> <span>&rsaquo;</span>
+            <a href="{% url 'videos:list' %}">Videos</a> <span>&rsaquo;</span>
+            <span style="color: var(--text);">{{ video.title }}</span>
+        </nav>
+    </div>
 
     <div class="vd-layout">
-        <section class="vd-main">
-            <div class="vd-player">
-                {% if can_watch %}
-                    {% if video.video_file %}
-                        <video
-                            controls
-                            playsinline
-                            preload="metadata"
-                            {% if video.thumbnail %}
-                                poster="{{ video.thumbnail.url }}"
-                            {% elif video.thumbnail_url %}
-                                poster="{{ video.thumbnail_url }}"
-                            {% endif %}
-                        >
-                            <!-- FIXED: Removed .url from video_file -->
-                            <source src="{{ video.video_file }}">
-                            Your browser does not support HTML video.
-                        </video>
-                    {% else %}
-                        <div class="vd-access-gate">
-                            <div class="vd-lock" aria-hidden="true">!</div>
-                            <h2>Video unavailable</h2>
-                            <p>The video file could not be found. Please try again later.</p>
+        <main>
+            <div class="vd-player-wrap">
+                <span class="vd-badge-hd">HD</span>
+                <video id="mainVideo" poster="{% if video.thumbnail_url %}{{ video.thumbnail_url }}{% elif video.thumbnail %}{{ video.thumbnail.url }}{% endif %}">
+                    <source src="{{ video.video_file }}" type="video/mp4">
+                </video>
+                
+                <div class="vd-up-next-overlay" id="upNextOverlay">
+                    <h2>Up Next in <span id="countdownTimer">3</span>s</h2>
+                    <div class="vd-up-next-card">
+                        <img id="upNextThumb" src="" alt="Up next thumbnail">
+                        <div class="vd-up-next-info">
+                            <div class="vd-up-next-title" id="upNextTitle"></div>
+                            <div class="vd-up-next-channel" id="upNextChannel"></div>
                         </div>
-                    {% endif %}
-                {% else %}
-                    <div class="vd-access-gate">
-                        <div class="vd-lock" aria-hidden="true">P</div>
-                        <h2>Premium content</h2>
-                        {% if user.is_authenticated %}
-                            <p>
-                                This video requires access before you can watch it.
-                                Purchase it to unlock the full video.
-                            </p>
-                            <a class="vd-button" href="{% url 'videos:purchase' video.pk %}">
-                                Unlock video
-                            </a>
-                        {% else %}
-                            <p>
-                                Sign in to check your access to this video,
-                                or create an account to get started.
-                            </p>
-                            <a class="vd-button" href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
-                                Sign in to continue
-                            </a>
-                        {% endif %}
                     </div>
-                {% endif %}
+                    <div class="vd-up-next-actions">
+                        <button class="vd-btn-cancel" id="cancelNextBtn">Cancel</button>
+                        <button class="vd-btn-play-next" id="playNextBtn">Play Now</button>
+                    </div>
+                </div>
+
+                <div class="vd-controls" id="videoControls">
+                    <div class="vd-progress-bar" id="progressBar"><div class="vd-progress-fill" id="progressFill"></div></div>
+                    <div class="vd-controls-row">
+                        <div class="vd-controls-left">
+                            <button id="playPauseBtn" aria-label="Play/Pause">
+                                <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            
+                            <button id="nextBtn" aria-label="Next Video" title="Next Video">
+                                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                            </button>
+
+                            <span class="vd-time" id="timeDisplay">0:00 / 0:00</span>
+                        </div>
+                        <div class="vd-controls-right">
+                            <button id="muteBtn" aria-label="Mute">
+                                <svg id="volumeIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                <svg id="muteIcon" viewBox="0 0 24 24" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                            </button>
+                            <button id="fullscreenBtn" aria-label="Fullscreen">
+                                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <header class="vd-video-heading">
+            <div class="vd-info-section">
                 <h1 class="vd-title">{{ video.title }}</h1>
-
-                <div class="vd-meta">
+                <div class="vd-meta-row">
+                    <span class="vd-meta-item">{{ video.get_category_display|default:"Video" }}</span>
+                    <span class="vd-meta-item">{{ video.duration|default:"0:00" }}</span>
                     <span class="vd-meta-item">
-                        <span class="vd-meta-dot"></span>
-                        {{ video.views|default:0 }} views
+                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        {{ video.views|default:"0" }} views
                     </span>
-
                     <span class="vd-meta-item">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                         {{ video.created_at|date:"M j, Y" }}
                     </span>
-
-                    {% if video.is_premium %}
-                        <span class="vd-meta-item">
-                            <span class="vd-meta-dot"></span>
-                            Premium
-                        </span>
-                    {% endif %}
-                </div>
-            </header>
-
-            <div class="vd-actions">
-                {% if user.is_authenticated %}
-                    <form
-                        class="vd-action-form"
-                        method="post"
-                        action="{% url 'videos:like' video.pk %}"
-                    >
-                        {% csrf_token %}
-                        <button
-                            type="submit"
-                            class="vd-action-button{% if liked %} is-active{% endif %}"
-                            aria-pressed="{% if liked %}true{% else %}false{% endif %}"
-                        >
-                            {% if liked %}Liked{% else %}Like{% endif %}
-                            <span class="vd-action-count">{{ like_count }}</span>
-                        </button>
-                    </form>
-                {% else %}
-                    <a
-                        class="vd-action-button"
-                        href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
-                    >
-                        Like <span class="vd-action-count">{{ like_count }}</span>
-                    </a>
-                {% endif %}
-
-                <a class="vd-action-button" href="#vd-comments">
-                    Comments <span class="vd-action-count">{{ comment_count }}</span>
-                </a>
-
-                <button
-                    type="button"
-                    class="vd-action-button"
-                    id="vd-share-button"
-                >
-                    Share
-                </button>
-
-                {% if user.is_authenticated %}
-                    <a
-                        class="vd-action-button vd-notification-link"
-                        href="{% url 'accounts:notifications' %}"
-                    >
-                        Notifications
-                    </a>
-                {% endif %}
-
-                <span
-                    class="vd-share-status"
-                    id="vd-share-status"
-                    aria-live="polite"
-                ></span>
-            </div>
-
-            <section class="vd-creator">
-                <div class="vd-creator-info">
-                    <div class="vd-avatar" aria-hidden="true">
-                        {% if video.creator.profile.avatar_image %}
-                            <img
-                                src="{{ video.creator.profile.avatar_image.url }}"
-                                alt=""
-                                loading="lazy"
-                            >
-                        {% elif video.creator.profile.avatar %}
-                            <img
-                                src="{{ video.creator.profile.avatar }}"
-                                alt=""
-                                loading="lazy"
-                            >
-                        {% else %}
-                            {{ video.creator.username|first|upper }}
-                        {% endif %}
-                    </div>
-
-                    <div class="vd-creator-copy">
-                        {% if user.is_authenticated and user.pk == video.creator_id %}
-                            <a class="vd-creator-name" href="{% url 'accounts:profile' %}">
-                                {{ video.creator.username }}
-                            </a>
-                        {% else %}
-                            <a
-                                class="vd-creator-name"
-                                href="{% url 'creators:profile' video.creator.username %}"
-                            >
-                                {{ video.creator.username }}
-                            </a>
-                        {% endif %}
-
-                        <div class="vd-creator-subtitle">
-                            {{ follower_count }} follower{{ follower_count|pluralize }}
-                        </div>
-                    </div>
                 </div>
 
-                {% if user.is_authenticated and user.pk != video.creator_id %}
-                    <form
-                        method="post"
-                        action="{% url 'creators:toggle_follow' video.creator.username %}"
-                    >
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}">
-
-                        <button
-                            type="submit"
-                            class="vd-button{% if following_creator %} vd-button-secondary{% endif %}"
-                        >
-                            {% if following_creator %}Following{% else %}Follow creator{% endif %}
+                <div class="vd-actions-row">
+                    <div class="vd-actions-left">
+                        <button class="vd-btn {% if liked %}vd-btn-active{% endif %}" id="likeBtn" data-url="{% url 'videos:toggle_like' video.pk %}">
+                            <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                            <span id="likeCount">{{ like_count }}</span>
                         </button>
-                    </form>
-                {% elif not user.is_authenticated %}
-                    <a
-                        class="vd-button vd-button-secondary"
-                        href="{% url 'account_login' %}?next={{ request.path|urlencode }}"
-                    >
-                        Follow creator
-                    </a>
-                {% endif %}
-            </section>
 
-            <section class="vd-description">
-                <h2 class="vd-section-title">About this video</h2>
+                        <a href="#comments" class="vd-btn">
+                            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                            <span id="commentCount">{{ comment_count }}</span> Comments
+                        </a>
 
-                {% if video.description %}
-                    <div class="vd-description-text">{{ video.description }}</div>
-                {% else %}
-                    <p class="vd-description-empty">
-                        No description has been added for this video.
-                    </p>
-                {% endif %}
-            </section>
-
-            <section class="vd-comments" id="vd-comments">
-                <h2 class="vd-section-title">
-                    Comments
-                    <span class="vd-comments-count" data-comment-count>({{ comment_count }})</span>
-                </h2>
-
-                {% if user.is_authenticated %}
-                    <form
-                        class="vd-comment-form"
-                        method="post"
-                        action="{% url 'videos:comment' video.pk %}"
-                    >
-                        {% csrf_token %}
-
-                        <div class="vd-avatar vd-avatar-small" aria-hidden="true">
-                            {% if user.profile.avatar_image %}
-                                <img
-                                    src="{{ user.profile.avatar_image.url }}"
-                                    alt=""
-                                    loading="lazy"
-                                >
-                            {% elif user.profile.avatar %}
-                                <img
-                                    src="{{ user.profile.avatar }}"
-                                    alt=""
-                                    loading="lazy"
-                                >
-                            {% else %}
-                                {{ user.username|first|upper }}
-                            {% endif %}
-                        </div>
-
-                        <div class="vd-comment-form-main">
-                            <textarea
-                                class="vd-comment-input"
-                                name="text"
-                                maxlength="2000"
-                                placeholder="Write a thoughtful comment..."
-                                aria-label="Write a comment"
-                                required
-                            ></textarea>
-
-                            <div class="vd-comment-submit-row">
-                                <button type="submit" class="vd-button">
-                                    Post comment
+                        <div style="position: relative;">
+                            <button class="vd-btn" id="shareBtn" type="button">
+                                <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                Share
+                            </button>
+                            <div class="vd-share-menu" id="shareMenu">
+                                <button class="vd-share-item" id="copyLinkBtn">
+                                    <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                    Copy Link
+                                </button>
+                                <button class="vd-share-item" id="shareEmailBtn">
+                                    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    Email
+                                </button>
+                                <button class="vd-share-item" id="shareTwitterBtn">
+                                    <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+                                    X (Twitter)
+                                </button>
+                                <button class="vd-share-item" id="shareFacebookBtn">
+                                    <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                                    Facebook
+                                </button>
+                                <button class="vd-share-item" id="shareWhatsAppBtn">
+                                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                    WhatsApp
+                                </button>
+                                <button class="vd-share-item" id="nativeShareBtn" style="display:none;">
+                                    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                                    More Options...
                                 </button>
                             </div>
                         </div>
-                    </form>
-                {% else %}
-                    <div class="vd-login-prompt">
-                        <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
-                            Sign in
+
+                        <a href="{% url 'videos:download' video.pk %}" class="vd-btn">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            Download
                         </a>
-                        to join the conversation and leave a comment.
                     </div>
-                {% endif %}
 
-                <div class="vd-comment-list" id="vd-comment-list">
-                    {% for comment in comments %}
-                        <article class="vd-comment" data-comment-id="{{ comment.pk }}">
-                            <div class="vd-avatar vd-avatar-small" aria-hidden="true">
-                                {% if comment.user.profile.avatar_image %}
-                                    <img
-                                        src="{{ comment.user.profile.avatar_image.url }}"
-                                        alt=""
-                                        loading="lazy"
-                                    >
-                                {% elif comment.user.profile.avatar %}
-                                    <img
-                                        src="{{ comment.user.profile.avatar }}"
-                                        alt=""
-                                        loading="lazy"
-                                    >
-                                {% else %}
-                                    {{ comment.user.username|first|upper }}
-                                {% endif %}
-                            </div>
-
-                            <div class="vd-comment-main">
-                                <div class="vd-comment-header">
-                                    <a
-                                        class="vd-comment-author"
-                                        href="{% url 'creators:profile' comment.user.username %}"
-                                    >
-                                        {{ comment.user.username }}
-                                    </a>
-
-                                    <time class="vd-comment-date" datetime="{{ comment.created_at|date:'c' }}">
-                                        {{ comment.created_at|date:"M j, Y · g:i A" }}
-                                    </time>
-                                </div>
-
-                                <p class="vd-comment-text">{{ comment.text }}</p>
-
-                                {% if user.is_authenticated %}
-                                    {% if user.pk == comment.user_id or user.pk == video.creator_id %}
-                                        <div class="vd-comment-footer">
-                                            <form
-                                                method="post"
-                                                action="{% url 'videos:delete_comment' comment.pk %}"
-                                                onsubmit="return confirm('Delete this comment?');"
-                                            >
-                                                {% csrf_token %}
-                                                <button type="submit" class="vd-delete-button">
-                                                    Delete comment
-                                                </button>
-                                            </form>
-                                        </div>
+                    <div>
+                        {% if request.user != video.creator %}
+                            <button 
+                                class="vd-btn {% if following_creator %}vd-btn-subscribed{% else %}vd-btn-subscribe{% endif %}" 
+                                id="followBtn" 
+                                data-url="{% url 'accounts:toggle_follow' video.creator.username %}"
+                                style="{% if following_creator %}background: transparent; color: var(--text); border-color: var(--line);{% endif %}"
+                            >
+                                <svg viewBox="0 0 24 24" id="followIcon">
+                                    {% if following_creator %}
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    {% else %}
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                                     {% endif %}
-                                {% endif %}
-                            </div>
-                        </article>
-                    {% empty %}
-                        <div class="vd-empty-comments">
-                            No comments yet. Be the first to join the conversation.
-                        </div>
-                    {% endfor %}
+                                </svg>
+                                <span id="followBtnText">{% if following_creator %}Subscribed{% else %}Subscribe{% endif %}</span>
+                            </button>
+                        {% endif %}
+                    </div>
                 </div>
-            </section>
 
-            <section class="vd-mobile-related">
-                <h2 class="vd-sidebar-heading">
-                    More videos
-                    <span class="vd-sidebar-count">{{ related_videos|length }}</span>
-                </h2>
-
-                <div class="vd-related-list">
-                    {% for related in related_videos %}
-                        <a
-                            class="vd-related-card"
-                            href="{% url 'videos:detail' related.pk %}"
-                        >
-                            <div class="vd-related-thumb">
-                                {% if related.thumbnail %}
-                                    <img
-                                        src="{{ related.thumbnail.url }}"
-                                        alt=""
-                                        loading="lazy"
-                                    >
-                                {% elif related.thumbnail_url %}
-                                    <img
-                                        src="{{ related.thumbnail_url }}"
-                                        alt=""
-                                        loading="lazy"
-                                    >
-                                {% else %}
-                                    <div class="vd-no-thumbnail">Thumbnail unavailable</div>
-                                {% endif %}
-
-                                {% if related.duration %}
-                                    <span class="vd-duration">{{ related.duration }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="vd-related-info">
-                                {% if related.is_premium %}
-                                    <span class="vd-premium-tag">Premium</span>
-                                {% endif %}
-
-                                <h3 class="vd-related-title">{{ related.title }}</h3>
-
-                                <div class="vd-related-creator-row">
-                                    <span class="vd-avatar vd-avatar-card" aria-hidden="true">
-                                        {% if related.creator.profile.avatar_image %}
-                                            <img
-                                                src="{{ related.creator.profile.avatar_image.url }}"
-                                                alt=""
-                                                loading="lazy"
-                                            >
-                                        {% elif related.creator.profile.avatar %}
-                                            <img
-                                                src="{{ related.creator.profile.avatar }}"
-                                                alt=""
-                                                loading="lazy"
-                                            >
-                                        {% else %}
-                                            {{ related.creator.username|first|upper }}
-                                        {% endif %}
-                                    </span>
-
-                                    <span class="vd-related-creator-name">
-                                        {{ related.creator.username }}
-                                    </span>
-                                </div>
-
-                                <div class="vd-related-meta">
-                                    {{ related.views|default:0 }} views
-                                    <span> · </span>
-                                    {{ related.created_at|date:"M j, Y" }}
-                                </div>
-                            </div>
+                <div class="vd-channel-bar">
+                    <div class="vd-channel-info">
+                        <a href="{% url 'creators:profile' video.creator.username %}" class="vd-channel-avatar">
+                            {% if video.creator.profile.avatar_image %}
+                                <img src="{{ video.creator.profile.avatar_image.url }}" alt="">
+                            {% else %}
+                                {{ video.creator.username|first|upper }}
+                            {% endif %}
                         </a>
-                    {% empty %}
-                        <div class="vd-related-empty">
-                            There are no other published videos yet.
+                        <div>
+                            <a href="{% url 'creators:profile' video.creator.username %}" class="vd-channel-name">
+                                {{ video.creator.get_full_name|default:video.creator.username }} 
+                                <span class="vd-verified" style="color: var(--muted);">&#10003;</span>
+                            </a>
+                            <div class="vd-channel-subs"><span id="subCount">{{ follower_count }}</span> subscribers</div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
-            </section>
-        </section>
+
+                <div class="vd-box">
+                    <h3>About this video</h3>
+                    <p>{{ video.description|default:"No description provided."|linebreaksbr }}</p>
+                </div>
+
+                <div class="vd-box" id="comments">
+                    <div class="vd-comments-header">
+                        <h3>Comments (<span id="commentCountHeader">{{ comment_count }}</span>)</h3>
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                    <form class="vd-comment-form" id="commentForm" data-url="{% url 'videos:add_comment' video.pk %}">
+                        {% csrf_token %}
+                        <div class="vd-avatar-small">
+                            {% if request.user.profile.avatar_image %}
+                                <img src="{{ request.user.profile.avatar_image.url }}" alt="">
+                            {% else %}
+                                {{ request.user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="vd-comment-input-wrap">
+                            <input type="text" name="text" id="commentInput" class="vd-comment-input" placeholder="Add a comment..." required>
+                            <div class="vd-comment-submit-row">
+                                <button type="submit" class="vd-btn vd-btn-post" id="postCommentBtn">Post comment</button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <div id="commentsList">
+                        {% for comment in comments %}
+                            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                                <div class="vd-avatar-small">
+                                    {% if comment.user.profile.avatar_image %}
+                                        <img src="{{ comment.user.profile.avatar_image.url }}" alt="">
+                                    {% else %}
+                                        {{ comment.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">
+                                        @{{ comment.user.username }}
+                                        <span style="color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 11px;">{{ comment.created_at|timesince }} ago</span>
+                                    </div>
+                                    <div style="font-size: 14px; line-height: 1.5; color: #d1d5db;">{{ comment.text }}</div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="vd-no-comments" id="noCommentsState">
+                                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                <h4>No comments yet</h4>
+                                <p>Be the first to share your thoughts!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
 
         <aside class="vd-sidebar">
-            <h2 class="vd-sidebar-heading">
-                More videos
-                <span class="vd-sidebar-count">{{ related_videos|length }}</span>
-            </h2>
-
-            <div class="vd-related-list">
+            <div class="vd-sidebar-header">
+                <h2>More videos</h2>
+                <a href="{% url 'videos:list' %}">View all &rarr;</a>
+            </div>
+            <div class="vd-sidebar-list" id="relatedVideosList">
                 {% for related in related_videos %}
-                    <a
-                        class="vd-related-card"
-                        href="{% url 'videos:detail' related.pk %}"
-                    >
-                        <div class="vd-related-thumb">
-                            {% if related.thumbnail %}
-                                <img
-                                    src="{{ related.thumbnail.url }}"
-                                    alt=""
-                                    loading="lazy"
-                                >
-                            {% elif related.thumbnail_url %}
-                                <img
-                                    src="{{ related.thumbnail_url }}"
-                                    alt=""
-                                    loading="lazy"
-                                >
-                            {% else %}
-                                <div class="vd-no-thumbnail">Thumbnail unavailable</div>
-                            {% endif %}
-
-                            {% if related.duration %}
-                                <span class="vd-duration">{{ related.duration }}</span>
-                            {% endif %}
+                    <a href="{% url 'videos:detail' related.pk %}" class="vd-sidebar-item" 
+                       data-video-url="{% url 'videos:detail' related.pk %}"
+                       data-video-title="{{ related.title|escapejs }}"
+                       data-video-channel="{{ related.creator.get_full_name|default:related.creator.username|escapejs }}"
+                       data-video-thumb="{% if related.thumbnail_url %}{{ related.thumbnail_url }}{% elif related.thumbnail %}{{ related.thumbnail.url }}{% endif %}">
+                        <div class="vd-sidebar-thumb">
+                            {% if related.thumbnail_url %}<img src="{{ related.thumbnail_url }}" alt="">
+                            {% elif related.thumbnail %}<img src="{{ related.thumbnail.url }}" alt="">
+                            {% else %}<div style="width:100%;height:100%;background:#111;"></div>{% endif %}
+                            {% if related.duration %}<span class="vd-sidebar-duration">{{ related.duration }}</span>{% endif %}
                         </div>
-
-                        <div class="vd-related-info">
-                            {% if related.is_premium %}
-                                <span class="vd-premium-tag">Premium</span>
-                            {% endif %}
-
-                            <h3 class="vd-related-title">{{ related.title }}</h3>
-
-                            <div class="vd-related-creator-row">
-                                <span class="vd-avatar vd-avatar-card" aria-hidden="true">
-                                    {% if related.creator.profile.avatar_image %}
-                                        <img
-                                            src="{{ related.creator.profile.avatar_image.url }}"
-                                            alt=""
-                                            loading="lazy"
-                                        >
-                                    {% elif related.creator.profile.avatar %}
-                                        <img
-                                            src="{{ related.creator.profile.avatar }}"
-                                            alt=""
-                                            loading="lazy"
-                                        >
-                                    {% else %}
-                                        {{ related.creator.username|first|upper }}
-                                    {% endif %}
-                                </span>
-
-                                <span class="vd-related-creator-name">
-                                    {{ related.creator.username }}
-                                </span>
-                            </div>
-
-                            <div class="vd-related-meta">
-                                {{ related.views|default:0 }} views
-                                <span> · </span>
-                                {{ related.created_at|date:"M j, Y" }}
-                            </div>
+                        <div class="vd-sidebar-info">
+                            <h3 class="vd-sidebar-title">{{ related.title }}</h3>
+                            <div class="vd-sidebar-channel">{{ related.creator.get_full_name|default:related.creator.username }}</div>
+                            <div class="vd-sidebar-meta">{{ related.views }} views &bull; {{ related.created_at|timesince }} ago</div>
                         </div>
                     </a>
-                {% empty %}
-                    <div class="vd-related-empty">
-                        There are no other published videos yet.
-                    </div>
                 {% endfor %}
             </div>
         </aside>
     </div>
-</main>
+</div>
 
 <script>
-(function () {
-    const shareButton = document.getElementById("vd-share-button");
-    const shareStatus = document.getElementById("vd-share-status");
+function handleBackButton() {
+    if (window.history.length > 2) {
+        window.history.back();
+    } else {
+        window.location.href = "{% url 'home' %}";
+    }
+}
 
-    if (!shareButton || !shareStatus) {
-        return;
+document.addEventListener('DOMContentLoaded', function() {
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    const video = document.getElementById('mainVideo');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeIcon = document.getElementById('volumeIcon');
+    const muteIcon = document.getElementById('muteIcon');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const upNextOverlay = document.getElementById('upNextOverlay');
+    const countdownTimer = document.getElementById('countdownTimer');
+    const upNextThumb = document.getElementById('upNextThumb');
+    const upNextTitle = document.getElementById('upNextTitle');
+    const upNextChannel = document.getElementById('upNextChannel');
+    const cancelNextBtn = document.getElementById('cancelNextBtn');
+    const playNextBtn = document.getElementById('playNextBtn');
+
+    const firstRelatedItem = document.querySelector('#relatedVideosList .vd-sidebar-item');
+    let nextVideoUrl = null;
+    let countdownInterval = null;
+
+    if (firstRelatedItem) {
+        const baseUrl = firstRelatedItem.getAttribute('data-video-url');
+        nextVideoUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+        
+        upNextThumb.src = firstRelatedItem.getAttribute('data-video-thumb');
+        upNextTitle.textContent = firstRelatedItem.getAttribute('data-video-title');
+        upNextChannel.textContent = firstRelatedItem.getAttribute('data-video-channel');
     }
 
-    shareButton.addEventListener("click", async function () {
-        const shareData = {
-            title: document.title,
-            text: document.querySelector(".vd-title")?.textContent?.trim()
-                || document.title,
-            url: window.location.href
-        };
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return m + ":" + (s < 10 ? "0" : "") + s;
+    }
 
-        try {
-            if (navigator.share) {
-                await navigator.share(shareData);
-                shareStatus.textContent = "Share opened.";
-                return;
+    // --- AUTOPLAY ON PAGE LOAD ---
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('autoplay') === '1' && video) {
+        video.play().catch(() => {
+            video.muted = true;
+            video.play().catch(e => console.log("Autoplay blocked:", e));
+        });
+    }
+
+    // --- PLAY/PAUSE CLICK ON VIDEO ITSELF ---
+    if (video) {
+        video.addEventListener('click', function(e) {
+            // Ensure we don't trigger if a control button was clicked
+            if (e.target.closest('#videoControls')) return;
+            
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
             }
+        });
+    }
 
-            if (navigator.clipboard && window.isSecureContext) {
-                await navigator.clipboard.writeText(shareData.url);
-                shareStatus.textContent = "Link copied.";
-                return;
+    if(playPauseBtn) {
+        playPauseBtn.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
             }
+        });
+    }
 
-            const temporaryInput = document.createElement("textarea");
-            temporaryInput.value = shareData.url;
-            temporaryInput.setAttribute("readonly", "");
-            temporaryInput.style.position = "fixed";
-            temporaryInput.style.left = "-9999px";
+    if(video) {
+        video.addEventListener('play', function() {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+        });
+        video.addEventListener('pause', function() {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+        });
 
-            document.body.appendChild(temporaryInput);
-            temporaryInput.select();
-
-            const copied = document.execCommand("copy");
-            temporaryInput.remove();
-
-            shareStatus.textContent = copied
-                ? "Link copied."
-                : "Copy the page URL from your browser.";
-        } catch (error) {
-            if (error && error.name === "AbortError") {
-                shareStatus.textContent = "";
-                return;
+        video.addEventListener('timeupdate', function() {
+            if (video.duration) {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressFill.style.width = percent + '%';
+                timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
             }
+        });
 
-            shareStatus.textContent = "Unable to share right now.";
+        video.addEventListener('ended', function() {
+            if (!nextVideoUrl) return;
+            upNextOverlay.classList.add('is-active');
+            let timeLeft = 3;
+            countdownTimer.textContent = timeLeft;
+
+            countdownInterval = setInterval(() => {
+                timeLeft -= 1;
+                countdownTimer.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = nextVideoUrl;
+                }
+            }, 1000);
+        });
+    }
+
+    if (cancelNextBtn) {
+        cancelNextBtn.addEventListener('click', function() {
+            clearInterval(countdownInterval);
+            upNextOverlay.classList.remove('is-active');
+        });
+    }
+    if (playNextBtn) {
+        playNextBtn.addEventListener('click', function() {
+            clearInterval(countdownInterval);
+            window.location.href = nextVideoUrl;
+        });
+    }
+
+    if(nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (nextVideoUrl) {
+                window.location.href = nextVideoUrl;
+            } else {
+                alert("No more videos available to play next.");
+            }
+        });
+    }
+
+    if(progressBar) {
+        progressBar.addEventListener('click', function(e) {
+            const rect = progressBar.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        });
+    }
+    
+    if(muteBtn) {
+        muteBtn.addEventListener('click', function() {
+            video.muted = !video.muted;
+            volumeIcon.style.display = video.muted ? 'none' : 'block';
+            muteIcon.style.display = video.muted ? 'block' : 'none';
+        });
+    }
+    if(fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', function() {
+            if (video.requestFullscreen) { video.requestFullscreen(); }
+        });
+    }
+
+    // --- AJAX LIKE ---
+    const likeBtn = document.getElementById('likeBtn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                likeBtn.classList.toggle('vd-btn-active', data.liked);
+                document.getElementById('likeCount').textContent = data.count;
+            });
+        });
+    }
+
+    // --- AJAX FOLLOW / SUBSCRIBE ---
+    const followBtn = document.getElementById('followBtn');
+    if (followBtn) {
+        followBtn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const btn = document.getElementById('followBtn');
+                const txt = document.getElementById('followBtnText');
+                const icon = document.getElementById('followIcon');
+                const subCount = document.getElementById('subCount');
+
+                if (data.following) {
+                    btn.classList.remove('vd-btn-subscribe');
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--text)';
+                    btn.style.borderColor = 'var(--line)';
+                    txt.textContent = 'Subscribed';
+                    icon.innerHTML = '<path d="M20 6L9 17l-5-5"/>';
+                } else {
+                    btn.classList.add('vd-btn-subscribe');
+                    btn.style.background = 'var(--orange)';
+                    btn.style.color = '#111';
+                    btn.style.borderColor = 'var(--orange)';
+                    txt.textContent = 'Subscribe';
+                    icon.innerHTML = '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>';
+                }
+                subCount.textContent = data.count;
+            });
+        });
+    }
+
+    // --- AJAX COMMENT ---
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('data-url');
+            const input = document.getElementById('commentInput');
+            const postBtn = document.getElementById('postCommentBtn');
+            const text = input.value.trim();
+            if (!text) return;
+
+            postBtn.disabled = true;
+            postBtn.textContent = 'Posting...';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ text: text })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const noComments = document.getElementById('noCommentsState');
+                    if (noComments) noComments.remove();
+
+                    const avatarHTML = data.avatar ? `<img src="${data.avatar}" alt="">` : data.username.charAt(0).toUpperCase();
+                    const newCommentHTML = `
+                        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                            <div class="vd-avatar-small">${avatarHTML}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">
+                                    @${data.username}
+                                    <span style="color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 11px;">Just now</span>
+                                </div>
+                                <div style="font-size: 14px; line-height: 1.5; color: #d1d5db;">${data.text}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('commentsList').insertAdjacentHTML('afterbegin', newCommentHTML);
+                    document.getElementById('commentCount').textContent = data.comment_count;
+                    document.getElementById('commentCountHeader').textContent = data.comment_count;
+                    input.value = '';
+                } else {
+                    alert(data.error || 'Something went wrong.');
+                }
+            })
+            .finally(() => {
+                postBtn.disabled = false;
+                postBtn.textContent = 'Post comment';
+            });
+        });
+    }
+
+    // --- SHARE MENU ---
+    const shareBtn = document.getElementById('shareBtn');
+    const shareMenu = document.getElementById('shareMenu');
+    const currentUrl = window.location.href;
+    const shareTitle = "{{ video.title|escapejs }}";
+
+    if (navigator.share) {
+        document.getElementById('nativeShareBtn').style.display = 'flex';
+    }
+
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            shareMenu.classList.toggle('is-open');
+        });
+    }
+    document.addEventListener('click', function() {
+        if (shareMenu) shareMenu.classList.remove('is-open');
+    });
+
+    document.getElementById('copyLinkBtn').addEventListener('click', function() {
+        navigator.clipboard.writeText(currentUrl).then(() => {
+            this.classList.add('copied');
+            const original = this.innerHTML;
+            this.innerHTML = this.innerHTML.replace('Copy Link', 'Copied!');
+            setTimeout(() => { this.innerHTML = original; this.classList.remove('copied'); }, 2000);
+        });
+    });
+
+    document.getElementById('shareEmailBtn').addEventListener('click', function() {
+        window.location.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent('Check out this video: ' + currentUrl)}`;
+    });
+
+    document.getElementById('shareTwitterBtn').addEventListener('click', function() {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(currentUrl)}`, '_blank');
+    });
+
+    document.getElementById('shareFacebookBtn').addEventListener('click', function() {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
+    });
+
+    document.getElementById('shareWhatsAppBtn').addEventListener('click', function() {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareTitle + ' ' + currentUrl)}`, '_blank');
+    });
+
+    document.getElementById('nativeShareBtn').addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({ title: shareTitle, url: currentUrl });
         }
     });
-})();
-
-
-    // Like and comment actions use fetch so the page stays in place.
-    // The Django views must return JSON when X-Requested-With is XMLHttpRequest.
-    const likeForm = document.getElementById("vd-like-form");
-    const likeButton = document.getElementById("vd-like-button");
-
-    if (likeForm && likeButton) {
-        likeForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            if (likeButton.disabled) return;
-            const oldText = likeButton.childNodes[0];
-            const countNode = likeButton.querySelector(".vd-action-count");
-            likeButton.disabled = true;
-            try {
-                const response = await fetch(likeForm.action, {
-                    method: "POST",
-                    body: new FormData(likeForm),
-                    headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
-                    credentials: "same-origin"
-                });
-                const data = await response.json();
-                if (!response.ok || data.success === false) throw new Error(data.error || "Unable to update like.");
-                if (countNode && data.like_count !== undefined) countNode.textContent = data.like_count;
-                const likedNow = Boolean(data.liked);
-                likeButton.classList.toggle("is-active", likedNow);
-                likeButton.setAttribute("aria-pressed", String(likedNow));
-                if (oldText && oldText.nodeType === Node.TEXT_NODE) oldText.textContent = likedNow ? "Liked " : "Like ";
-            } catch (error) {
-                console.error("Like request failed:", error);
-                window.alert(error.message || "Unable to update like. Please try again.");
-            } finally {
-                likeButton.disabled = false;
-            }
-        });
-    }
-
-    const commentForm = document.getElementById("vd-comment-form");
-    const commentList = document.getElementById("vd-comment-list");
-    const commentStatus = document.getElementById("vd-comment-status");
-
-    if (commentForm && commentList) {
-        commentForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            const submitButton = commentForm.querySelector('button[type="submit"]');
-            const textarea = commentForm.querySelector('textarea[name="text"]');
-            if (!textarea || !textarea.value.trim() || (submitButton && submitButton.disabled)) return;
-            if (submitButton) submitButton.disabled = true;
-            if (commentStatus) { commentStatus.className = "vd-ajax-status"; commentStatus.textContent = "Posting comment..."; }
-            try {
-                const response = await fetch(commentForm.action, {
-                    method: "POST",
-                    body: new FormData(commentForm),
-                    headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
-                    credentials: "same-origin"
-                });
-                const data = await response.json();
-                if (!response.ok || data.success === false) throw new Error(data.error || "Unable to post comment.");
-                const item = data.comment;
-                if (!item || item.id === undefined || !item.username || item.text === undefined) {
-                    throw new Error("The server response is missing comment details. Update the Django comment view to return comment JSON.");
-                }
-                const article = document.createElement("article");
-                article.className = "vd-comment";
-                article.dataset.commentId = item.id;
-                const body = document.createElement("div");
-                body.className = "vd-comment-body";
-                const header = document.createElement("div");
-                header.className = "vd-comment-header";
-                const author = document.createElement("span");
-                author.className = "vd-comment-author";
-                author.textContent = item.username;
-                header.appendChild(author);
-                if (item.created_at) {
-                    const date = document.createElement("time");
-                    date.className = "vd-comment-date";
-                    date.textContent = item.created_at;
-                    header.appendChild(date);
-                }
-                const text = document.createElement("p");
-                text.className = "vd-comment-text";
-                text.textContent = item.text;
-                body.append(header, text);
-                article.appendChild(body);
-                const empty = commentList.querySelector(".vd-empty-comments");
-                if (empty) empty.remove();
-                commentList.prepend(article);
-                textarea.value = "";
-                if (data.comment_count !== undefined) {
-                    document.querySelectorAll("[data-comment-count]").forEach(function (node) {
-                        node.textContent = "(" + data.comment_count + ")";
-                    });
-                }
-                if (commentStatus) { commentStatus.className = "vd-ajax-status is-success"; commentStatus.textContent = "Comment posted."; }
-            } catch (error) {
-                console.error("Comment request failed:", error);
-                if (commentStatus) { commentStatus.className = "vd-ajax-status is-error"; commentStatus.textContent = error.message || "Unable to post comment. Please try again."; }
-            } finally {
-                if (submitButton) submitButton.disabled = false;
-            }
-        });
-    }
+});
 </script>
 {% endblock %}

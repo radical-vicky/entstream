@@ -4,439 +4,224 @@
 
 {% block extra_css %}
 <style>
-    .sp-edit-page {
-        --sp-panel: #0d1117;
-        --sp-bg: #080b10;
-        --sp-border: #30363d;
-        --sp-text: #e6edf3;
-        --sp-muted: #8b949e;
-        --sp-orange: #f0883e;
-        max-width: 850px;
-        margin: 0 auto;
-        padding: 32px 20px 60px;
-        color: var(--sp-text);
-    }
+.ep-page {
+    --bg: #0b0d10;
+    --panel: #12151a;
+    --panel2: #191d24;
+    --line: #2b3039;
+    --text: #f4f6f8;
+    --muted: #9ba3af;
+    --orange: #ff7900;
+    min-height: calc(100vh - 60px);
+    padding: clamp(14px, 3vw, 30px) clamp(12px, 2.5vw, 24px) 48px;
+    background: var(--bg);
+    color: var(--text);
+}
+.ep-page, .ep-page * { box-sizing: border-box; }
+.ep-page h1, .ep-page h2, .ep-page h3, .ep-page p { margin-top: 0; }
+.ep-page a { color: inherit; text-decoration: none; }
+.ep-container { max-width: 800px; width: 100%; margin: auto; min-width: 0; }
 
-    .sp-edit-page * {
-        box-sizing: border-box;
-    }
+.ep-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: clamp(20px, 4vw, 40px);
+}
 
-    .sp-edit-card {
-        padding: 28px;
-        background: var(--sp-panel);
-        border: 1px solid var(--sp-border);
-    }
+.ep-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+}
+.ep-eyebrow {
+    display: block; margin-bottom: 8px; color: var(--orange);
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+.ep-header h1 { margin: 0 0 8px; font-size: 28px; font-weight: 850; letter-spacing: -0.5px; }
+.ep-header p { margin: 0; color: var(--muted); font-size: 13px; }
 
-    .sp-edit-header {
-        margin-bottom: 28px;
-    }
+/* Form Fields */
+.ep-field { margin-bottom: 24px; }
+.ep-label {
+    display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700;
+}
+.ep-required { color: var(--orange); }
+.ep-help { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
 
-    .sp-edit-header h1 {
-        margin: 0 0 8px;
-        font-size: clamp(25px, 3vw, 32px);
-    }
+/* File Upload Sections */
+.ep-file-group {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 16px; background: var(--panel2); border: 1px solid var(--line);
+}
+.ep-file-preview {
+    width: 80px; height: 80px; background: #0d1014; border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+}
+.ep-file-preview.cover { width: 160px; height: 80px; }
+.ep-file-preview img { width: 100%; height: 100%; object-fit: cover; }
+.ep-file-preview span { font-size: 10px; color: var(--muted); text-align: center; padding: 0 10px; }
+.ep-file-inputs { flex: 1; min-width: 0; }
 
-    .sp-edit-header p {
-        margin: 0;
-        color: var(--sp-muted);
-        line-height: 1.6;
-    }
+/* Input Styling */
+.ep-input {
+    display: block; width: 100%; padding: 12px 14px;
+    background: #0d1014; border: 1px solid var(--line); color: var(--text);
+    font: inherit; font-size: 13px; outline: none; transition: border-color 0.2s;
+}
+.ep-input:focus { border-color: var(--orange); }
+.ep-input::placeholder { color: #555b63; }
+textarea.ep-input { min-height: 100px; resize: vertical; }
 
-    .sp-edit-messages {
-        margin-bottom: 18px;
-    }
+/* Custom File Input */
+.ep-file-input {
+    display: block; width: 100%; font-size: 12px; color: var(--muted);
+}
+.ep-file-input::file-selector-button {
+    padding: 8px 12px; margin-right: 12px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); font-weight: 600; cursor: pointer;
+    transition: background 0.2s; font-family: inherit;
+}
+.ep-file-input::file-selector-button:hover { background: #2a3039; }
 
-    .sp-edit-message {
-        margin-bottom: 8px;
-        padding: 12px 14px;
-        background: #171d26;
-        border: 1px solid var(--sp-border);
-        line-height: 1.5;
-    }
+/* Alerts */
+.ep-alert {
+    padding: 13px 15px; margin-bottom: 24px; border: 1px solid;
+    font-size: 12px; line-height: 1.6;
+}
+.ep-alert-error { background: #241010; border-color: #6b3037; color: #ff9ba1; }
+.ep-alert-success { background: #101e16; border-color: #245d45; color: #8be4bb; }
+.ep-error-text { color: #ff9ba1; font-size: 11px; margin-top: 4px; display: block; }
 
-    .sp-edit-message.error {
-        border-left: 3px solid #f85149;
-    }
+/* Actions */
+.ep-actions {
+    display: flex; gap: 12px; margin-top: 32px;
+    padding-top: 20px; border-top: 1px solid var(--line);
+}
+.ep-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 24px; font-size: 13px; font-weight: 700;
+    border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+}
+.ep-btn-primary { background: var(--orange); color: #111; }
+.ep-btn-primary:hover { background: #e86e00; }
+.ep-btn-secondary { background: transparent; border-color: var(--line); color: var(--text); }
+.ep-btn-secondary:hover { background: var(--panel2); border-color: #596270; }
 
-    .sp-edit-message.success {
-        border-left: 3px solid #3fb950;
-    }
-
-    .sp-edit-avatar-area {
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        padding: 20px;
-        margin-bottom: 28px;
-        background: var(--sp-bg);
-        border: 1px solid var(--sp-border);
-    }
-
-    .sp-edit-avatar-preview {
-        width: 104px;
-        height: 104px;
-        flex: 0 0 104px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        background: #171d26;
-        border: 1px solid var(--sp-border);
-        color: var(--sp-orange);
-        font-size: 34px;
-        font-weight: 800;
-    }
-
-    .sp-edit-avatar-preview img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .sp-edit-avatar-copy h2 {
-        margin: 0 0 7px;
-        font-size: 17px;
-    }
-
-    .sp-edit-avatar-copy p {
-        margin: 0;
-        color: var(--sp-muted);
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .sp-edit-field {
-        margin-bottom: 21px;
-    }
-
-    .sp-edit-field label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-    .sp-edit-field input,
-    .sp-edit-field textarea {
-        display: block;
-        width: 100%;
-        padding: 12px 13px;
-        background: var(--sp-bg);
-        color: var(--sp-text);
-        border: 1px solid var(--sp-border);
-        border-radius: 0;
-        font: inherit;
-        font-size: 14px;
-    }
-
-    .sp-edit-field input {
-        min-height: 45px;
-    }
-
-    .sp-edit-field input[type="file"] {
-        padding: 10px;
-    }
-
-    .sp-edit-field input[type="file"]::file-selector-button {
-        padding: 8px 11px;
-        margin-right: 12px;
-        background: #202833;
-        color: var(--sp-text);
-        border: 1px solid var(--sp-border);
-        border-radius: 0;
-        cursor: pointer;
-    }
-
-    .sp-edit-field textarea {
-        min-height: 125px;
-        resize: vertical;
-        line-height: 1.6;
-    }
-
-    .sp-edit-field input:focus,
-    .sp-edit-field textarea:focus {
-        outline: 1px solid var(--sp-orange);
-        border-color: var(--sp-orange);
-    }
-
-    .sp-edit-help {
-        display: block;
-        margin-top: 7px;
-        color: var(--sp-muted);
-        font-size: 12px;
-        line-height: 1.5;
-    }
-
-    .sp-edit-divider {
-        height: 1px;
-        margin: 27px 0;
-        background: var(--sp-border);
-        border: 0;
-    }
-
-    .sp-edit-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 28px;
-    }
-
-    .sp-edit-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-        padding: 11px 17px;
-        border: 1px solid var(--sp-border);
-        border-radius: 0;
-        text-decoration: none;
-        font: inherit;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .sp-edit-btn-primary {
-        background: var(--sp-orange);
-        color: #101010;
-        border-color: var(--sp-orange);
-    }
-
-    .sp-edit-btn-primary:hover {
-        background: #ff9b50;
-        border-color: #ff9b50;
-    }
-
-    .sp-edit-btn-secondary {
-        background: #161b22;
-        color: var(--sp-text);
-    }
-
-    .sp-edit-btn-secondary:hover {
-        background: #202833;
-    }
-
-    @media (max-width: 600px) {
-        .sp-edit-page {
-            padding: 20px 12px 40px;
-        }
-
-        .sp-edit-card {
-            padding: 19px;
-        }
-
-        .sp-edit-avatar-area {
-            align-items: flex-start;
-            flex-direction: column;
-            padding: 16px;
-        }
-
-        .sp-edit-actions {
-            flex-direction: column;
-        }
-
-        .sp-edit-btn {
-            width: 100%;
-        }
-    }
+/* Form layout helpers */
+.ep-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="sp-edit-page">
-    {% if messages %}
-        <div class="sp-edit-messages" aria-live="polite">
-            {% for message in messages %}
-                <div class="sp-edit-message {{ message.tags }}">
-                    {{ message }}
+<div class="ep-page">
+    <div class="ep-container">
+        
+        <div class="ep-card">
+            <div class="ep-header">
+                <span class="ep-eyebrow">Creator Settings</span>
+                <h1>Edit Profile</h1>
+                <p>Update your personal details and visual branding.</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="ep-alert {% if 'success' in message.tags %}ep-alert-success{% else %}ep-alert-error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <!-- User Account Info (Manually rendered to match the view) -->
+                <div class="ep-field">
+                    <label class="ep-label" for="id_username">Username <span class="ep-required">*</span></label>
+                    <input type="text" name="username" id="id_username" class="ep-input" value="{{ account_user.username }}" required>
                 </div>
-            {% endfor %}
+
+                <div class="ep-row">
+                    <div class="ep-field">
+                        <label class="ep-label" for="id_first_name">First Name</label>
+                        <input type="text" name="first_name" id="id_first_name" class="ep-input" value="{{ account_user.first_name }}">
+                    </div>
+                    <div class="ep-field">
+                        <label class="ep-label" for="id_last_name">Last Name</label>
+                        <input type="text" name="last_name" id="id_last_name" class="ep-input" value="{{ account_user.last_name }}">
+                    </div>
+                </div>
+
+                <div class="ep-field">
+                    <label class="ep-label" for="id_email">Email Address</label>
+                    <input type="email" name="email" id="id_email" class="ep-input" value="{{ account_user.email }}">
+                </div>
+
+                <!-- Profile Images -->
+                <div class="ep-field">
+                    <label class="ep-label">Avatar Image</label>
+                    <div class="ep-file-group">
+                        <div class="ep-file-preview" style="border-radius: 50%;">
+                            {% if profile.avatar_image %}
+                                <img src="{{ profile.avatar_image.url }}" alt="Avatar">
+                            {% else %}
+                                <span>No Image</span>
+                            {% endif %}
+                        </div>
+                        <div class="ep-file-inputs">
+                            {{ form.avatar_upload }}
+                            <span class="ep-help">Upload a square image for your profile picture. JPG, PNG, WEBP or GIF. Max 5MB.</span>
+                            {% if form.avatar_upload.errors %}<span class="ep-error-text">{{ form.avatar_upload.errors.0 }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ep-field">
+                    <label class="ep-label">Cover Image</label>
+                    <div class="ep-file-group">
+                        <div class="ep-file-preview cover">
+                            {% if profile.cover_image %}
+                                <img src="{{ profile.cover_image.url }}" alt="Cover">
+                            {% else %}
+                                <span>No Image</span>
+                            {% endif %}
+                        </div>
+                        <div class="ep-file-inputs">
+                            {{ form.cover_image }}
+                            <span class="ep-help">Upload a wide landscape image to display at the top of your profile.</span>
+                            {% if form.cover_image.errors %}<span class="ep-error-text">{{ form.cover_image.errors.0 }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio & Details -->
+                <div class="ep-field">
+                    <label class="ep-label" for="{{ form.bio.id_for_label }}">Bio</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}<span class="ep-error-text">{{ form.bio.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="ep-row">
+                    <div class="ep-field">
+                        <label class="ep-label" for="{{ form.location.id_for_label }}">Location</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}<span class="ep-error-text">{{ form.location.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="ep-field">
+                        <label class="ep-label" for="{{ form.website.id_for_label }}">Website / Link</label>
+                        {{ form.website }}
+                        {% if form.website.errors %}<span class="ep-error-text">{{ form.website.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="ep-actions">
+                    <button type="submit" class="ep-btn ep-btn-primary">Save Changes</button>
+                    <a href="{% url 'accounts:profile' %}" class="ep-btn ep-btn-secondary">Cancel</a>
+                </div>
+            </form>
+
         </div>
-    {% endif %}
-
-    <section class="sp-edit-card">
-        <header class="sp-edit-header">
-            <h1>Edit your profile</h1>
-            <p>Update your StreamSphere identity and the information other people see.</p>
-        </header>
-
-        <form method="post"
-              action="{% url 'accounts:profile_edit' %}"
-              enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="sp-edit-avatar-area">
-                <div class="sp-edit-avatar-preview" id="avatarPreview">
-                    {% if profile.avatar_image %}
-                        <img src="{{ profile.avatar_image.url }}"
-                             alt="Current profile avatar"
-                             id="avatarPreviewImage">
-                    {% elif profile.avatar %}
-                        <img src="{{ profile.avatar }}"
-                             alt="Current profile avatar"
-                             id="avatarPreviewImage">
-                    {% else %}
-                        <span id="avatarInitial">
-                            {{ account_user.username|first|upper }}
-                        </span>
-                        <img src=""
-                             alt="Avatar preview"
-                             id="avatarPreviewImage"
-                             hidden>
-                    {% endif %}
-                </div>
-
-                <div class="sp-edit-avatar-copy">
-                    <h2>Profile photo</h2>
-                    <p>Upload a clear image for your avatar. Your image will be stored through Cloudinary.</p>
-                </div>
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="{{ form.avatar_upload.id_for_label }}">Upload avatar</label>
-                {{ form.avatar_upload }}
-                <span class="sp-edit-help">
-                    Choose an image file from your device. Leave this blank to keep your current uploaded avatar.
-                </span>
-            </div>
-
-            <hr class="sp-edit-divider">
-
-            <div class="sp-edit-field">
-                <label for="username">Username *</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value="{{ account_user.username }}"
-                    maxlength="150"
-                    autocomplete="username"
-                    required
-                >
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="first_name">First name</label>
-                <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    value="{{ account_user.first_name }}"
-                    autocomplete="given-name"
-                >
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="last_name">Last name</label>
-                <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    value="{{ account_user.last_name }}"
-                    autocomplete="family-name"
-                >
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="email">Email address</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="{{ account_user.email }}"
-                    autocomplete="email"
-                >
-            </div>
-
-            <hr class="sp-edit-divider">
-
-            <div class="sp-edit-field">
-                <label for="bio">Bio</label>
-                <textarea
-                    id="bio"
-                    name="bio"
-                    maxlength="500"
-                    placeholder="Tell people a little about yourself..."
-                >{{ profile.bio }}</textarea>
-                <span class="sp-edit-help">Maximum 500 characters.</span>
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="location">Location</label>
-                <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    value="{{ profile.location }}"
-                    maxlength="100"
-                    placeholder="Your city or location"
-                >
-            </div>
-
-            <div class="sp-edit-field">
-                <label for="website">Website</label>
-                <input
-                    type="url"
-                    id="website"
-                    name="website"
-                    value="{{ profile.website }}"
-                    placeholder="https://example.com"
-                >
-            </div>
-
-            <div class="sp-edit-actions">
-                <button class="sp-edit-btn sp-edit-btn-primary" type="submit">
-                    Save changes
-                </button>
-                <a class="sp-edit-btn sp-edit-btn-secondary"
-                   href="{% url 'accounts:profile' %}">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </section>
-</main>
-
-<script>
-    (() => {
-        // CHANGED: The field ID is now "id_avatar_upload" based on how Django renders form fields.
-        const input = document.getElementById("id_avatar_upload");
-        const preview = document.getElementById("avatarPreviewImage");
-        const initial = document.getElementById("avatarInitial");
-
-        if (!input || !preview) return;
-
-        let currentObjectUrl = null;
-
-        input.addEventListener("change", () => {
-            const file = input.files && input.files[0];
-
-            if (!file) return;
-
-            if (!file.type.startsWith("image/")) {
-                input.value = "";
-                return;
-            }
-
-            if (currentObjectUrl) {
-                URL.revokeObjectURL(currentObjectUrl);
-            }
-
-            currentObjectUrl = URL.createObjectURL(file);
-            preview.src = currentObjectUrl;
-            preview.hidden = false;
-
-            if (initial) {
-                initial.hidden = true;
-            }
-        });
-
-        window.addEventListener("beforeunload", () => {
-            if (currentObjectUrl) {
-                URL.revokeObjectURL(currentObjectUrl);
-            }
-        });
-    })();
-</script>
+    </div>
+</div>
 {% endblock %}

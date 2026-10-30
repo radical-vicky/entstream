@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}My Profile - StreamSphere{% endblock %}
+{% block title %}{{ profile_user.username }}'s Profile - StreamSphere{% endblock %}
 
 {% block extra_css %}
 <style>
+/* ... (Your existing sp-page CSS) ... */
 .sp-page {
     --bg: #0b0d10;
     --panel: #12151a;
@@ -20,7 +21,6 @@
 .sp-page, .sp-page * { box-sizing: border-box; }
 .sp-page h1, .sp-page h2, .sp-page h3, .sp-page p { margin-top: 0; }
 .sp-page a { color: inherit; text-decoration: none; }
-.sp-page button, .sp-page input, .sp-page textarea { font: inherit; }
 .sp-container { max-width: 1240px; width: 100%; margin: auto; min-width: 0; }
 .sp-muted { color: var(--muted); }
 .sp-eyebrow {
@@ -39,11 +39,9 @@
 .sp-btn-primary:hover { background: #e86e00; border-color: #e86e00; }
 .sp-btn-secondary { background: #20252d; border-color: #363d48; color: var(--text) !important; }
 .sp-btn-secondary:hover { background: #2a3039; border-color: #596270; }
-/* CHANGED: styles for edit/delete controls */
 .sp-btn-danger { background: #3a1d20; border-color: #6b3037; color: #ff9ba1 !important; }
 .sp-btn-danger:hover { background: #4d2429; border-color: #8a3d46; }
 .sp-btn-sm { min-height: 30px; padding: 6px 10px; font-size: 11px; }
-.sp-page :is(a, button):focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 
 .sp-messages { display: grid; gap: 9px; margin-bottom: 18px; }
 .sp-alert { padding: 13px 15px; border: 1px solid var(--line); background: var(--panel); font-size: 12px; line-height: 1.6; }
@@ -82,12 +80,10 @@
 .sp-avatar-wrap {
     flex: 0 0 108px; width: 108px; height: 108px; margin-top: -34px;
     padding: 4px; border: 1px solid var(--line); background: var(--panel);
-    border-radius: 50%;
+    border-radius: 50%; cursor: pointer; transition: transform 0.2s;
 }
-.sp-avatar {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-    border-radius: 50%; background: #252a32;
-}
+.sp-avatar-wrap:hover { transform: scale(1.05); }
+.sp-avatar { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #252a32; }
 .sp-avatar-fallback {
     display: flex; align-items: center; justify-content: center; width: 100%;
     height: 100%; border-radius: 50%; background: #242a32;
@@ -99,10 +95,18 @@
 .sp-profile-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 11px; }
 .sp-profile-meta span { display: inline-flex; align-items: center; gap: 7px; overflow-wrap: anywhere; }
 .sp-profile-meta a:hover { color: var(--orange); }
-.sp-profile-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 2px; }
+.sp-profile-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 2px; align-items: center; }
 
+/* Clickable stats */
 .sp-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 18px 0 25px; }
-.sp-stat { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 17px; border: 1px solid var(--line); background: var(--panel); }
+.sp-stat { 
+    display: flex; align-items: center; gap: 13px; min-width: 0; padding: 17px; 
+    border: 1px solid var(--line); background: var(--panel); 
+    color: inherit; text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+.sp-stat:hover { background: var(--panel2); border-color: #4b3322; }
+.sp-stat.is-active { border-color: var(--orange); background: rgba(255,121,0,0.05); }
 .sp-stat-icon {
     display: flex; align-items: center; justify-content: center; flex: 0 0 40px;
     width: 40px; height: 40px; border: 1px solid #4b3322;
@@ -123,21 +127,37 @@
 .sp-video-card:hover { border-color: #8b4b1c; transform: translateY(-2px); }
 .sp-video-thumb { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #20252d; }
 .sp-video-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
-.sp-video-card:hover .sp-video-thumb img { transform: scale(1.025); }
-.sp-video-placeholder {
-    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
-    background: linear-gradient(135deg,#252a32,#111419); color: #aeb5bf; font-size: 12px;
-}
+.sp-video-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg,#252a32,#111419); color: #aeb5bf; font-size: 12px; }
 .sp-video-body { padding: 12px; }
-.sp-video-title {
-    display: -webkit-box; margin: 0 0 8px; overflow: hidden;
-    font-size: 13px; font-weight: 750; line-height: 1.5;
-    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-}
+.sp-video-title { display: -webkit-box; margin: 0 0 8px; overflow: hidden; font-size: 13px; font-weight: 750; line-height: 1.5; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .sp-video-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font-size: 11px; }
-/* CHANGED: per-video edit/delete row */
-.sp-video-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sp-video-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .sp-video-actions form { display: inline; margin: 0; }
+.sp-icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--line);
+    background: var(--panel2); color: var(--muted); cursor: pointer; transition: all 0.2s;
+}
+.sp-icon-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+.sp-icon-btn:hover { background: #2a3039; color: var(--text); border-color: #596270; }
+.sp-icon-btn.sp-btn-danger { background: #241010; border-color: #4a1c1f; color: #ff9ba1; }
+.sp-icon-btn.sp-btn-danger:hover { background: #3a1d20; border-color: #6b3037; color: #ffd1d1; }
+
+.sp-user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.sp-user-card {
+    display: flex; align-items: center; gap: 12px; padding: 16px;
+    background: #0d1014; border: 1px solid var(--line);
+}
+.sp-user-avatar {
+    width: 48px; height: 48px; border-radius: 50%; background: #252a32;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: var(--orange); flex-shrink: 0; overflow: hidden;
+}
+.sp-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sp-user-info { flex: 1; min-width: 0; }
+.sp-user-name { display: block; font-size: 14px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-user-username { display: block; font-size: 12px; color: var(--muted); }
+
 .sp-empty { padding: 35px 18px; border: 1px dashed #343a44; text-align: center; }
 .sp-empty h3 { margin: 0 0 8px; font-size: 16px; }
 .sp-empty p { max-width: 430px; margin: 0 auto 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
@@ -146,19 +166,18 @@
 .sp-info-item { display: flex; gap: 11px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .sp-info-item:first-child { padding-top: 0; }
 .sp-info-item:last-child { padding-bottom: 0; border-bottom: 0; }
-.sp-info-icon {
-    display: flex; align-items: center; justify-content: center; flex: 0 0 33px;
-    width: 33px; height: 33px; border: 1px solid #353b45;
-    background: #1b2027; color: var(--orange); font-size: 12px; font-weight: 800;
-}
+.sp-info-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 33px; width: 33px; height: 33px; border: 1px solid #353b45; background: #1b2027; color: var(--orange); font-size: 12px; font-weight: 800; }
 .sp-info-copy { flex: 1; min-width: 0; }
 .sp-info-copy strong { display: block; margin-bottom: 4px; font-size: 11px; }
 .sp-info-copy p, .sp-info-copy a { display: block; overflow-wrap: anywhere; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .sp-info-copy a:hover { color: var(--orange); }
 .sp-help { margin: 8px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
-/* CHANGED: danger-zone form layout */
 .sp-danger-zone { margin-top: 12px; }
 .sp-danger-zone form { display: inline-block; margin: 0; }
+
+.sp-lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; cursor: zoom-out; padding: 20px; }
+.sp-lightbox.is-active { display: flex; }
+.sp-lightbox img { max-width: 100%; max-height: 90vh; object-fit: contain; border: 2px solid var(--line); box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 4px; }
 
 @media(max-width:1000px) {
     .sp-content-grid { grid-template-columns: minmax(0,1fr) 250px; }
@@ -207,9 +226,8 @@
       </div>
     {% endif %}
 
-    {# Use the real cover URL saved in Profile.cover_image, when present. #}
     <section class="sp-cover{% if profile.cover_image %} has-image{% endif %}"
-      {% if profile.cover_image %}style="background-image:url('{{ profile.cover_image|escape }}')"{% endif %}>
+      {% if profile.cover_image %}style="background-image:url('{{ profile.cover_image.url|escape }}')"{% endif %}>
       <div class="sp-cover-content">
         <div class="sp-cover-copy">
           <span class="sp-cover-badge">STREAMSPHERE · CREATOR PROFILE</span>
@@ -220,15 +238,11 @@
     </section>
 
     <section class="sp-profile-summary" aria-label="Profile summary">
-      <div class="sp-avatar-wrap">
+      <div class="sp-avatar-wrap" onclick="openLightbox('{% if profile.avatar_image %}{{ profile.avatar_image.url }}{% elif profile.avatar %}{{ profile.avatar }}{% endif %}')" title="Click to view profile photo">
         {% if profile.avatar_image %}
-          <img class="sp-avatar"
-               src="{{ profile.avatar_image.url }}"
-               alt="{{ profile_user.username }}'s profile photo">
+          <img class="sp-avatar" src="{{ profile.avatar_image.url }}" alt="{{ profile_user.username }}'s profile photo">
         {% elif profile.avatar %}
-          <img class="sp-avatar"
-               src="{{ profile.avatar }}"
-               alt="{{ profile_user.username }}'s profile photo">
+          <img class="sp-avatar" src="{{ profile.avatar }}" alt="{{ profile_user.username }}'s profile photo">
         {% else %}
           <div class="sp-avatar-fallback" aria-label="Default profile avatar">
             {{ profile_user.username|first|upper }}
@@ -249,91 +263,176 @@
       </div>
 
       <div class="sp-profile-actions">
-        {# CHANGED: is_owner is set by the view; works for both self and others. #}
         {% if is_owner %}
           <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Edit profile</a>
         {% else %}
-          <a class="sp-btn sp-btn-primary" href="{% url 'chat:start' username=profile_user.username %}">Message</a>
-          <a class="sp-btn sp-btn-secondary" href="{% url 'streaming:list' %}">Watch Streams</a>
+          <!-- Follow / Unfollow Form -->
+          <form method="post" action="{% url 'accounts:toggle_follow' profile_user.username %}">
+            {% csrf_token %}
+            {% if profile in request.user.profile.following.all %}
+              <button type="submit" class="sp-btn sp-btn-secondary">Following</button>
+            {% else %}
+              <button type="submit" class="sp-btn sp-btn-primary">Follow</button>
+            {% endif %}
+          </form>
+          <a class="sp-btn sp-btn-secondary" href="{% url 'chat:start' username=profile_user.username %}">Message</a>
         {% endif %}
       </div>
     </section>
 
+    <!-- Clickable Stats -->
     <section class="sp-stats" aria-label="Profile statistics">
-      <div class="sp-stat">
+      <a href="?tab=videos" class="sp-stat {% if active_tab == 'videos' %}is-active{% endif %}">
         <div class="sp-stat-icon">V</div>
         <div><div class="sp-stat-label">Videos</div><div class="sp-stat-value">{{ video_count|default:"0" }}</div></div>
-      </div>
-      <div class="sp-stat">
+      </a>
+      <a href="?tab=followers" class="sp-stat {% if active_tab == 'followers' %}is-active{% endif %}">
         <div class="sp-stat-icon">F</div>
         <div><div class="sp-stat-label">Followers</div><div class="sp-stat-value">{{ profile.followers.count|default:0 }}</div></div>
-      </div>
-      <div class="sp-stat">
+      </a>
+      <a href="?tab=following" class="sp-stat {% if active_tab == 'following' %}is-active{% endif %}">
         <div class="sp-stat-icon">+</div>
         <div><div class="sp-stat-label">Following</div><div class="sp-stat-value">{{ profile.following.count|default:0 }}</div></div>
-      </div>
+      </a>
     </section>
 
     <div class="sp-content-grid">
       <main class="sp-main-column">
         <section class="sp-card sp-card-pad">
-          <div class="sp-section-heading">
-            <div>
-              <span class="sp-eyebrow">Your library</span>
-              <h2>Videos</h2>
-              <p>Videos uploaded to this StreamSphere account.</p>
+          
+          <!-- TAB: VIDEOS -->
+          {% if active_tab == 'videos' %}
+            <div class="sp-section-heading">
+              <div>
+                <span class="sp-eyebrow">Your library</span>
+                <h2>Videos</h2>
+                <p>Videos uploaded to this StreamSphere account.</p>
+              </div>
+              <span class="sp-muted">{{ video_count|default:"0" }} total</span>
             </div>
-            <span class="sp-muted">{{ video_count|default:"0" }} total</span>
-          </div>
 
-          <div class="sp-video-grid">
-            {% for video in videos %}
-              {# CHANGED: card is now a container; only thumb+title link, so edit/delete actions work. #}
-              <div class="sp-video-card">
-                <a href="{% url 'videos:detail' video.pk %}" aria-label="{{ video.title|default:'Video' }}">
-                  <div class="sp-video-thumb">
-                    {% if video.thumbnail %}
-                      <img src="{{ video.thumbnail.url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
-                    {% elif video.thumbnail_url %}
-                      <img src="{{ video.thumbnail_url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
-                    {% else %}
-                      <div class="sp-video-placeholder">Video thumbnail</div>
+            <div class="sp-video-grid">
+              {% for video in videos %}
+                <div class="sp-video-card">
+                  <a href="{% url 'videos:detail' video.pk %}" aria-label="{{ video.title|default:'Video' }}">
+                    <div class="sp-video-thumb">
+                      {% if video.thumbnail %}
+                        <img src="{{ video.thumbnail.url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                      {% elif video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" alt="{{ video.title|default:'Video thumbnail' }}" loading="lazy">
+                      {% else %}
+                        <div class="sp-video-placeholder">Video thumbnail</div>
+                      {% endif %}
+                    </div>
+                  </a>
+                  <div class="sp-video-body">
+                    <a href="{% url 'videos:detail' video.pk %}">
+                      <h3 class="sp-video-title">{{ video.title|default:"Untitled video" }}</h3>
+                    </a>
+                    <div class="sp-video-meta">
+                      {% if video.created_at %}<span>{{ video.created_at|date:"M j, Y" }}</span>{% endif %}
+                      <span>{{ video.views|default:0 }} views</span>
+                    </div>
+
+                    {% if request.user == video.creator %}
+                      <div class="sp-video-actions">
+                        <a class="sp-icon-btn" href="{% url 'videos:edit' video.pk %}" title="Edit video">
+                          <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+                        </a>
+                        <form method="post" action="{% url 'videos:delete' video.pk %}" onsubmit="return confirm('Delete this video? This cannot be undone.');">
+                          {% csrf_token %}
+                          <button type="submit" class="sp-icon-btn sp-btn-danger" title="Delete video">
+                            <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                          </button>
+                        </form>
+                      </div>
                     {% endif %}
                   </div>
-                </a>
-                <div class="sp-video-body">
-                  <a href="{% url 'videos:detail' video.pk %}">
-                    <h3 class="sp-video-title">{{ video.title|default:"Untitled video" }}</h3>
-                  </a>
-                  <div class="sp-video-meta">
-                    {% if video.created_at %}<span>{{ video.created_at|date:"M j, Y" }}</span>{% endif %}
-                    <span>{{ video.views|default:0 }} views</span>
-                  </div>
-
-                  {# CHANGED: only the creator sees edit/delete. #}
-                  {% if request.user == video.creator %}
-                    <div class="sp-video-actions">
-                      <a class="sp-btn sp-btn-secondary sp-btn-sm"
-                         href="{% url 'videos:edit' video.pk %}">Edit</a>
-                      <form method="post" action="{% url 'videos:delete' video.pk %}"
-                            onsubmit="return confirm('Delete this video? This cannot be undone.');">
-                        {% csrf_token %}
-                        <button type="submit" class="sp-btn sp-btn-danger sp-btn-sm">Delete</button>
-                      </form>
-                    </div>
+                </div>
+              {% empty %}
+                <div class="sp-empty">
+                  <h3>No videos yet</h3>
+                  <p>Uploaded videos will appear here when they are available.</p>
+                  {% if is_owner %}
+                    <a class="sp-btn sp-btn-secondary" href="{% url 'home' %}">Explore StreamSphere</a>
                   {% endif %}
                 </div>
+              {% endfor %}
+            </div>
+
+          <!-- TAB: FOLLOWERS -->
+          {% elif active_tab == 'followers' %}
+            <div class="sp-section-heading">
+              <div>
+                <span class="sp-eyebrow">Community</span>
+                <h2>Followers</h2>
+                <p>People who follow @{{ profile_user.username }}.</p>
               </div>
-            {% empty %}
-              <div class="sp-empty">
-                <h3>No videos yet</h3>
-                <p>Uploaded videos will appear here when they are available.</p>
-                {% if is_owner %}
-                  <a class="sp-btn sp-btn-secondary" href="{% url 'home' %}">Explore StreamSphere</a>
-                {% endif %}
+              <span class="sp-muted">{{ profile.followers.count|default:"0" }} total</span>
+            </div>
+
+            <div class="sp-user-grid">
+              {% for follower_user in followers %}
+                <div class="sp-user-card">
+                  <a href="{% url 'accounts:profile_detail' follower_user.username %}" class="sp-user-avatar">
+                    {% if follower_user.profile.avatar_image %}
+                      <img src="{{ follower_user.profile.avatar_image.url }}" alt="">
+                    {% elif follower_user.profile.avatar %}
+                      <img src="{{ follower_user.profile.avatar }}" alt="">
+                    {% else %}
+                      {{ follower_user.username|first|upper }}
+                    {% endif %}
+                  </a>
+                  <div class="sp-user-info">
+                    <a href="{% url 'accounts:profile_detail' follower_user.username %}" class="sp-user-name">{{ follower_user.get_full_name|default:follower_user.username }}</a>
+                    <span class="sp-user-username">@{{ follower_user.username }}</span>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="sp-empty" style="grid-column: 1/-1;">
+                  <h3>No followers yet</h3>
+                  <p>When someone follows this creator, they will appear here.</p>
+                </div>
+              {% endfor %}
+            </div>
+
+          <!-- TAB: FOLLOWING -->
+          {% elif active_tab == 'following' %}
+            <div class="sp-section-heading">
+              <div>
+                <span class="sp-eyebrow">Community</span>
+                <h2>Following</h2>
+                <p>Creators that @{{ profile_user.username }} is following.</p>
               </div>
-            {% endfor %}
-          </div>
+              <span class="sp-muted">{{ profile.following.count|default:"0" }} total</span>
+            </div>
+
+            <div class="sp-user-grid">
+              {% for followed_user in following %}
+                <div class="sp-user-card">
+                  <a href="{% url 'accounts:profile_detail' followed_user.user.username %}" class="sp-user-avatar">
+                    {% if followed_user.avatar_image %}
+                      <img src="{{ followed_user.avatar_image.url }}" alt="">
+                    {% elif followed_user.avatar %}
+                      <img src="{{ followed_user.avatar }}" alt="">
+                    {% else %}
+                      {{ followed_user.user.username|first|upper }}
+                    {% endif %}
+                  </a>
+                  <div class="sp-user-info">
+                    <a href="{% url 'accounts:profile_detail' followed_user.user.username %}" class="sp-user-name">{{ followed_user.user.get_full_name|default:followed_user.user.username }}</a>
+                    <span class="sp-user-username">@{{ followed_user.user.username }}</span>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="sp-empty" style="grid-column: 1/-1;">
+                  <h3>Not following anyone</h3>
+                  <p>@{{ profile_user.username }} hasn't followed any creators yet.</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
         </section>
       </main>
 
@@ -378,7 +477,6 @@
           <a class="sp-btn sp-btn-primary" href="{% url 'accounts:profile_edit' %}">Update profile</a>
         </section>
 
-        {# CHANGED: owner-only danger zone with POST-only account deletion. #}
         <section class="sp-card sp-card-pad">
           <span class="sp-eyebrow">Danger zone</span>
           <h2>Delete account</h2>
@@ -396,4 +494,27 @@
     </div>
   </div>
 </div>
+
+<div id="avatarLightbox" class="sp-lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="Full size profile photo">
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openLightbox(imageUrl) {
+        if (!imageUrl || imageUrl === '') return;
+        const lightbox = document.getElementById('avatarLightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightboxImg.src = imageUrl;
+        lightbox.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('avatarLightbox');
+        lightbox.classList.remove('is-active');
+        document.body.style.overflow = '';
+    }
+</script>
 {% endblock %}

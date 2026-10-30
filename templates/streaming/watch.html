@@ -1,0 +1,1087 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ stream.title }} | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --watch-orange: #ff7900;
+    --watch-bg: #090d12;
+    --watch-panel: #10161e;
+    --watch-border: #29323d;
+    --watch-muted: #8b98a7;
+    --watch-text: #f0f3f6;
+}
+
+.watch-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    color: var(--watch-text);
+}
+
+.watch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.watch-heading h1 {
+    margin: 0;
+    font-size: clamp(20px, 3vw, 29px);
+    font-weight: 850;
+    line-height: 1.25;
+}
+
+.watch-heading p {
+    margin: 8px 0 0;
+    color: var(--watch-muted);
+    font-size: 13px;
+}
+
+.watch-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.watch-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 39px;
+    padding: 9px 14px;
+    border: 1px solid var(--watch-border);
+    border-radius: 3px;
+    background: #151c25;
+    color: var(--watch-text);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.watch-btn:hover {
+    border-color: var(--watch-orange);
+    color: #fff;
+}
+
+.watch-btn-primary {
+    background: var(--watch-orange);
+    border-color: var(--watch-orange);
+    color: #111;
+}
+
+.watch-btn-primary:hover {
+    background: #ff8b25;
+    color: #111;
+}
+
+.watch-btn-danger {
+    background: #351719;
+    border-color: #793137;
+    color: #ff777e;
+}
+
+.watch-btn-danger:hover {
+    background: #512025;
+    border-color: #f04438;
+    color: #fff;
+}
+
+.watch-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.watch-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 350px;
+    gap: 18px;
+    align-items: start;
+}
+
+.watch-main {
+    min-width: 0;
+}
+
+.watch-player {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 240px;
+    overflow: hidden;
+    background: #030507;
+    border: 1px solid var(--watch-border);
+}
+
+.watch-video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    background: #030507;
+}
+
+.watch-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+    color: var(--watch-muted);
+    background: #030507;
+}
+
+.watch-placeholder-icon {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    background: #171d25;
+    color: var(--watch-orange);
+    font-size: 25px;
+}
+
+.watch-placeholder strong {
+    color: #fff;
+    font-size: 15px;
+}
+
+.watch-placeholder p {
+    max-width: 340px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.watch-live-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 3;
+    padding: 6px 10px;
+    background: #e53945;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .7px;
+}
+
+.watch-live-badge.offline {
+    background: #343d48;
+}
+
+.watch-player-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 15px;
+    background: var(--watch-panel);
+    border: 1px solid var(--watch-border);
+    border-top: 0;
+}
+
+.watch-connection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--watch-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.watch-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #d29922;
+}
+
+.watch-dot.connected {
+    background: #3fb950;
+    box-shadow: 0 0 9px #3fb950;
+}
+
+.watch-dot.error {
+    background: #f04438;
+}
+
+.watch-viewers {
+    color: var(--watch-muted);
+    font-size: 11px;
+}
+
+.watch-info {
+    margin-top: 18px;
+    padding: 18px;
+    background: var(--watch-panel);
+    border: 1px solid var(--watch-border);
+}
+
+.watch-info h2 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.watch-info-description {
+    color: #aab5c2;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.watch-creator {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 17px;
+    padding-top: 15px;
+    border-top: 1px solid var(--watch-border);
+}
+
+.watch-avatar {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    background: #242c36;
+    color: var(--watch-orange);
+    font-weight: 900;
+}
+
+.watch-creator-info strong {
+    display: block;
+    font-size: 12px;
+}
+
+.watch-creator-info span {
+    display: block;
+    margin-top: 4px;
+    color: var(--watch-muted);
+    font-size: 10px;
+}
+
+.watch-chat {
+    min-width: 0;
+    background: var(--watch-panel);
+    border: 1px solid var(--watch-border);
+    display: flex;
+    flex-direction: column;
+    height: 610px;
+    max-height: calc(100vh - 150px);
+}
+
+.watch-chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid var(--watch-border);
+}
+
+.watch-chat-header h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.watch-chat-status {
+    color: var(--watch-muted);
+    font-size: 10px;
+}
+
+.watch-chat-messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.watch-chat-message {
+    overflow-wrap: anywhere;
+}
+
+.watch-chat-message strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--watch-orange);
+    font-size: 11px;
+}
+
+.watch-chat-message p {
+    margin: 0;
+    color: #d5dce5;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.watch-chat-message time {
+    display: block;
+    margin-top: 5px;
+    color: #667383;
+    font-size: 9px;
+}
+
+.watch-chat-empty {
+    margin: auto;
+    max-width: 230px;
+    text-align: center;
+    color: var(--watch-muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.watch-chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--watch-border);
+}
+
+.watch-chat-form input {
+    min-width: 0;
+    flex: 1;
+    padding: 11px;
+    background: #090d12;
+    border: 1px solid var(--watch-border);
+    border-radius: 2px;
+    color: #fff;
+    outline: none;
+    font-size: 12px;
+}
+
+.watch-chat-form input:focus {
+    border-color: var(--watch-orange);
+}
+
+.watch-chat-form button {
+    width: 43px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--watch-orange);
+    color: #111;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.watch-chat-form button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.watch-chat-login {
+    padding: 15px;
+    border-top: 1px solid var(--watch-border);
+    color: var(--watch-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+.watch-chat-login a {
+    color: var(--watch-orange);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.watch-notice {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--watch-border);
+    background: #151c25;
+    color: #c7d0da;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.watch-notice.visible {
+    display: block;
+}
+
+.watch-notice.error {
+    border-color: #793137;
+    color: #ff9297;
+}
+
+.watch-owner-panel {
+    margin-bottom: 18px;
+    padding: 15px;
+    background: rgba(255,121,0,.055);
+    border: 1px solid rgba(255,121,0,.3);
+}
+
+.watch-owner-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.watch-owner-panel-header strong {
+    font-size: 12px;
+}
+
+.watch-owner-panel-header span {
+    color: var(--watch-muted);
+    font-size: 10px;
+}
+
+.watch-owner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 13px;
+}
+
+@media (max-width: 1050px) {
+    .watch-layout {
+        grid-template-columns: minmax(0, 1fr) 300px;
+    }
+}
+
+@media (max-width: 760px) {
+    .watch-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .watch-chat {
+        height: 430px;
+        max-height: none;
+    }
+
+    .watch-header-actions {
+        width: 100%;
+    }
+
+    .watch-header-actions .watch-btn {
+        flex: 1;
+    }
+
+    .watch-player {
+        min-height: 190px;
+    }
+}
+
+@media (max-width: 420px) {
+    .watch-chat-form {
+        padding: 9px;
+    }
+
+    .watch-owner-actions .watch-btn {
+        flex: 1 1 100%;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div
+    class="watch-page"
+    id="watchRoot"
+    data-stream-id="{{ stream.pk }}"
+    data-token-url="{% url 'streaming:stream_token' stream_id=stream.pk %}"
+    data-livekit-url="{{ livekit_url|default:'' }}"
+    data-chat-url="{{ chat_ws_url|default:'' }}"
+    data-live="{% if stream.status == 'live' %}true{% else %}false{% endif %}"
+    data-owner="{% if request.user.is_authenticated and request.user.pk == stream.creator_id %}true{% else %}false{% endif %}"
+    data-end-url="{% url 'streaming:end_stream' stream_id=stream.pk %}"
+>
+    <header class="watch-header">
+        <div class="watch-heading">
+            <h1>{{ stream.title }}</h1>
+            <p>
+                {{ stream.creator.username }}
+                <span aria-hidden="true"> · </span>
+                {{ stream.category|default:"Live stream" }}
+            </p>
+        </div>
+
+        <div class="watch-header-actions">
+            <button type="button" class="watch-btn" id="watchShareButton">
+                ↗ Share
+            </button>
+
+            {% if request.user.is_authenticated and request.user.pk == stream.creator_id %}
+                <a href="{% url 'streaming:studio' stream_id=stream.pk %}"
+                   class="watch-btn watch-btn-primary">
+                    Creator Studio
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if request.user.is_authenticated and request.user.pk == stream.creator_id %}
+    <section class="watch-owner-panel">
+        <div class="watch-owner-panel-header">
+            <strong>Creator controls</strong>
+            <span>You are viewing your own broadcast</span>
+        </div>
+
+        <div class="watch-owner-actions">
+            <a href="{% url 'streaming:studio' stream_id=stream.pk %}"
+               class="watch-btn watch-btn-primary">
+                Open Creator Studio
+            </a>
+
+            {% if stream.status != "live" %}
+            <a href="{% url 'streaming:edit_stream' stream_id=stream.pk %}"
+               class="watch-btn">
+                Edit stream details
+            </a>
+            {% endif %}
+
+            {% if stream.status == "live" %}
+            <button type="button"
+                    class="watch-btn watch-btn-danger"
+                    id="watchEndStreamButton">
+                End live stream
+            </button>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="watch-layout">
+        <main class="watch-main">
+            <section class="watch-player">
+                <div class="watch-live-badge {% if stream.status != 'live' %}offline{% endif %}"
+                     id="watchLiveBadge">
+                    {% if stream.status == "live" %}● LIVE{% else %}OFFLINE{% endif %}
+                </div>
+
+                <video
+                    id="watchVideo"
+                    class="watch-video"
+                    autoplay
+                    playsinline
+                    controls
+                    {% if stream.thumbnail %}
+                    poster="{{ stream.thumbnail.url }}"
+                    {% endif %}
+                ></video>
+
+                <div class="watch-placeholder"
+                     id="watchPlaceholder"
+                     {% if stream.status == "live" %}style="display:none"{% endif %}>
+                    <div class="watch-placeholder-icon">▶</div>
+                    <strong id="watchPlaceholderTitle">
+                        This stream is currently offline
+                    </strong>
+                    <p id="watchPlaceholderText">
+                        The broadcast will appear here when the creator goes live.
+                    </p>
+                </div>
+            </section>
+
+            <div class="watch-player-footer">
+                <div class="watch-connection">
+                    <span class="watch-dot" id="watchConnection"></span>
+                    <span id="watchConnectionStatus">Waiting for broadcast</span>
+                </div>
+
+                <div class="watch-viewers">
+                    <span>◉</span>
+                    <span id="watchViewerCount">{{ stream.viewer_count|default:0 }}</span>
+                    <span>watching</span>
+                </div>
+            </div>
+
+            <div class="watch-notice" id="watchNotice" role="status"></div>
+
+            <section class="watch-info">
+                <h2>{{ stream.title }}</h2>
+
+                <div class="watch-info-description">
+                    {{ stream.description|default:"No description provided." }}
+                </div>
+
+                <div class="watch-creator">
+                    <div class="watch-avatar">
+                        {{ stream.creator.username|first|upper }}
+                    </div>
+
+                    <div class="watch-creator-info">
+                        <strong>{{ stream.creator.username }}</strong>
+                        <span>Stream creator</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="watch-chat">
+            <div class="watch-chat-header">
+                <h2>Live chat</h2>
+                <span class="watch-chat-status" id="watchChatStatus">
+                    Connecting...
+                </span>
+            </div>
+
+            <div class="watch-chat-messages" id="watchChatMessages">
+                {% for item in chat_messages %}
+                <article class="watch-chat-message">
+                    <strong>{{ item.user.username|default:"Viewer" }}</strong>
+                    <p>{{ item.message }}</p>
+                    <time>{{ item.created_at|date:"H:i" }}</time>
+                </article>
+                {% empty %}
+                <div class="watch-chat-empty" id="watchChatEmpty">
+                    No messages yet. Be the first to join the conversation.
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if request.user.is_authenticated %}
+            <form class="watch-chat-form" id="watchChatForm">
+                {% csrf_token %}
+                <input
+                    type="text"
+                    id="watchChatInput"
+                    maxlength="500"
+                    placeholder="Send a message..."
+                    autocomplete="off"
+                    aria-label="Chat message"
+                >
+                <button type="submit" id="watchChatSend" aria-label="Send message">
+                    ➤
+                </button>
+            </form>
+            {% else %}
+            <div class="watch-chat-login">
+                <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}">
+                    Sign in
+                </a>
+                to join the conversation.
+            </div>
+            {% endif %}
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(() => {
+    "use strict";
+
+    const root = document.getElementById("watchRoot");
+    if (!root) return;
+
+    const streamId = root.dataset.streamId;
+    const tokenUrl = root.dataset.tokenUrl;
+    const livekitUrl = root.dataset.livekitUrl;
+    const chatUrlFromServer = root.dataset.chatUrl;
+    const isOwner = root.dataset.owner === "true";
+
+    const video = document.getElementById("watchVideo");
+    const placeholder = document.getElementById("watchPlaceholder");
+    const placeholderTitle = document.getElementById("watchPlaceholderTitle");
+    const placeholderText = document.getElementById("watchPlaceholderText");
+
+    const connectionDot = document.getElementById("watchConnection");
+    const connectionStatus = document.getElementById("watchConnectionStatus");
+    const liveBadge = document.getElementById("watchLiveBadge");
+    const notice = document.getElementById("watchNotice");
+
+    const chatMessages = document.getElementById("watchChatMessages");
+    const chatStatus = document.getElementById("watchChatStatus");
+    const chatForm = document.getElementById("watchChatForm");
+    const chatInput = document.getElementById("watchChatInput");
+    const chatSend = document.getElementById("watchChatSend");
+
+    let chatSocket = null;
+    let livekitRoom = null;
+    let connecting = false;
+    let streamIsLive = root.dataset.live === "true";
+
+    function showNotice(message, isError = false) {
+        if (!notice) return;
+
+        notice.textContent = message;
+        notice.classList.add("visible");
+        notice.classList.toggle("error", isError);
+    }
+
+    function setConnection(message, state = "waiting") {
+        if (connectionStatus) {
+            connectionStatus.textContent = message;
+        }
+
+        if (connectionDot) {
+            connectionDot.classList.remove("connected", "error");
+
+            if (state === "connected") {
+                connectionDot.classList.add("connected");
+            } else if (state === "error") {
+                connectionDot.classList.add("error");
+            }
+        }
+    }
+
+    function setLiveState(isLive) {
+        streamIsLive = isLive;
+        root.dataset.live = isLive ? "true" : "false";
+
+        if (liveBadge) {
+            liveBadge.textContent = isLive ? "● LIVE" : "OFFLINE";
+            liveBadge.classList.toggle("offline", !isLive);
+        }
+
+        if (!isLive && placeholder) {
+            placeholder.style.display = "flex";
+            placeholderTitle.textContent = "This stream is currently offline";
+            placeholderText.textContent =
+                "The creator has ended the broadcast or has not started yet.";
+        }
+    }
+
+    function appendChatMessage(username, message, createdAt = "") {
+        if (!chatMessages) return;
+
+        const empty = document.getElementById("watchChatEmpty");
+        if (empty) empty.remove();
+
+        const article = document.createElement("article");
+        article.className = "watch-chat-message";
+
+        const name = document.createElement("strong");
+        name.textContent = username || "Viewer";
+
+        const body = document.createElement("p");
+        body.textContent = message || "";
+
+        article.appendChild(name);
+        article.appendChild(body);
+
+        if (createdAt) {
+            const time = document.createElement("time");
+            const date = new Date(createdAt);
+
+            time.textContent = Number.isNaN(date.getTime())
+                ? ""
+                : date.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+            article.appendChild(time);
+        }
+
+        chatMessages.appendChild(article);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getChatUrl() {
+        if (chatUrlFromServer) return chatUrlFromServer;
+
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+
+        return `${protocol}//${window.location.host}/ws/streams/${streamId}/chat/`;
+    }
+
+    function connectChat() {
+        if (!chatStatus || chatSocket) return;
+
+        const url = getChatUrl();
+
+        try {
+            chatSocket = new WebSocket(url);
+        } catch (error) {
+            chatStatus.textContent = "Chat unavailable";
+            return;
+        }
+
+        chatSocket.addEventListener("open", () => {
+            chatStatus.textContent = "Connected";
+        });
+
+        chatSocket.addEventListener("message", event => {
+            let data;
+
+            try {
+                data = JSON.parse(event.data);
+            } catch {
+                return;
+            }
+
+            if (data.type === "chat_message") {
+                appendChatMessage(
+                    data.username,
+                    data.message,
+                    data.created_at
+                );
+            } else if (data.type === "connection") {
+                chatStatus.textContent = "Connected";
+            } else if (data.type === "error") {
+                showNotice(data.message || "Chat error.", true);
+            }
+        });
+
+        chatSocket.addEventListener("close", () => {
+            chatStatus.textContent = "Disconnected";
+            chatSocket = null;
+        });
+
+        chatSocket.addEventListener("error", () => {
+            chatStatus.textContent = "Connection error";
+        });
+    }
+
+    if (chatForm && chatInput && chatSend) {
+        chatForm.addEventListener("submit", event => {
+            event.preventDefault();
+
+            const message = chatInput.value.trim();
+
+            if (!message) return;
+
+            if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+                showNotice("Chat is not connected. Please try again.", true);
+                return;
+            }
+
+            chatSocket.send(JSON.stringify({ message }));
+            chatInput.value = "";
+            chatInput.focus();
+        });
+    }
+
+    async function connectLiveKit() {
+        if (connecting || !streamIsLive || !video) return;
+
+        connecting = true;
+        setConnection("Connecting to live broadcast...");
+
+        try {
+            const response = await fetch(tokenUrl, {
+                method: "GET",
+                credentials: "same-origin",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    response.status === 503
+                        ? "Streaming service is unavailable."
+                        : "Could not obtain a viewer connection token."
+                );
+            }
+
+            const data = await response.json();
+
+            const serverUrl = data.url || livekitUrl;
+
+            const token =
+                data.token ||
+                data.access_token ||
+                data.livekit_token;
+
+            if (!serverUrl || !token) {
+                throw new Error("The streaming server returned incomplete connection details.");
+            }
+
+            const livekit = await import(
+                "https://cdn.jsdelivr.net/npm/livekit-client@2.15.6/dist/livekit-client.esm.mjs"
+            );
+
+            const room = new livekit.Room({
+                adaptiveStream: true,
+                dynacast: true
+            });
+
+            livekitRoom = room;
+
+            room.on(livekit.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+                const element = track.attach();
+
+                if (track.kind === "video") {
+                    element.className = "watch-video";
+                    element.autoplay = true;
+                    element.playsInline = true;
+                    element.controls = true;
+
+                    video.replaceWith(element);
+                    element.id = "watchVideo";
+                } else if (track.kind === "audio") {
+                    element.autoplay = true;
+                    element.style.display = "none";
+                    document.body.appendChild(element);
+                }
+
+                const activeVideo = document.getElementById("watchVideo");
+
+                if (activeVideo && track.kind === "video") {
+                    activeVideo.play().catch(() => {});
+                }
+
+                if (placeholder && track.kind === "video") {
+                    placeholder.style.display = "none";
+                }
+
+                setConnection("Connected to live broadcast", "connected");
+            });
+
+            room.on(livekit.RoomEvent.TrackUnsubscribed, track => {
+                track.detach().forEach(element => element.remove());
+            });
+
+            room.on(livekit.RoomEvent.Disconnected, () => {
+                setConnection("Broadcast disconnected", "error");
+            });
+
+            await room.connect(serverUrl, token);
+
+            setConnection("Connected to live broadcast", "connected");
+
+            if (placeholder) {
+                placeholder.style.display = "none";
+            }
+
+        } catch (error) {
+            console.error("LiveKit viewer error:", error);
+            setConnection(error.message || "Unable to connect", "error");
+
+            if (placeholder) {
+                placeholder.style.display = "flex";
+                placeholderTitle.textContent = "Unable to connect to broadcast";
+                placeholderText.textContent =
+                    error.message || "Please refresh the page and try again.";
+            }
+        } finally {
+            connecting = false;
+        }
+    }
+
+    const shareButton = document.getElementById("watchShareButton");
+
+    if (shareButton) {
+        shareButton.addEventListener("click", async () => {
+            const shareData = {
+                title: document.title,
+                text: "{{ stream.title|escapejs }}",
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(window.location.href);
+                    showNotice("Watch link copied to clipboard.");
+                } else {
+                    window.prompt("Copy this watch link:", window.location.href);
+                }
+            } catch (error) {
+                if (error.name !== "AbortError") {
+                    showNotice("Unable to share this link.", true);
+                }
+            }
+        });
+    }
+
+    const endButton = document.getElementById("watchEndStreamButton");
+
+    if (endButton && isOwner) {
+        endButton.addEventListener("click", async () => {
+            const confirmed = window.confirm(
+                "Are you sure you want to end this live stream? Viewers will lose access to the broadcast."
+            );
+
+            if (!confirmed) return;
+
+            endButton.disabled = true;
+            endButton.textContent = "Ending stream...";
+
+            try {
+                const csrfInput = document.querySelector(
+                    "#watchChatForm input[name='csrfmiddlewaretoken']"
+                );
+
+                const csrfToken =
+                    csrfInput?.value ||
+                    document.cookie
+                        .split("; ")
+                        .find(row => row.startsWith("csrftoken="))
+                        ?.split("=")[1];
+
+                const response = await fetch(root.dataset.endUrl, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "X-CSRFToken": csrfToken || "",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json"
+                    }
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.error || data.message || "Could not end the stream.");
+                }
+
+                if (livekitRoom) {
+                    await livekitRoom.disconnect();
+                    livekitRoom = null;
+                }
+
+                setLiveState(false);
+                setConnection("Broadcast ended");
+
+                showNotice("Your live stream has ended successfully.");
+
+                endButton.remove();
+
+                window.setTimeout(() => {
+                    window.location.reload();
+                }, 1200);
+
+            } catch (error) {
+                showNotice(error.message || "Unable to end stream.", true);
+                endButton.disabled = false;
+                endButton.textContent = "End live stream";
+            }
+        });
+    }
+
+    connectChat();
+
+    if (streamIsLive) {
+        connectLiveKit();
+    } else {
+        setConnection("Waiting for broadcast");
+    }
+
+    window.addEventListener("beforeunload", () => {
+        if (chatSocket) chatSocket.close();
+
+        if (livekitRoom) {
+            livekitRoom.disconnect();
+        }
+    });
+})();
+</script>
+{% endblock %}

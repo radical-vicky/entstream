@@ -1,0 +1,619 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Live Streams | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================
+   STREAMSPHERE — LIVE STREAM DISCOVERY
+========================================================= */
+
+.stream-index {
+    --si-bg: #090b0e;
+    --si-panel: #11151b;
+    --si-panel-hover: #171c23;
+    --si-border: rgba(255,255,255,.09);
+    --si-text: #f5f6f8;
+    --si-muted: #929ba7;
+    --si-orange: #ff7900;
+    --si-green: #20c77a;
+
+    width: 100%;
+    max-width: 1550px;
+    margin: 0 auto;
+    padding: 28px;
+    color: var(--si-text);
+}
+
+.stream-index,
+.stream-index * {
+    box-sizing: border-box;
+}
+
+.si-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 27px;
+}
+
+.si-heading-content {
+    min-width: 0;
+}
+
+.si-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    color: var(--si-orange);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+}
+
+.si-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--si-orange);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(255,121,0,.65);
+}
+
+.si-heading h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(25px, 3vw, 36px);
+    font-weight: 850;
+    letter-spacing: -1px;
+}
+
+.si-heading p {
+    margin: 9px 0 0;
+    color: var(--si-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.si-create-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 43px;
+    padding: 0 17px;
+    background: var(--si-orange);
+    border: 1px solid var(--si-orange);
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.si-create-btn:hover {
+    background: #e96e00;
+    border-color: #e96e00;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.si-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0 17px;
+}
+
+.si-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.si-section-title i {
+    color: var(--si-orange);
+}
+
+.si-section-count {
+    color: var(--si-muted);
+    font-size: 11px;
+}
+
+/* STREAM GRID */
+
+.si-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.si-card {
+    min-width: 0;
+    overflow: hidden;
+    background: var(--si-panel);
+    border: 1px solid var(--si-border);
+    transition: border-color .2s ease, transform .2s ease,
+                background .2s ease;
+}
+
+.si-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,121,0,.55);
+    background: var(--si-panel-hover);
+}
+
+.si-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.si-card-link:hover {
+    color: inherit;
+}
+
+.si-thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at center, rgba(255,121,0,.13), transparent 55%),
+        #171b22;
+}
+
+.si-thumbnail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.si-card:hover .si-thumbnail img {
+    transform: scale(1.045);
+}
+
+.si-thumbnail-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #68717e;
+}
+
+.si-thumbnail-placeholder i {
+    color: var(--si-orange);
+    font-size: 34px;
+}
+
+.si-thumbnail-placeholder span {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.si-live-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 9px;
+    background: #e63232;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .8px;
+}
+
+.si-live-dot {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    animation: siPulse 1.4s infinite;
+}
+
+@keyframes siPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+}
+
+.si-viewer-badge {
+    position: absolute;
+    right: 11px;
+    bottom: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    background: rgba(0,0,0,.78);
+    color: #fff;
+    font-size: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.si-viewer-badge i {
+    color: var(--si-orange);
+}
+
+.si-card-content {
+    padding: 16px;
+}
+
+.si-card-title {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.si-card-description {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 9px 0 0;
+    color: var(--si-muted);
+    font-size: 11px;
+    line-height: 1.65;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.si-card-creator {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 15px;
+    padding-top: 13px;
+    border-top: 1px solid var(--si-border);
+}
+
+.si-creator-avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,121,0,.13);
+    border: 1px solid rgba(255,121,0,.25);
+    color: var(--si-orange);
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.si-creator-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.si-creator-name {
+    overflow: hidden;
+    margin: 0;
+    color: #e9ebef;
+    font-size: 11px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.si-creator-label {
+    margin: 3px 0 0;
+    color: #77818e;
+    font-size: 9px;
+}
+
+.si-card-arrow {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,121,0,.1);
+    color: var(--si-orange);
+    font-size: 11px;
+    transition: .2s ease;
+}
+
+.si-card:hover .si-card-arrow {
+    background: var(--si-orange);
+    color: #fff;
+}
+
+/* EMPTY STATE */
+
+.si-empty {
+    padding: 65px 20px;
+    background: var(--si-panel);
+    border: 1px solid var(--si-border);
+    text-align: center;
+}
+
+.si-empty-icon {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    background: rgba(255,121,0,.1);
+    border: 1px solid rgba(255,121,0,.22);
+    color: var(--si-orange);
+    font-size: 24px;
+}
+
+.si-empty h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.si-empty p {
+    max-width: 400px;
+    margin: 10px auto 20px;
+    color: var(--si-muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.si-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    background: var(--si-orange);
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.si-empty-btn:hover {
+    background: #e96e00;
+    color: #fff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+    .si-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+    .stream-index {
+        padding: 22px 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .stream-index {
+        padding: 17px 12px 35px;
+    }
+
+    .si-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .si-create-btn {
+        width: 100%;
+    }
+
+    .si-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .si-section-header {
+        margin-top: 23px;
+    }
+
+    .si-card-content {
+        padding: 14px;
+    }
+
+    .si-card-title {
+        font-size: 14px;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="stream-index">
+
+    <!-- PAGE HEADER -->
+    <header class="si-heading">
+        <div class="si-heading-content">
+            <div class="si-eyebrow">
+                <span class="si-eyebrow-dot"></span>
+                StreamSphere Live
+            </div>
+
+            <h1>Discover live streams</h1>
+
+            <p>
+                Watch creators, join conversations and discover what's
+                happening across StreamSphere.
+            </p>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'streaming:create_stream' %}"
+               class="si-create-btn">
+                <i class="fas fa-plus"></i>
+                Start streaming
+            </a>
+        {% endif %}
+    </header>
+
+
+    <!-- LIVE STREAMS -->
+    <section>
+
+        <div class="si-section-header">
+            <h2 class="si-section-title">
+                <i class="fas fa-tower-broadcast"></i>
+                Live now
+            </h2>
+
+            <span class="si-section-count">
+                {{ streams|length }} available
+            </span>
+        </div>
+
+
+        {% if streams %}
+
+            <div class="si-grid">
+
+                {% for stream in streams %}
+
+                    <article class="si-card">
+
+                        <a href="{% url 'streaming:watch_stream' stream.id %}"
+                           class="si-card-link"
+                           aria-label="Watch {{ stream.title }}">
+
+                            <!-- THUMBNAIL -->
+                            <div class="si-thumbnail">
+
+                                {% if stream.thumbnail %}
+                                    <img
+                                        src="{{ stream.thumbnail.url }}"
+                                        alt="{{ stream.title }}"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="si-thumbnail-placeholder">
+                                        <i class="fas fa-play-circle"></i>
+                                        <span>StreamSphere Live</span>
+                                    </div>
+                                {% endif %}
+
+                                <div class="si-live-badge">
+                                    <span class="si-live-dot"></span>
+                                    LIVE
+                                </div>
+
+                                <div class="si-viewer-badge">
+                                    <i class="fas fa-eye"></i>
+                                    {{ stream.viewer_count|default:0 }}
+                                </div>
+
+                            </div>
+
+
+                            <!-- STREAM INFORMATION -->
+                            <div class="si-card-content">
+
+                                <h3 class="si-card-title">
+                                    {{ stream.title }}
+                                </h3>
+
+                                {% if stream.description %}
+                                    <p class="si-card-description">
+                                        {{ stream.description }}
+                                    </p>
+                                {% else %}
+                                    <p class="si-card-description">
+                                        Join this creator's live broadcast.
+                                    </p>
+                                {% endif %}
+
+
+                                <div class="si-card-creator">
+
+                                    <div class="si-creator-avatar">
+                                        {{ stream.creator.username|first|upper }}
+                                    </div>
+
+                                    <div class="si-creator-details">
+                                        <p class="si-creator-name">
+                                            {{ stream.creator.username }}
+                                        </p>
+
+                                        <p class="si-creator-label">
+                                            Live creator
+                                        </p>
+                                    </div>
+
+                                    <div class="si-card-arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <!-- EMPTY STATE -->
+            <div class="si-empty">
+
+                <div class="si-empty-icon">
+                    <i class="fas fa-tower-broadcast"></i>
+                </div>
+
+                <h2>No live streams right now</h2>
+
+                <p>
+                    There are no creators broadcasting at the moment.
+                    Check back soon or start your own live stream.
+                </p>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'streaming:create_stream' %}"
+                       class="si-empty-btn">
+                        <i class="fas fa-video"></i>
+                        Start your first stream
+                    </a>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+{% endblock %}
