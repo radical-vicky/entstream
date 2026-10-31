@@ -1,0 +1,112 @@
+
+{% if search_query|length >= 3 and youtube_enabled %}
+
+<section class="vl-external-section">
+
+    <div class="vl-external-heading">
+        <div class="vl-external-heading-main">
+
+            <span class="vl-youtube-icon" aria-hidden="true">
+                ▶
+            </span>
+
+            <div>
+                <h2 class="vl-external-title">
+                    More videos
+                </h2>
+
+                <p class="vl-external-subtitle">
+                    Videos discovered from YouTube
+                </p>
+            </div>
+
+        </div>
+
+        <span class="vl-source-label">
+            External results
+        </span>
+    </div>
+
+    {% if youtube_videos %}
+
+        <div class="vl-external-grid">
+
+            {% for video in youtube_videos %}
+
+                <article class="vl-external-card">
+
+                    <a
+                        href="{% url 'videos:external_detail' video.video_id %}"
+                        class="vl-external-thumbnail"
+                        aria-label="Watch {{ video.title }}"
+                    >
+
+                        {% if video.thumbnail %}
+                            <img
+                                src="{{ video.thumbnail }}"
+                                alt="{{ video.title }}"
+                                loading="lazy"
+                            >
+                        {% endif %}
+
+                        <span class="vl-external-badge">
+                            YouTube
+                        </span>
+
+                        <span class="vl-external-play" aria-hidden="true">
+                            ▶
+                        </span>
+
+                    </a>
+
+                    <div class="vl-external-info">
+
+                        <h3 class="vl-external-video-title">
+                            <a href="{% url 'videos:external_detail' video.video_id %}">
+                                {{ video.title }}
+                            </a>
+                        </h3>
+
+                        <p class="vl-external-channel">
+                            {{ video.channel }}
+                        </p>
+
+                        {% if video.description %}
+                            <p class="vl-external-description">
+                                {{ video.description }}
+                            </p>
+                        {% endif %}
+
+                        <a
+                            class="vl-external-watch"
+                            href="{% url 'videos:external_detail' video.video_id %}"
+                        >
+                            Watch on StreamSphere →
+                        </a>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="vl-external-empty">
+            No matching YouTube videos were found.
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% elif search_query|length >= 3 and not youtube_enabled %}
+
+    <div class="vl-external-notice">
+        YouTube search is not configured yet.
+        StreamSphere uploads are still searchable.
+    </div>
+
+{% endif %}

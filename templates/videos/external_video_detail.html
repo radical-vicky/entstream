@@ -1,0 +1,1001 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ external_video.title }} | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =========================================================
+   EXTERNAL VIDEO DETAIL
+========================================================= */
+
+.vd-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    color: #f0f3f6;
+}
+
+.vd-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 24px;
+    align-items: start;
+}
+
+.vd-main {
+    min-width: 0;
+}
+
+.vd-player-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+    border: 1px solid #30363d;
+}
+
+.vd-player-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+}
+
+.vd-hd-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 5;
+    padding: 5px 9px;
+    background: rgba(0,0,0,.78);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    pointer-events: none;
+}
+
+.vd-custom-controls {
+    position: absolute;
+    z-index: 6;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 35px 16px 13px;
+    background: linear-gradient(transparent, rgba(0,0,0,.9));
+    opacity: 1;
+    transition: opacity .2s ease;
+    pointer-events: none;
+}
+
+.vd-custom-controls button,
+.vd-custom-controls input {
+    pointer-events: auto;
+}
+
+.vd-player-wrap:hover .vd-custom-controls {
+    opacity: 1;
+}
+
+.vd-progress-container {
+    width: 100%;
+    height: 5px;
+    background: rgba(255,255,255,.35);
+    cursor: pointer;
+    margin-bottom: 13px;
+    position: relative;
+}
+
+.vd-progress-container:hover {
+    height: 7px;
+}
+
+.vd-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #ff7900;
+    position: relative;
+}
+
+.vd-progress-fill::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff7900;
+    transform: translateY(-50%);
+}
+
+.vd-control-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.vd-control-btn {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vd-control-btn:hover {
+    color: #ff7900;
+}
+
+.vd-time {
+    font-size: 11px;
+    color: #fff;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.vd-control-spacer {
+    flex: 1;
+}
+
+.vd-upnext {
+    position: absolute;
+    z-index: 8;
+    right: 20px;
+    bottom: 78px;
+    width: min(340px, calc(100% - 40px));
+    padding: 14px;
+    background: rgba(12,16,22,.96);
+    border: 1px solid #454d57;
+    display: none;
+    box-shadow: 0 10px 35px rgba(0,0,0,.5);
+}
+
+.vd-upnext.show {
+    display: block;
+}
+
+.vd-upnext-label {
+    color: #ff7900;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.vd-upnext-content {
+    display: flex;
+    gap: 11px;
+    align-items: center;
+}
+
+.vd-upnext-thumb {
+    width: 105px;
+    height: 62px;
+    flex-shrink: 0;
+    object-fit: cover;
+    background: #20252d;
+}
+
+.vd-upnext-info {
+    min-width: 0;
+}
+
+.vd-upnext-info strong {
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.vd-upnext-info span {
+    font-size: 10px;
+    color: #9ba5b1;
+}
+
+.vd-upnext-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 13px;
+}
+
+.vd-upnext-actions button,
+.vd-upnext-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid #454d57;
+    background: #171d25;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.vd-upnext-actions .vd-play-next {
+    background: #ff7900;
+    border-color: #ff7900;
+    color: #fff;
+}
+
+.vd-upnext-actions button:hover,
+.vd-upnext-actions a:hover {
+    opacity: .85;
+}
+
+.vd-title {
+    font-size: 21px;
+    line-height: 1.4;
+    font-weight: 800;
+    margin: 18px 0 10px;
+    overflow-wrap: anywhere;
+}
+
+.vd-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: #9ba5b1;
+    font-size: 12px;
+}
+
+.vd-meta-dot {
+    color: #59636f;
+}
+
+.vd-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding: 15px 0;
+    margin-top: 14px;
+    border-top: 1px solid #30363d;
+    border-bottom: 1px solid #30363d;
+}
+
+.vd-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    background: #171d25;
+    color: #dce2e9;
+    border: 1px solid #30363d;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.vd-action-btn:hover {
+    border-color: #ff7900;
+    color: #ff7900;
+}
+
+.vd-action-btn i {
+    font-size: 14px;
+}
+
+.vd-share-wrap {
+    position: relative;
+}
+
+.vd-share-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    min-width: 190px;
+    padding: 7px;
+    background: #111820;
+    border: 1px solid #30363d;
+    box-shadow: 0 8px 25px rgba(0,0,0,.4);
+}
+
+.vd-share-menu.show {
+    display: block;
+}
+
+.vd-share-menu button,
+.vd-share-menu a {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background: transparent;
+    border: 0;
+    color: #e6edf3;
+    text-align: left;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.vd-share-menu button:hover,
+.vd-share-menu a:hover {
+    background: #202833;
+    color: #ff7900;
+}
+
+.vd-channel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 0;
+    border-bottom: 1px solid #30363d;
+}
+
+.vd-channel-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.vd-channel-avatar {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    background: #20252d;
+    border: 1px solid #30363d;
+    flex-shrink: 0;
+}
+
+.vd-channel-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #f0f3f6;
+}
+
+.vd-channel-label {
+    font-size: 11px;
+    color: #9ba5b1;
+    margin-top: 4px;
+}
+
+.vd-description {
+    padding: 17px;
+    margin-top: 16px;
+    background: #111820;
+    border: 1px solid #30363d;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c5ced8;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.vd-description-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.vd-sidebar {
+    min-width: 0;
+}
+
+.vd-sidebar-heading {
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+
+.vd-recommendation {
+    display: flex;
+    gap: 11px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+}
+
+.vd-recommendation:hover .vd-rec-title {
+    color: #ff7900;
+}
+
+.vd-rec-thumb-wrap {
+    width: 145px;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    flex-shrink: 0;
+    background: #20252d;
+    overflow: hidden;
+}
+
+.vd-rec-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.vd-rec-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.vd-rec-title {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.45;
+    color: #e6edf3;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.vd-rec-channel,
+.vd-rec-meta {
+    font-size: 10px;
+    color: #8b949e;
+    line-height: 1.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vd-empty-recommendations {
+    padding: 20px;
+    text-align: center;
+    color: #8b949e;
+    font-size: 12px;
+    border: 1px solid #30363d;
+}
+
+@media (max-width: 1050px) {
+    .vd-layout {
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 18px;
+    }
+
+    .vd-rec-thumb-wrap {
+        width: 115px;
+    }
+}
+
+@media (max-width: 800px) {
+    .vd-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .vd-sidebar {
+        margin-top: 12px;
+    }
+
+    .vd-recommendation {
+        max-width: 650px;
+    }
+
+    .vd-rec-thumb-wrap {
+        width: 150px;
+    }
+}
+
+@media (max-width: 520px) {
+    .vd-title {
+        font-size: 17px;
+        margin-top: 13px;
+    }
+
+    .vd-actions {
+        gap: 7px;
+    }
+
+    .vd-action-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .vd-channel {
+        align-items: flex-start;
+    }
+
+    .vd-control-row {
+        gap: 10px;
+    }
+
+    .vd-time {
+        font-size: 10px;
+    }
+
+    .vd-custom-controls {
+        padding: 25px 10px 9px;
+    }
+
+    .vd-upnext {
+        right: 10px;
+        bottom: 65px;
+        width: calc(100% - 20px);
+    }
+
+    .vd-rec-thumb-wrap {
+        width: 125px;
+    }
+
+    .vd-rec-title {
+        font-size: 11px;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="vd-page">
+
+    <div class="vd-layout">
+
+        <!-- MAIN VIDEO CONTENT -->
+        <main class="vd-main">
+
+            <!-- VIDEO PLAYER -->
+            <div class="vd-player-wrap" id="vdPlayerWrap">
+
+                <iframe
+    id="mainExternalPlayer"
+    src="{{ external_video.embed_url }}"
+    title="{{ external_video.title }}"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+</iframe>
+
+                <div class="vd-hd-badge">HD</div>
+
+                <!-- CUSTOM PLAYER CONTROLS -->
+                <div class="vd-custom-controls">
+
+                    <div class="vd-progress-container" id="vdProgressContainer">
+                        <div class="vd-progress-fill" id="vdProgressFill"></div>
+                    </div>
+
+                    <div class="vd-control-row">
+
+                        <button
+                            type="button"
+                            class="vd-control-btn"
+                            id="vdPlayPause"
+                            aria-label="Play or pause">
+                            <i class="fas fa-play"></i>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="vd-control-btn"
+                            id="vdMute"
+                            aria-label="Mute or unmute">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+
+                        <span class="vd-time">
+                            <span id="vdCurrentTime">0:00</span>
+                            /
+                            <span id="vdDuration">0:00</span>
+                        </span>
+
+                        <div class="vd-control-spacer"></div>
+
+                        <button
+                            type="button"
+                            class="vd-control-btn"
+                            id="vdFullscreen"
+                            aria-label="Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- UP NEXT -->
+                {% if recommended_videos %}
+                {% with next_video=recommended_videos.0 %}
+                <div class="vd-upnext" id="vdUpNext">
+
+                    <div class="vd-upnext-label">
+                        Up next · <span id="vdCountdown">10</span>s
+                    </div>
+
+                    <div class="vd-upnext-content">
+
+                        {% if next_video.thumbnail_url %}
+                            <img
+                                class="vd-upnext-thumb"
+                                src="{{ next_video.thumbnail_url }}"
+                                alt="{{ next_video.title|default:'Next video' }}">
+                        {% elif next_video.thumbnail %}
+                            <img
+                                class="vd-upnext-thumb"
+                                src="{{ next_video.thumbnail }}"
+                                alt="{{ next_video.title|default:'Next video' }}">
+                        {% else %}
+                            <img
+                                class="vd-upnext-thumb"
+                                src="https://i.ytimg.com/vi/{{ next_video.video_id }}/hqdefault.jpg"
+                                alt="{{ next_video.title|default:'Next video' }}">
+                        {% endif %}
+
+                        <div class="vd-upnext-info">
+                            <strong>{{ next_video.title }}</strong>
+                            <span>{{ next_video.channel_title|default:"Recommended video" }}</span>
+                        </div>
+
+                    </div>
+
+                    <div class="vd-upnext-actions">
+                        <button type="button" id="vdCancelNext">Cancel</button>
+
+                        <a
+                            class="vd-play-next"
+                            href="{% url 'videos:external_detail' next_video.video_id %}">
+                            Play now
+                        </a>
+                    </div>
+
+                </div>
+                {% endwith %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- VIDEO TITLE -->
+            <h1 class="vd-title">
+                {{ external_video.title }}
+            </h1>
+
+            <!-- VIDEO METADATA -->
+            <div class="vd-meta">
+
+                {% if external_video.views %}
+                    <span>{{ external_video.views }} views</span>
+                    <span class="vd-meta-dot">•</span>
+                {% endif %}
+
+                {% if external_video.published_at %}
+                    <span>{{ external_video.published_at }}</span>
+                {% endif %}
+
+                {% if external_video.category %}
+                    <span class="vd-meta-dot">•</span>
+                    <span>{{ external_video.category }}</span>
+                {% endif %}
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+            <div class="vd-actions">
+
+                <button
+                    type="button"
+                    class="vd-action-btn"
+                    id="vdLikeButton"
+                    title="Like">
+                    <i class="far fa-thumbs-up"></i>
+                    <span>Like</span>
+                </button>
+
+                <div class="vd-share-wrap">
+
+                    <button
+                        type="button"
+                        class="vd-action-btn"
+                        id="vdShareButton">
+                        <i class="fas fa-share"></i>
+                        Share
+                    </button>
+
+                    <div class="vd-share-menu" id="vdShareMenu">
+
+                        <button type="button" id="vdCopyLink">
+                            <i class="fas fa-link"></i>
+                            Copy link
+                        </button>
+
+                        <a
+                            id="vdWhatsApp"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp
+                        </a>
+
+                        <a
+                            id="vdFacebook"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-facebook"></i>
+                            Facebook
+                        </a>
+
+                        <a
+                            id="vdTwitter"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-x-twitter"></i>
+                            X / Twitter
+                        </a>
+
+                        <a id="vdEmail" href="#">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </a>
+
+                        <button type="button" id="vdNativeShare">
+                            <i class="fas fa-mobile-alt"></i>
+                            More sharing options
+                        </button>
+
+                    </div>
+                </div>
+
+                <a
+                    class="vd-action-btn"
+                    href="https://www.youtube.com/watch?v={{ external_video.video_id|urlencode }}"
+                    target="_blank"
+                    rel="noopener">
+                    <i class="fab fa-youtube"></i>
+                    Watch on YouTube
+                </a>
+
+            </div>
+
+
+            <!-- CHANNEL INFORMATION -->
+            <div class="vd-channel">
+
+                <div class="vd-channel-info">
+
+                    {% if external_video.channel_thumbnail %}
+                        <img
+                            class="vd-channel-avatar"
+                            src="{{ external_video.channel_thumbnail }}"
+                            alt="{{ external_video.channel_title|default:'Channel' }}">
+                    {% else %}
+                        <div class="vd-channel-avatar"
+                             style="display:grid;place-items:center;color:#ff7900;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="vd-channel-name">
+                            {{ external_video.channel_title|default:"External creator" }}
+                        </div>
+
+                        <div class="vd-channel-label">
+                            YouTube channel
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+            {% if external_video.description %}
+            <div class="vd-description">
+
+                <div class="vd-description-title">
+                    Description
+                </div>
+
+                {{ external_video.description }}
+
+            </div>
+            {% endif %}
+
+        </main>
+
+
+        <!-- RECOMMENDED VIDEOS -->
+        <aside class="vd-sidebar">
+
+            <h3 class="vd-sidebar-heading">
+                Recommended videos
+            </h3>
+
+            {% for related in recommended_videos %}
+
+                {% if related.video_id %}
+                <a
+                    href="{% url 'videos:external_detail' related.video_id %}"
+                    class="vd-recommendation">
+
+                    <div class="vd-rec-thumb-wrap">
+
+                        {% if related.thumbnail_url %}
+                            <img
+                                class="vd-rec-thumb"
+                                src="{{ related.thumbnail_url }}"
+                                alt="{{ related.title }}"
+                                loading="lazy">
+                        {% elif related.thumbnail %}
+                            <img
+                                class="vd-rec-thumb"
+                                src="{{ related.thumbnail }}"
+                                alt="{{ related.title }}"
+                                loading="lazy">
+                        {% else %}
+                            <img
+                                class="vd-rec-thumb"
+                                src="https://i.ytimg.com/vi/{{ related.video_id }}/hqdefault.jpg"
+                                alt="{{ related.title }}"
+                                loading="lazy">
+                        {% endif %}
+
+                    </div>
+
+                    <div class="vd-rec-info">
+
+                        <div class="vd-rec-title">
+                            {{ related.title }}
+                        </div>
+
+                        <div class="vd-rec-channel">
+                            {{ related.channel_title|default:"YouTube" }}
+                        </div>
+
+                        <div class="vd-rec-meta">
+                            {% if related.views %}
+                                {{ related.views }} views
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </a>
+                {% endif %}
+
+            {% empty %}
+
+                <div class="vd-empty-recommendations">
+                    No recommended videos available.
+                </div>
+
+            {% endfor %}
+
+        </aside>
+
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const shareButton = document.getElementById("shareBtn");
+    const shareMenu = document.getElementById("shareMenu");
+
+    const shareUrl = window.location.href;
+    const safeShareTitle = "{{ external_video.title|default:'StreamSphere video'|escapejs }}";
+
+    if (shareButton && shareMenu) {
+        shareButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            shareMenu.classList.toggle("show");
+        });
+
+        document.addEventListener("click", function (event) {
+            if (
+                !shareMenu.contains(event.target) &&
+                !shareButton.contains(event.target)
+            ) {
+                shareMenu.classList.remove("show");
+            }
+        });
+    }
+
+    const whatsapp = document.getElementById("vdWhatsApp");
+    const facebook = document.getElementById("vdFacebook");
+    const twitter = document.getElementById("vdTwitter");
+    const email = document.getElementById("vdEmail");
+
+    if (whatsapp) {
+        whatsapp.href =
+            "https://wa.me/?text=" +
+            encodeURIComponent(safeShareTitle + " " + shareUrl);
+    }
+
+    if (facebook) {
+        facebook.href =
+            "https://www.facebook.com/sharer/sharer.php?u=" +
+            encodeURIComponent(shareUrl);
+    }
+
+    if (twitter) {
+        twitter.href =
+            "https://twitter.com/intent/tweet?text=" +
+            encodeURIComponent(safeShareTitle) +
+            "&url=" +
+            encodeURIComponent(shareUrl);
+    }
+
+    if (email) {
+        email.href =
+            "mailto:?subject=" +
+            encodeURIComponent(safeShareTitle) +
+            "&body=" +
+            encodeURIComponent(shareUrl);
+    }
+
+    const copyLinkBtn = document.getElementById("vdCopyLink");
+
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener("click", async function () {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (error) {
+                const tempInput = document.createElement("textarea");
+                tempInput.value = shareUrl;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                tempInput.remove();
+            }
+
+            copyLinkBtn.textContent = "Copied";
+
+            setTimeout(function () {
+                copyLinkBtn.textContent = "Copy link";
+            }, 1800);
+        });
+    }
+
+    const nativeShareBtn = document.getElementById("vdNativeShare");
+
+    if (nativeShareBtn) {
+        nativeShareBtn.addEventListener("click", async function () {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: safeShareTitle,
+                        url: shareUrl
+                    });
+                } catch (error) {
+                    // Sharing was cancelled.
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    nativeShareBtn.textContent = "Link copied";
+                } catch (error) {
+                    nativeShareBtn.textContent = "Unable to copy link";
+                }
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

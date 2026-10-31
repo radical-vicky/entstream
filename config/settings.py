@@ -310,7 +310,8 @@ SECURE_PROXY_SSL_HEADER = (
     "https",
 )
 
-
+# YouTube Data API v3
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
 # --------------------------------------------------
 # DJANGO CHANNELS
 # --------------------------------------------------
