@@ -8,6 +8,9 @@ from urllib.parse import urlparse
 from asgiref.sync import async_to_sync
 from django.core.cache import cache
 
+from xvideos_api import Client
+
+
 logger = logging.getLogger(__name__)
 
 CACHE_TIMEOUT = 60 * 10
@@ -62,8 +65,6 @@ def _valid_video_url(url):
                     parsed.path,
                 )
             )
-            and not parsed.query
-            and not parsed.fragment
         )
 
     except (ValueError, TypeError):
@@ -137,22 +138,10 @@ def _valid_embed_url(url):
 
 
 async def _search_xvideos_async(query, max_results):
-    # Import lazily: a broken optional dependency must not
-    # prevent Django from starting.
-    try:
-        from xvideos_api import Client
-    except ImportError:
-        logger.exception(
-            "XVideos API dependency is unavailable. "
-            "XVideos search has been disabled."
-        )
-        return []
-
+    client = Client()
     results = []
 
     try:
-        client = Client()
-
         search_generator = client.search(
             query=query,
             pages=1,
@@ -212,9 +201,6 @@ async def _search_xvideos_async(query, max_results):
             if thumbnail and not _valid_thumbnail_url(thumbnail):
                 thumbnail = ""
 
-            if creator_url and not _valid_video_url(creator_url):
-                creator_url = ""
-
             results.append({
                 "video_id": video_id,
                 "title": title,
@@ -245,13 +231,10 @@ def search_xvideos(query, max_results=MAX_RESULTS):
     if len(query) < 3:
         return []
 
-    try:
-        max_results = max(1, min(int(max_results), 20))
-    except (TypeError, ValueError):
-        max_results = MAX_RESULTS
+    max_results = max(1, min(int(max_results), 20))
 
     cache_key = (
-        "streamsphere_xvideos_search_v3_"
+        "streamsphere_xvideos_search_v2_"
         + hashlib.sha256(
             query.lower().encode("utf-8")
         ).hexdigest()
