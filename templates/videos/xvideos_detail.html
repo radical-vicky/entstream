@@ -1,0 +1,380 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ video.title }} | StreamSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --x-orange: #ff7900;
+        --x-bg: #0b0d0e;
+        --x-panel: #141719;
+        --x-border: #252a2d;
+        --x-text: #f1f3f4;
+        --x-muted: #92999e;
+    }
+
+    .xv-detail {
+        width: 100%;
+        max-width: 1450px;
+        margin: 0 auto;
+        padding: 24px;
+        color: var(--x-text);
+    }
+
+    .xv-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 25px;
+        align-items: start;
+    }
+
+    .xv-main {
+        min-width: 0;
+    }
+
+    .xv-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+
+    .xv-back {
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 13px;
+        color: var(--x-muted);
+        background: var(--x-panel);
+        border: 1px solid var(--x-border);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    .xv-back:hover {
+        color: var(--x-orange);
+        border-color: var(--x-orange);
+    }
+
+    .xv-player {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border: 1px solid var(--x-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .xv-player iframe {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border: 0;
+        background: #000;
+    }
+
+    .xv-unavailable {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 25px;
+        text-align: center;
+        color: var(--x-muted);
+    }
+
+    .xv-unavailable h2 {
+        color: var(--x-text);
+        font-size: 19px;
+        margin-bottom: 8px;
+    }
+
+    .xv-title {
+        font-size: 24px;
+        font-weight: 750;
+        line-height: 1.4;
+        margin: 20px 0 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .xv-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px;
+        padding-bottom: 17px;
+        border-bottom: 1px solid var(--x-border);
+        color: var(--x-muted);
+        font-size: 12px;
+    }
+
+    .xv-provider {
+        color: var(--x-orange);
+        font-weight: 750;
+    }
+
+    .xv-description {
+        margin-top: 20px;
+        padding: 18px;
+        background: var(--x-panel);
+        border: 1px solid var(--x-border);
+    }
+
+    .xv-description h2 {
+        font-size: 14px;
+        margin: 0 0 10px;
+    }
+
+    .xv-description p {
+        color: #b5bdc2;
+        font-size: 13px;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .xv-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .xv-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 17px;
+        background: var(--x-orange);
+        color: #111;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 750;
+        border: 1px solid var(--x-orange);
+    }
+
+    .xv-button:hover {
+        background: #ff9233;
+        color: #111;
+    }
+
+    .xv-button.secondary {
+        background: var(--x-panel);
+        border-color: var(--x-border);
+        color: var(--x-text);
+    }
+
+    .xv-button.secondary:hover {
+        border-color: var(--x-orange);
+        color: var(--x-orange);
+    }
+
+    .xv-sidebar {
+        background: var(--x-panel);
+        border: 1px solid var(--x-border);
+        padding: 18px;
+    }
+
+    .xv-sidebar h2 {
+        font-size: 14px;
+        font-weight: 750;
+        margin: 0 0 12px;
+    }
+
+    .xv-sidebar p {
+        color: var(--x-muted);
+        font-size: 12px;
+        line-height: 1.8;
+        margin: 0 0 15px;
+    }
+
+    .xv-notice {
+        margin-top: 20px;
+        padding: 13px 15px;
+        border: 1px solid var(--x-border);
+        background: #101314;
+        color: var(--x-muted);
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+    .xv-notice strong {
+        color: var(--x-orange);
+    }
+
+    @media (max-width: 850px) {
+        .xv-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .xv-sidebar {
+            margin-top: 5px;
+        }
+    }
+
+    @media (max-width: 550px) {
+        .xv-detail {
+            padding: 12px 9px;
+        }
+
+        .xv-title {
+            font-size: 19px;
+        }
+
+        .xv-meta {
+            gap: 10px;
+        }
+
+        .xv-player {
+            aspect-ratio: 16 / 9;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xv-detail">
+
+    <div class="xv-layout">
+
+        <main class="xv-main">
+
+            <div class="xv-navigation">
+                <a href="javascript:history.back()" class="xv-back">
+                    &larr; Back to videos
+                </a>
+                <span class="xv-back">External video</span>
+            </div>
+
+            <div class="xv-player">
+
+                {% if video.embedding_allowed and video.embed_url %}
+
+                    <iframe
+                        src="{{ video.embed_url }}"
+                        title="{{ video.title }}"
+                        loading="eager"
+                        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                        allowfullscreen
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+
+                {% else %}
+
+                    <div class="xv-unavailable">
+                        <h2>Embedded playback unavailable</h2>
+                        <p>This video must be opened on its original provider page.</p>
+
+                        {% if video.url %}
+                            <a
+                                href="{{ video.url }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="xv-button">
+                                Open original video
+                            </a>
+                        {% endif %}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <h1 class="xv-title">{{ video.title }}</h1>
+
+            <div class="xv-meta">
+                <span class="xv-provider">XVideos</span>
+
+                {% if video.duration %}
+                    <span>{{ video.duration }}</span>
+                {% endif %}
+
+                {% if video.views %}
+                    <span>{{ video.views }} views</span>
+                {% endif %}
+            </div>
+
+            <div class="xv-actions">
+
+                {% if video.url %}
+                    <a
+                        href="{{ video.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="xv-button">
+                        Open original source &rarr;
+                    </a>
+                {% endif %}
+
+                <a
+                    href="javascript:history.back()"
+                    class="xv-button secondary">
+                    Back to search
+                </a>
+
+            </div>
+
+            <div class="xv-description">
+                <h2>About this video</h2>
+                <p>
+                    This video is provided by an external content provider.
+                    It is not uploaded or hosted by StreamSphere.
+                    Playback availability is controlled by the original provider.
+                </p>
+            </div>
+
+            <div class="xv-notice">
+                <strong>External content notice:</strong>
+                StreamSphere does not host this video. The original provider
+                controls its availability, playback restrictions and content.
+            </div>
+
+        </main>
+
+        <aside class="xv-sidebar">
+
+            <h2>Video information</h2>
+
+            <p>
+                <strong>Provider:</strong> XVideos
+            </p>
+
+            {% if video.duration %}
+                <p>
+                    <strong>Duration:</strong> {{ video.duration }}
+                </p>
+            {% endif %}
+
+            {% if video.views %}
+                <p>
+                    <strong>Views:</strong> {{ video.views }}
+                </p>
+            {% endif %}
+
+            <p>
+                <strong>Playback:</strong>
+                {% if video.embedding_allowed and video.embed_url %}
+                    Embedded player available
+                {% else %}
+                    Original provider only
+                {% endif %}
+            </p>
+
+            {% if video.url %}
+                <a
+                    href="{{ video.url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="xv-button"
+                    style="width:100%;">
+                    Visit original source
+                </a>
+            {% endif %}
+
+        </aside>
+
+    </div>
+
+</div>
+{% endblock %}

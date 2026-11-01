@@ -1,101 +1,302 @@
-{% if search_query|length >= 3 and youtube_enabled %}
+
+{% if youtube_videos or external_videos or xvideos_results %}
 
 <section class="vl-external-section">
 
     <div class="vl-external-heading">
         <div class="vl-external-heading-main">
-
-            <span class="vl-youtube-icon" aria-hidden="true">
-                ▶
-            </span>
-
             <div>
                 <h2 class="vl-external-title">
                     More videos to explore
                 </h2>
 
                 <p class="vl-external-subtitle">
-                    Discovered for you
+                    Videos discovered from external providers
                 </p>
             </div>
-
         </div>
     </div>
 
-    {% if youtube_videos %}
+    <div class="vl-external-grid">
 
-        <div class="vl-external-grid">
+       
 
-            {% for video in youtube_videos %}
+        {% for video in youtube_videos %}
 
-                <article class="vl-external-card">
+            <article class="vl-external-card">
+
+                <a
+                    href="{% url 'videos:external_detail' video.video_id %}"
+                    class="vl-external-thumbnail"
+                    aria-label="Watch {{ video.title }}"
+                >
+
+                    {% if video.thumbnail %}
+                        <img
+                            src="{{ video.thumbnail }}"
+                            alt="{{ video.title }}"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <div class="vl-thumb-placeholder" style="height:100%;">
+                            <span class="vl-play-symbol" aria-hidden="true">&#9654;</span>
+                        </div>
+                    {% endif %}
+
+                    <span class="vl-external-badge">
+                        YouTube
+                    </span>
+
+                    <span class="vl-external-play" aria-hidden="true">
+                        &#9654;
+                    </span>
+
+                </a>
+
+                <div class="vl-external-info">
+
+                    <h3 class="vl-external-video-title">
+                        <a href="{% url 'videos:external_detail' video.video_id %}">
+                            {{ video.title }}
+                        </a>
+                    </h3>
+
+                    <p class="vl-external-channel">
+                        {{ video.channel_title|default:"YouTube Creator" }}
+                    </p>
+
+                    {% if video.description %}
+                        <p class="vl-external-description">
+                            {{ video.description }}
+                        </p>
+                    {% endif %}
 
                     <a
+                        class="vl-external-watch"
                         href="{% url 'videos:external_detail' video.video_id %}"
-                        class="vl-external-thumbnail"
-                        aria-label="Watch {{ video.title }}"
                     >
-
-                        {% if video.thumbnail %}
-                            <img
-                                src="{{ video.thumbnail }}"
-                                alt="{{ video.title }}"
-                                loading="lazy"
-                            >
-                        {% else %}
-                            <div class="vl-thumb-placeholder" style="height:100%;">
-                                <span class="vl-play-symbol" aria-hidden="true">&#9654;</span>
-                            </div>
-                        {% endif %}
-
-                        <span class="vl-external-badge">
-                            Video
-                        </span>
-
-                        <span class="vl-external-play" aria-hidden="true">
-                            ▶
-                        </span>
-
+                        Watch now &rarr;
                     </a>
 
-                    <div class="vl-external-info">
+                </div>
 
-                        <h3 class="vl-external-video-title">
-                            <a href="{% url 'videos:external_detail' video.video_id %}">
-                                {{ video.title }}
-                            </a>
-                        </h3>
+            </article>
 
-                        <p class="vl-external-channel">
-                            {{ video.channel_title|default:"StreamSphere Creator" }}
+        {% endfor %}
+
+
+
+        {% for video in external_videos %}
+
+            <article class="vl-external-card">
+
+                <a
+                    href="{{ video.external_url }}"
+                    class="vl-external-thumbnail"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open {{ video.title }}"
+                >
+
+                    {% if video.thumbnail_url %}
+                        <img
+                            src="{{ video.thumbnail_url }}"
+                            alt="{{ video.title }}"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <div class="vl-thumb-placeholder" style="height:100%;">
+                            <span class="vl-play-symbol" aria-hidden="true">
+                                &#9654;
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <span class="vl-external-badge">
+                        {{ video.get_source_display }}
+                    </span>
+
+                    <span class="vl-external-play" aria-hidden="true">
+                        &#9654;
+                    </span>
+
+                </a>
+
+                <div class="vl-external-info">
+
+                    <h3 class="vl-external-video-title">
+                        <a
+                            href="{{ video.external_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ video.title }}
+                        </a>
+                    </h3>
+
+                    <p class="vl-external-channel">
+                        {{ video.creator_name|default:"External Creator" }}
+                    </p>
+
+                    {% if video.description %}
+                        <p class="vl-external-description">
+                            {{ video.description }}
                         </p>
+                    {% endif %}
 
-                        {% if video.description %}
-                            <p class="vl-external-description">
-                                {{ video.description }}
-                            </p>
+                    <div class="vl-external-channel">
+                        {% if video.duration_seconds %}
+                            {{ video.duration_seconds }} seconds
                         {% endif %}
 
-                        <a
-                            class="vl-external-watch"
-                            href="{% url 'videos:external_detail' video.video_id %}"
-                        >
-                            Watch now →
-                        </a>
-
+                        {% if video.view_count %}
+                            &middot; {{ video.view_count }} views
+                        {% endif %}
                     </div>
 
-                </article>
+                    <a
+                        class="vl-external-watch"
+                        href="{{ video.external_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open video &rarr;
+                    </a>
 
-            {% endfor %}
+                </div>
 
-        </div>
+            </article>
 
-    {% else %}
+        {% endfor %}
 
-        <!-- If no external results, show nothing to keep the page clean -->
-        <div style="display:none;"></div>
 
+
+        {% for video in xvideos_results %}
+
+            <article class="vl-external-card">
+
+                {% if video.embedding_allowed and video.embed_url %}
+
+                    {# Thumbnail preview; click to reveal player #}
+
+                    <details class="vl-xvideos-player">
+
+                        <summary class="vl-external-thumbnail"
+                                 style="cursor:pointer;">
+
+                            {% if video.thumbnail %}
+                                <img
+                                    src="{{ video.thumbnail }}"
+                                    alt="{{ video.title }}"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer"
+                                >
+                            {% else %}
+                                <div class="vl-thumb-placeholder" style="height:100%;">
+                                    <span class="vl-play-symbol" aria-hidden="true">
+                                        &#9654;
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            <span class="vl-external-badge">
+                                XVideos
+                            </span>
+
+                            <span class="vl-external-play" aria-hidden="true">
+                                &#9654;
+                            </span>
+
+                            {% if video.duration %}
+                                <span class="vl-external-duration">
+                                    {{ video.duration }}
+                                </span>
+                            {% endif %}
+
+                        </summary>
+
+                        <div class="vl-xvideos-embed"
+                             style="position:relative;width:100%;aspect-ratio:16/9;background:#000;">
+
+                            <iframe
+                                src="{{ video.embed_url }}"
+                                title="{{ video.title }}"
+                                loading="lazy"
+                                allowfullscreen
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                style="position:absolute;inset:0;width:100%;height:100%;border:0;"
+                            ></iframe>
+
+                        </div>
+
+                    </details>
+
+                {% else %}
+
+                    {# External fallback if no usable embed URL #}
+
+                   <a href="{% url 'videos:external_xvideos_detail' video_id=video.video_id %}?q={{ request.GET.q|urlencode }}">
+    {{ video.title }}
+</a>
+
+                {% endif %}
+
+
+                <div class="vl-external-info">
+
+                    <h3 class="vl-external-video-title">
+                        <a
+                            href="{{ video.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ video.title }}
+                        </a>
+                    </h3>
+
+                    <p class="vl-external-channel">
+                        XVideos
+                        {% if video.author %}
+                            &middot; {{ video.author }}
+                        {% endif %}
+                    </p>
+
+                    {% if video.duration %}
+                        <p class="vl-external-channel">
+                            {{ video.duration }}
+                        </p>
+                    {% endif %}
+
+                    {% if video.views %}
+                        <p class="vl-external-channel">
+                            {{ video.views }} views
+                        </p>
+                    {% endif %}
+
+                    <a
+                        class="vl-external-watch"
+                        href="{{ video.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Open original source &rarr;
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+    {% if xvideos_search_enabled %}
+        <p class="vl-external-notice">
+            Restricted provider search results are visible to authorized
+            StreamSphere staff only. Embedded playback depends on provider
+            permissions and availability. These videos are not hosted by
+            StreamSphere.
+        </p>
     {% endif %}
 
 </section>

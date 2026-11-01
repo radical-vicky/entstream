@@ -60,3 +60,40 @@ class VideoPurchaseAdmin(admin.ModelAdmin):
         "payment_reference",
         "purchased_at",
     )
+
+
+from .models import ExternalVideo
+
+
+@admin.register(ExternalVideo)
+class ExternalVideoAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "source",
+        "import_method",
+        "submitted_by",
+        "is_approved",
+        "age_restricted",
+        "created_at",
+    )
+
+    list_filter = (
+        "source",
+        "import_method",
+        "is_approved",
+        "age_restricted",
+    )
+
+    search_fields = (
+        "title",
+        "external_video_id",
+        "creator_name",
+    )
+
+    list_editable = ("is_approved",)
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "metadata_fetched_at",
+    )

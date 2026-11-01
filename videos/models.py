@@ -259,3 +259,86 @@ class VideoPurchase(models.Model):
 
     def __str__(self):
         return f"{self.buyer} purchased {self.video}"
+
+
+
+
+class ExternalVideo(models.Model):
+
+    class Source(models.TextChoices):
+        XVIDEOS = "xvideos", "XVideos"
+
+    class ImportMethod(models.TextChoices):
+        ADMIN = "admin", "Admin import"
+        API = "api", "Authorized API"
+
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="external_videos",
+    )
+
+    source = models.CharField(
+        max_length=20,
+        choices=Source.choices,
+        default=Source.XVIDEOS,
+    )
+
+    import_method = models.CharField(
+        max_length=20,
+        choices=ImportMethod.choices,
+        default=ImportMethod.ADMIN,
+    )
+
+    external_video_id = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+
+    title = models.CharField(max_length=200)
+
+    # Original provider watch URL
+    external_url = models.URLField(max_length=500)
+
+    # Provider-approved embedded player URL
+    embed_url = models.URLField(
+        max_length=1000,
+        blank=True,
+        help_text="Only enter an embed URL explicitly authorized by the provider.",
+    )
+
+    # Embedding must be explicitly approved
+    embedding_allowed = models.BooleanField(
+        default=False,
+        help_text="Enable only when the provider explicitly permits embedding.",
+    )
+
+    description = models.TextField(blank=True)
+    thumbnail_url = models.URLField(max_length=1000, blank=True)
+    creator_name = models.CharField(max_length=200, blank=True)
+
+    duration_seconds = models.PositiveIntegerField(default=0)
+    view_count = models.PositiveBigIntegerField(default=0)
+    likes_count = models.PositiveBigIntegerField(default=0)
+
+    # Metadata returned by an authorized API
+    metadata = models.JSONField(default=dict, blank=True)
+    metadata_fetched_at = models.DateTimeField(null=True, blank=True)
+
+    # Adult content remains restricted by default
+    age_restricted = models.BooleanField(default=True)
+
+    is_approved = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "External video"
+        verbose_name_plural = "External videos"
+
+    def __str__(self):
+        return self.title

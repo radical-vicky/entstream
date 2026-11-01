@@ -321,6 +321,19 @@ BUNNY_STREAM_LIBRARY_ID = os.environ.get(
 BUNNY_STREAM_API_KEY = os.environ.get(
     "BUNNY_STREAM_API_KEY", ""
 )
+
+
+XVIDEOS_SEARCH_ENABLED = os.getenv(
+    "XVIDEOS_SEARCH_ENABLED", "False"
+).lower() == "true"
+
+XVIDEOS_SEARCH_API_URL = os.getenv(
+    "XVIDEOS_SEARCH_API_URL", ""
+)
+
+XVIDEOS_SEARCH_API_TOKEN = os.getenv(
+    "XVIDEOS_SEARCH_API_TOKEN", ""
+)
 # --------------------------------------------------
 # DJANGO CHANNELS
 # --------------------------------------------------

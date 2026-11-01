@@ -1,0 +1,112 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ external_video.title }} | StreamSphere{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+    <div class="border border-[#252525] bg-[#101112]">
+
+        <div class="flex items-center justify-between gap-4 border-b border-[#252525] px-5 py-4">
+            <span class="text-xs uppercase tracking-widest text-orange-500">
+                External video
+            </span>
+
+            <span class="text-xs text-gray-500">
+                External provider
+            </span>
+        </div>
+
+        <div class="p-5">
+
+            <h1 class="text-xl font-semibold text-white mb-3">
+                {{ external_video.title }}
+            </h1>
+
+            {% if external_video.creator_name %}
+                <p class="text-sm text-gray-500 mb-4">
+                    {{ external_video.creator_name }}
+                </p>
+            {% endif %}
+
+            {% if external_video.description %}
+                <p class="text-sm leading-6 text-gray-400 mb-6">
+                    {{ external_video.description }}
+                </p>
+            {% endif %}
+
+            <div class="aspect-video w-full bg-[#090b0c] border border-[#252525] overflow-hidden">
+
+                {% if safe_embed_url %}
+                    <iframe
+                        src="{{ safe_embed_url }}"
+                        title="{{ external_video.title }}"
+                        class="w-full h-full"
+                        loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                {% else %}
+                    <div class="w-full h-full flex flex-col items-center justify-center text-center p-6">
+
+                        <p class="text-sm font-medium text-white mb-2">
+                            Embedded playback unavailable
+                        </p>
+
+                        <p class="text-sm text-gray-500 max-w-md">
+                            The original provider has not been confirmed to permit
+                            embedded playback for this video.
+                        </p>
+
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {% if external_video.thumbnail_url %}
+                <div class="mt-5">
+                    <img
+                        src="{{ external_video.thumbnail_url }}"
+                        alt="{{ external_video.title }}"
+                        class="w-full max-h-72 object-cover border border-[#252525]"
+                        loading="lazy">
+                </div>
+            {% endif %}
+
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+
+                <a
+                    href="{% url 'videos:open_xvideos_source' external_video.external_video_id %}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-500 text-white px-5 py-3 text-sm font-semibold transition">
+                    Open original video
+                </a>
+
+                <a
+                    href="{% url 'videos:list' %}"
+                    class="inline-flex items-center justify-center border border-[#303030] hover:border-[#555] text-gray-300 hover:text-white px-5 py-3 text-sm transition">
+                    Back to videos
+                </a>
+
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-[#252525]">
+
+                <p class="text-xs text-gray-500">
+                    Source: {{ external_video.get_source_display }}
+                </p>
+
+                <p class="text-xs text-gray-600 mt-2">
+                    Playback and availability are controlled by the original provider.
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
