@@ -72,4 +72,9 @@ urlpatterns = [
         views.video_download,
         name="download",
     ),
+    path(
+    "bunny/create-upload/",
+    views.create_bunny_upload,
+    name="create_bunny_upload",
+),
 ]

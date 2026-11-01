@@ -312,6 +312,15 @@ SECURE_PROXY_SSL_HEADER = (
 
 # YouTube Data API v3
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
+
+
+BUNNY_STREAM_LIBRARY_ID = os.environ.get(
+    "BUNNY_STREAM_LIBRARY_ID", ""
+)
+
+BUNNY_STREAM_API_KEY = os.environ.get(
+    "BUNNY_STREAM_API_KEY", ""
+)
 # --------------------------------------------------
 # DJANGO CHANNELS
 # --------------------------------------------------

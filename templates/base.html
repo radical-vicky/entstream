@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#090b0e">
 
-    <title>{% block title %}StreamSphere | Watch. Create. Earn.{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Discover videos, follow creators, watch live streams and build your audience on StreamSphere.{% endblock %}">
+    <title>{% block title %}EnStreamVideos | Watch. Create. Earn.{% endblock %}</title>
 
+<meta name="description" content="{% block meta_description %}Discover videos, follow creators, watch live streams and build your audience on EnStreamVideos.{% endblock %}">
+
+<link rel="icon" type="image/png" href="{% static 'images/enstreamvideos-logo.jpg' %}">
     {% block meta %}{% endblock %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1424,6 +1426,42 @@
                 transition-duration: .01ms !important;
             }
         }
+
+
+        /* EnStreamVideos brand logo */
+.ss-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 0 0 auto;
+    width: 190px;
+    height: 54px;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.ss-brand img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left center;
+}
+
+/* Responsive logo */
+@media (max-width: 768px) {
+    .ss-brand {
+        width: 150px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 400px) {
+    .ss-brand {
+        width: 125px;
+        height: 44px;
+    }
+}
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -1460,9 +1498,12 @@
             </svg>
         </button>
 
-        <a class="ss-brand" href="/" aria-label="StreamSphere home">
-            Stream<span>Sphere</span>
-        </a>
+        <a class="ss-brand" href="/" aria-label="EnStreamVideos home">
+    <img
+        src="{% static 'images/enstreamvideos-logo.jpg' %}"
+        alt="EnStreamVideos — Watch. Create. Earn."
+    >
+</a>
 
         <nav class="ss-topnav" aria-label="Primary navigation">
             <a href="/" {% if request.path == '/' %}aria-current="page" class="is-active"{% endif %}>Home</a>

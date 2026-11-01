@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -77,7 +76,6 @@
 
 /* Buttons */
 .vl-page .vl-upload-btn,
-.vl-page .vl-search-btn,
 .vl-page .vl-empty-action,
 .vl-page .vl-page-link {
     border-radius: 0;
@@ -105,68 +103,6 @@
     background: var(--vl-orange-hover);
     color: #fff;
 }
-
-/* Toolbar */
-.vl-toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 190px auto;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-}
-
-.vl-search { position: relative; min-width: 0; }
-
-.vl-search-icon {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    color: var(--vl-muted);
-    font-size: 20px;
-    pointer-events: none;
-    transform: translateY(-50%);
-}
-
-.vl-search-input, .vl-sort-select {
-    width: 100%;
-    height: 48px;
-    outline: none;
-    border: 1px solid #282d35;
-    border-radius: 0;
-    background: var(--vl-surface);
-    color: var(--vl-text);
-    font: inherit;
-    font-size: 13px;
-    transition: border-color var(--vl-transition);
-}
-
-.vl-search-input { padding: 0 15px 0 45px; }
-.vl-search-input::placeholder { color: #777e89; }
-
-.vl-search-input:focus, .vl-sort-select:focus {
-    border-color: var(--vl-orange);
-}
-
-.vl-sort-select { padding: 0 12px; cursor: pointer; }
-
-.vl-sort-select option {
-    background: var(--vl-surface);
-    color: var(--vl-text);
-}
-
-.vl-search-btn {
-    height: 48px;
-    padding: 0 22px;
-    border: 1px solid var(--vl-orange);
-    background: var(--vl-orange);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: background var(--vl-transition);
-}
-
-.vl-search-btn:hover { background: var(--vl-orange-hover); }
 
 /* Results bar */
 .vl-results-bar {
@@ -389,7 +325,7 @@
 .vl-meta-dot { color: #555c66; }
 
 /* ==========================================================
-   EXTERNAL YOUTUBE RESULTS
+   MORE VIDEOS (REBRANDED EXTERNAL)
    ========================================================== */
 
 .vl-external-section {
@@ -413,6 +349,7 @@
     gap: 12px;
 }
 
+/* Rebranded to StreamSphere Orange */
 .vl-youtube-icon {
     display: flex;
     width: 40px;
@@ -420,7 +357,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    background: #ff0033;
+    background: var(--vl-orange); 
     color: #fff;
     font-size: 17px;
 }
@@ -480,6 +417,7 @@
     transform: scale(1.035);
 }
 
+/* Rebranded to StreamSphere Orange */
 .vl-external-play {
     position: absolute;
     top: 50%;
@@ -490,7 +428,7 @@
     align-items: center;
     justify-content: center;
     padding-left: 3px;
-    background: #ff0033;
+    background: var(--vl-orange); 
     color: #fff;
     font-size: 18px;
     transform: translate(-50%, -50%);
@@ -500,12 +438,13 @@
 
 .vl-external-card:hover .vl-external-play { opacity: 1; }
 
+/* Rebranded to StreamSphere Orange */
 .vl-external-badge {
     position: absolute;
     top: 9px;
     left: 9px;
     padding: 5px 8px;
-    background: #ff0033;
+    background: var(--vl-orange); 
     color: #fff;
     font-size: 9px;
     font-weight: 900;
@@ -712,15 +651,6 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 28px 16px;
     }
-
-    .vl-toolbar {
-        grid-template-columns: minmax(0, 1fr) 160px;
-    }
-
-    .vl-search-btn {
-        grid-column: 1 / -1;
-        width: 100%;
-    }
 }
 
 @media (max-width: 560px) {
@@ -749,14 +679,6 @@
 
     .vl-upload-label { display: none; }
 
-    .vl-toolbar {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
-        margin-bottom: 24px;
-    }
-
-    .vl-search-input, .vl-sort-select, .vl-search-btn { height: 44px; }
-    .vl-sort-select, .vl-search-btn { grid-column: 1; }
     .vl-results-bar { margin-bottom: 16px; }
 
     .vl-video-grid,
@@ -846,7 +768,9 @@
         <header class="vl-header">
             <div class="vl-heading">
                 <span class="vl-eyebrow">Your next watch starts here</span>
-                <h1 class="vl-title">Explore videos</h1>
+                <h1 class="vl-title">
+                    {% if search_query %}Search results for "{{ search_query }}"{% else %}Explore videos{% endif %}
+                </h1>
                 <p class="vl-subtitle">
                     Discover new videos, explore creators, and find something worth watching on StreamSphere.
                 </p>
@@ -860,46 +784,7 @@
             {% endif %}
         </header>
 
-        <form class="vl-toolbar" id="vlSearchForm" method="get" action="{% url 'videos:list' %}">
-            <div class="vl-search">
-                <span class="vl-search-icon" aria-hidden="true">&#8981;</span>
-                <input
-                    class="vl-search-input"
-                    type="search"
-                    name="q"
-                    id="vlSearchInput"
-                    value="{{ search_query|default:'' }}"
-                    placeholder="Search videos or topics..."
-                    aria-label="Search videos"
-                    autocomplete="off"
-                >
-            </div>
-
-            <select class="vl-sort-select" name="sort" id="vlSortSelect" aria-label="Sort videos">
-                <option value="newest" {% if sort_by != 'popular' %}selected{% endif %}>Recently uploaded</option>
-                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most popular</option>
-            </select>
-
-            <button class="vl-search-btn" type="submit">Search videos</button>
-        </form>
-
-        <div class="vl-results-bar">
-            <p class="vl-results-label" id="vlResultsLabel">
-                {% if search_query %}
-                    Results for <strong>{{ search_query }}</strong>
-                {% else %}
-                    <strong>{{ total_videos|default:0 }}</strong> videos available
-                {% endif %}
-            </p>
-
-            {% if search_query or sort_by == 'popular' %}
-                <a class="vl-clear-link" href="{% url 'videos:list' %}" id="vlClearFilters">Clear filters</a>
-            {% else %}
-                <a class="vl-clear-link" href="{% url 'videos:list' %}" id="vlClearFilters" style="display:none;">Clear filters</a>
-            {% endif %}
-        </div>
-
-        <!-- STREAMSPHERE UPLOADED VIDEOS -->
+        <!-- STREAMSPHERE UPLOADED VIDEOS (AND SILENT EXTERNAL FALLBACK) -->
         <div id="vlResultsContainer">
             {% if videos %}
                 <section class="vl-video-grid" aria-label="StreamSphere video results">
@@ -908,8 +793,6 @@
                             <a class="vl-thumb-link" href="{% url 'videos:detail' pk=video.pk %}" aria-label="Watch {{ video.title }}">
                                 {% if video.thumbnail_url %}
                                     <img class="vl-thumb" src="{{ video.thumbnail_url }}" alt="{{ video.title }}" loading="lazy" decoding="async">
-                                {% elif video.thumbnail %}
-                                    <img class="vl-thumb" src="{{ video.thumbnail.url }}" alt="{{ video.title }}" loading="lazy" decoding="async">
                                 {% else %}
                                     <div class="vl-thumb-placeholder">
                                         <span class="vl-play-symbol" aria-hidden="true">&#9654;</span>
@@ -975,32 +858,10 @@
                         </article>
                     {% endfor %}
                 </section>
-            {% else %}
-                <section class="vl-empty">
-                    <div class="vl-empty-icon" aria-hidden="true">&#9654;</div>
-
-                    {% if search_query %}
-                        <h2 class="vl-empty-title">No StreamSphere videos found</h2>
-                        <p class="vl-empty-text">
-                            We couldn't find uploaded videos matching "{{ search_query }}".
-                            Check the external results below or try another search.
-                        </p>
-                    {% else %}
-                        <h2 class="vl-empty-title">Nothing to watch yet</h2>
-                        <p class="vl-empty-text">
-                            There are no videos to display right now. Check back soon or upload the first video.
-                        </p>
-                        {% if user.is_authenticated %}
-                            <a class="vl-empty-action" href="{% url 'videos:upload' %}">
-                                Upload the first video
-                            </a>
-                        {% endif %}
-                    {% endif %}
-                </section>
             {% endif %}
         </div>
 
-        <!-- EXTERNAL YOUTUBE VIDEOS -->
+        <!-- MORE VIDEOS (EXTERNAL) -->
         <div id="vlExternalResults">
             {% include "videos/partials/_external_video_grid.html" %}
         </div>
@@ -1041,137 +902,92 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('vlSearchForm');
-    const searchInput = document.getElementById('vlSearchInput');
-    const sortSelect = document.getElementById('vlSortSelect');
+    const form = document.getElementById('ssSearchForm'); // Updated to target base.html search form
+    const searchInput = document.querySelector('.ss-search input[name="q"]'); // Targets base.html input
     const resultsContainer = document.getElementById('vlResultsContainer');
     const externalResults = document.getElementById('vlExternalResults');
     const paginationContainer = document.getElementById('vlPaginationContainer');
-    const resultsLabel = document.getElementById('vlResultsLabel');
-    const clearFilters = document.getElementById('vlClearFilters');
 
     let debounceTimer;
     let currentController = null;
 
+    if (!form || !searchInput) return; // Failsafe if base.html doesn't have the search
+
     function loadResults(url) {
+        // 1. Cancel previous request if still pending
         if (currentController) {
             currentController.abort();
         }
-
         currentController = new AbortController();
 
-        const localGrid = resultsContainer.querySelector('.vl-video-grid')
-            || resultsContainer.querySelector('.vl-empty');
-
-        if (localGrid) {
-            localGrid.classList.add('is-loading');
-        }
+        // Add loading state
+        const localGrid = resultsContainer.querySelector('.vl-video-grid');
+        if (localGrid) localGrid.classList.add('is-loading');
 
         fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
             signal: currentController.signal
         })
         .then(res => {
-            if (!res.ok) {
-                throw new Error('Search request failed.');
-            }
+            if (!res.ok) throw new Error('Search request failed.');
             return res.json();
         })
         .then(data => {
-            /* Update StreamSphere uploaded videos */
+            // Update HTML seamlessly
             resultsContainer.innerHTML = data.grid_html || '';
-
-            /* Update YouTube results at the same time */
-            if (externalResults) {
-                externalResults.innerHTML = data.external_html || '';
-            }
-
-            /* Update local video pagination */
+            if (externalResults) externalResults.innerHTML = data.external_html || '';
             paginationContainer.innerHTML = data.pagination_html || '';
 
-            /* Update result label safely */
-            if (data.search_query) {
-                resultsLabel.textContent = 'Results for ' + data.search_query;
-                clearFilters.style.display = 'inline-block';
-            } else {
-                resultsLabel.innerHTML =
-                    '<strong>' + Number(data.total_videos || 0) +
-                    '</strong> videos available';
-
-                clearFilters.style.display =
-                    data.sort_by === 'popular' ? 'inline-block' : 'none';
-            }
-
-            /* Update browser URL without reloading */
+            // Update URL quietly
             const newUrl = new URL(url, window.location.origin);
             window.history.replaceState({}, '', newUrl);
 
+            // Re-bind pagination events
             bindPaginationLinks();
         })
         .catch(err => {
-            if (err.name !== 'AbortError') {
-                console.error('StreamSphere search error:', err);
-            }
+            if (err.name !== 'AbortError') console.error('Search error:', err);
         })
         .finally(() => {
-            const updatedGrid = resultsContainer.querySelector('.vl-video-grid')
-                || resultsContainer.querySelector('.vl-empty');
-
-            if (updatedGrid) {
-                updatedGrid.classList.remove('is-loading');
-            }
+            const updatedGrid = resultsContainer.querySelector('.vl-video-grid');
+            if (updatedGrid) updatedGrid.classList.remove('is-loading');
         });
     }
 
     function buildUrl(page = 1) {
         const params = new URLSearchParams();
         const q = searchInput.value.trim();
-        const sort = sortSelect.value;
 
         if (q) params.set('q', q);
-        if (sort) params.set('sort', sort);
         if (page > 1) params.set('page', page);
 
         const queryString = params.toString();
-        return `{% url 'videos:list' %}` +
-            (queryString ? '?' + queryString : '');
+        return `{% url 'videos:list' %}` + (queryString ? '?' + queryString : '');
     }
 
-    /* Live search */
+    // Note: We removed the 'input' event debounce because the base.html
+    // search form submits normally (which reloads the page).
+    // If you want AJAX typing on the base.html search, uncomment below:
+
+    /*
     searchInput.addEventListener('input', function() {
         clearTimeout(debounceTimer);
-
         debounceTimer = setTimeout(function() {
             loadResults(buildUrl(1));
         }, 700);
     });
+    */
 
-    /* Sorting */
-    sortSelect.addEventListener('change', function() {
-        loadResults(buildUrl(1));
-    });
-
-    /* Search form submission */
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        clearTimeout(debounceTimer);
-        loadResults(buildUrl(1));
+        // If we are already on the videos page, intercept the base.html form submission
+        if (window.location.pathname === "{% url 'videos:list' %}") {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            loadResults(buildUrl(1));
+        }
     });
 
-    /* Clear search and sorting */
-    clearFilters.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        clearTimeout(debounceTimer);
-        searchInput.value = '';
-        sortSelect.value = 'newest';
-
-        loadResults(buildUrl(1));
-    });
-
-    /* AJAX pagination */
+    // Pagination binding
     function bindPaginationLinks() {
         paginationContainer.querySelectorAll('a.vl-page-link').forEach(link => {
             link.addEventListener('click', function(e) {

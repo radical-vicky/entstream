@@ -5,885 +5,1227 @@
 
 {% block extra_css %}
 <style>
-    .vd-page {
-        --bg: #0b0d10;
-        --panel: #12151a;
-        --panel2: #191d24;
-        --line: #2b3039;
-        --text: #f4f6f8;
-        --muted: #9ba3af;
-        --orange: #ff7900;
-        --orange-hover: #e86e00;
-        --red: #ef4444;
-        max-width: 1400px;
+    :root {
+        --ss-orange: #ff7900;
+        --ss-bg: #0b0b0b;
+        --ss-panel: #151515;
+        --ss-panel-light: #1c1c1c;
+        --ss-border: #292929;
+        --ss-text: #f5f5f5;
+        --ss-muted: #999;
+    }
+
+    .video-detail-page {
+        width: 100%;
+        max-width: 1500px;
         margin: 0 auto;
         padding: 24px;
-        color: var(--text);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--ss-text);
     }
 
-    .vd-page * { box-sizing: border-box; }
-    .vd-page a { text-decoration: none; color: inherit; }
-    .vd-page button, .vd-page input, .vd-page textarea { font: inherit; }
-
-    .vd-top-bar {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
-    }
-
-    .vd-back-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: var(--panel); border: 1px solid var(--line);
-        color: var(--text); padding: 8px 16px; font-size: 13px; font-weight: 600;
-        cursor: pointer; transition: background 0.2s;
-    }
-    .vd-back-btn:hover { background: var(--panel2); border-color: #555; }
-    .vd-back-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
-
-    .vd-breadcrumb {
-        display: flex; align-items: center; gap: 8px;
-        font-size: 13px; color: var(--muted);
-    }
-    .vd-breadcrumb a:hover { color: var(--orange); }
-    .vd-breadcrumb span { font-size: 10px; }
-
-    .vd-layout {
+    .video-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 380px;
-        gap: 24px;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 28px;
         align-items: start;
     }
 
-    .vd-player-wrap {
-        position: relative; background: #000; border: 1px solid var(--line);
-        aspect-ratio: 16/9; display: flex; flex-direction: column;
-        overflow: hidden;
+    .main-video-column {
+        min-width: 0;
     }
-    
-    /* Added cursor pointer so users know they can click the video */
-    .vd-player-wrap video { 
-        width: 100%; height: 100%; object-fit: contain; 
+
+    /* NAVIGATION BUTTONS */
+    .video-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ss-muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        background: var(--ss-panel);
+        border: 1px solid var(--ss-border);
+        border-radius: 4px;
+        transition: 0.2s;
+    }
+
+    .nav-btn:hover {
+        color: #fff;
+        border-color: var(--ss-orange);
+    }
+
+    .video-player-wrapper {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid var(--ss-border);
+    }
+
+    .video-player-wrapper iframe,
+    .video-player-wrapper video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        object-fit: contain;
+        background: #000;
+    }
+
+    .video-player-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        min-height: 250px;
+        color: var(--ss-muted);
+        text-align: center;
+        padding: 25px;
+    }
+
+    .video-player-placeholder i {
+        font-size: 48px;
+        color: var(--ss-orange);
+        margin-bottom: 15px;
+    }
+
+    .video-heading {
+        margin-top: 22px;
+    }
+
+    .video-title {
+        font-size: 25px;
+        line-height: 1.35;
+        font-weight: 750;
+        margin: 0 0 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .video-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--ss-border);
+    }
+
+    .video-statistics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: var(--ss-muted);
+        font-size: 13px;
+    }
+
+    .video-statistics span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .video-statistics i {
+        color: var(--ss-orange);
+    }
+
+    .video-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .ss-action-btn {
+        border: 1px solid var(--ss-border);
+        background: var(--ss-panel-light);
+        color: var(--ss-text);
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: 650;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: .2s ease;
+    }
+
+    .ss-action-btn:hover {
+        border-color: var(--ss-orange);
+        color: var(--ss-orange);
+    }
+
+    .ss-action-btn.active {
+        color: var(--ss-orange);
+        border-color: var(--ss-orange);
+    }
+
+    .creator-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--ss-border);
+    }
+
+    .creator-info {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-width: 0;
+    }
+
+    .creator-avatar {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        background: #242424;
+        border: 1px solid var(--ss-border);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ss-orange);
+        font-size: 20px;
+    }
+
+    .creator-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .creator-name {
+        font-weight: 750;
+        font-size: 14px;
+        color: #fff;
+        overflow-wrap: anywhere;
+    }
+
+    .creator-followers {
+        color: var(--ss-muted);
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .follow-btn {
+        border: 0;
+        background: var(--ss-orange);
+        color: #111;
+        padding: 11px 18px;
+        font-weight: 750;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .follow-btn:hover {
+        background: #ff9233;
+        color: #111;
+    }
+
+    .follow-btn.following {
+        background: #292929;
+        color: #fff;
+        border: 1px solid #444;
+    }
+
+    .video-description-box {
+        background: var(--ss-panel);
+        border: 1px solid var(--ss-border);
+        padding: 18px;
+        margin-top: 20px;
+    }
+
+    .description-top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 12px;
+        font-size: 12px;
+        color: var(--ss-muted);
+    }
+
+    .video-description {
+        color: #c7c7c7;
+        font-size: 14px;
+        line-height: 1.8;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    .premium-label {
+        display: inline-block;
+        background: rgba(255, 121, 0, .13);
+        color: var(--ss-orange);
+        border: 1px solid rgba(255, 121, 0, .35);
+        padding: 5px 9px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+    }
+
+    .comments-section {
+        margin-top: 32px;
+    }
+
+    .section-heading {
+        font-size: 18px;
+        font-weight: 750;
+        margin: 0 0 20px;
+    }
+
+    .comment-form {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .comment-form textarea {
+        flex: 1;
+        min-width: 0;
+        min-height: 75px;
+        resize: vertical;
+        background: var(--ss-panel);
+        color: #fff;
+        border: 1px solid var(--ss-border);
+        padding: 13px;
+        outline: none;
+        font-family: inherit;
+    }
+
+    .comment-form textarea:focus {
+        border-color: var(--ss-orange);
+    }
+
+    .comment-submit {
+        align-self: flex-end;
+        border: 0;
+        background: var(--ss-orange);
+        color: #111;
+        font-weight: 750;
+        padding: 12px 18px;
         cursor: pointer;
     }
 
-    .vd-badge-hd {
-        position: absolute; top: 16px; left: 16px;
-        background: var(--orange); color: #111;
-        padding: 4px 8px; font-size: 11px; font-weight: 800;
-        z-index: 10;
+    .comment-item {
+        display: flex;
+        gap: 12px;
+        padding: 17px 0;
+        border-bottom: 1px solid var(--ss-border);
     }
 
-    .vd-controls {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-        padding: 20px 16px 12px;
-        display: flex; flex-direction: column; gap: 12px;
-        z-index: 10; opacity: 0; transition: opacity 0.3s;
-    }
-    .vd-player-wrap:hover .vd-controls { opacity: 1; }
-
-    .vd-progress-bar {
-        width: 100%; height: 4px; background: rgba(255,255,255,0.2);
-        position: relative; cursor: pointer;
-    }
-    .vd-progress-fill {
-        position: absolute; left: 0; top: 0; bottom: 0;
-        background: var(--orange); width: 0%;
-    }
-    .vd-progress-fill::after {
-        content: ''; position: absolute; right: -6px; top: -4px;
-        width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    .comment-avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        background: #252525;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ss-orange);
+        overflow: hidden;
     }
 
-    .vd-controls-row {
-        display: flex; align-items: center; justify-content: space-between; color: #fff;
+    .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-    .vd-controls-left, .vd-controls-right { display: flex; align-items: center; gap: 16px; }
-    .vd-controls button {
-        background: transparent; border: none; color: #fff; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        padding: 0; opacity: 0.8; transition: opacity 0.2s;
-    }
-    .vd-controls button:hover { opacity: 1; }
-    .vd-controls svg { width: 20px; height: 20px; fill: currentColor; }
-    .vd-time { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-    .vd-up-next-overlay {
-        position: absolute; inset: 0; background: rgba(0,0,0,0.85);
-        display: none; flex-direction: column; align-items: center; justify-content: center;
-        z-index: 50; text-align: center; padding: 20px;
+    .comment-content {
+        flex: 1;
+        min-width: 0;
     }
-    .vd-up-next-overlay.is-active { display: flex; }
-    .vd-up-next-overlay h2 { margin: 0 0 16px; font-size: 20px; font-weight: 800; color: #fff; }
-    .vd-up-next-card {
-        display: flex; gap: 16px; background: var(--panel);
-        padding: 12px; border: 1px solid var(--line); max-width: 400px; width: 100%;
-        margin-bottom: 20px; text-align: left;
+
+    .comment-author {
+        font-size: 13px;
+        font-weight: 750;
+        color: #fff;
     }
-    .vd-up-next-card img { width: 140px; aspect-ratio: 16/9; object-fit: cover; }
-    .vd-up-next-info { display: flex; flex-direction: column; justify-content: center; }
-    .vd-up-next-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .vd-up-next-channel { font-size: 12px; color: var(--muted); }
-    .vd-up-next-actions { display: flex; gap: 12px; }
-    .vd-up-next-actions button { padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
-    .vd-btn-cancel { background: transparent; color: #fff; border: 1px solid var(--line) !important; }
-    .vd-btn-play-next { background: var(--orange); color: #111; }
 
-    .vd-info-section { margin-top: 20px; }
-    .vd-title { margin: 0 0 12px; font-size: 24px; font-weight: 800; line-height: 1.3; }
-
-    .vd-meta-row {
-        display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
-        color: var(--muted); font-size: 13px; margin-bottom: 20px;
+    .comment-date {
+        font-size: 11px;
+        color: var(--ss-muted);
+        margin-left: 7px;
+        font-weight: 400;
     }
-    .vd-meta-item { display: flex; align-items: center; gap: 6px; }
-    .vd-meta-item svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-    .vd-actions-row {
-        display: flex; justify-content: space-between; align-items: center;
-        flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+    .comment-text {
+        margin-top: 7px;
+        color: #c5c5c5;
+        font-size: 13px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
     }
-    .vd-actions-left { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-    .vd-btn {
-        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        padding: 10px 18px; background: var(--panel2); border: 1px solid var(--line);
-        color: var(--text); font-size: 13px; font-weight: 700;
-        cursor: pointer; transition: all 0.2s; text-decoration: none;
+    .comment-empty {
+        padding: 25px;
+        text-align: center;
+        background: var(--ss-panel);
+        color: var(--ss-muted);
+        font-size: 13px;
+    }
+
+    .sidebar-heading {
+        font-size: 16px;
+        font-weight: 750;
+        margin: 0 0 17px;
+    }
+
+    .related-video {
+        display: grid;
+        grid-template-columns: 145px minmax(0, 1fr);
+        gap: 12px;
+        margin-bottom: 17px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .related-thumbnail {
         position: relative;
-    }
-    .vd-btn:hover { background: #2a3039; border-color: #555; }
-    .vd-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
-    .vd-btn-active { color: var(--orange); border-color: var(--orange); }
-    .vd-btn-active svg { fill: var(--orange); stroke: none; }
-
-    .vd-btn-subscribe {
-        background: var(--orange); color: #111; border-color: var(--orange); padding: 10px 24px;
-    }
-    .vd-btn-subscribe:hover { background: var(--orange-hover); border-color: var(--orange-hover); }
-
-    .vd-share-menu {
-        position: absolute; top: 100%; left: 0; margin-top: 8px;
-        background: var(--panel); border: 1px solid var(--line);
-        min-width: 220px; display: none; flex-direction: column;
-        z-index: 20; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    .vd-share-menu.is-open { display: flex; }
-    .vd-share-item {
-        display: flex; align-items: center; gap: 12px;
-        padding: 12px 16px; font-size: 13px; color: var(--text);
-        background: transparent; border: none; text-align: left;
-        cursor: pointer; transition: background 0.2s; width: 100%;
-    }
-    .vd-share-item:hover { background: var(--panel2); }
-    .vd-share-item svg { width: 18px; height: 18px; fill: currentColor; }
-    .vd-share-item.copied { color: #8be4bb; }
-
-    .vd-channel-bar {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-        margin-bottom: 24px;
-    }
-    .vd-channel-info { display: flex; align-items: center; gap: 14px; }
-    .vd-channel-avatar {
-        width: 48px; height: 48px; border-radius: 50%; background: #252a32;
-        overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        font-weight: 800; color: var(--orange);
-    }
-    .vd-channel-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .vd-channel-name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .vd-channel-subs { color: var(--muted); font-size: 13px; }
-
-    .vd-box {
-        background: var(--panel); border: 1px solid var(--line);
-        padding: 20px; margin-bottom: 24px;
-    }
-    .vd-box h3 { margin: 0 0 12px; font-size: 16px; font-weight: 800; }
-    .vd-box p { margin: 0; font-size: 14px; line-height: 1.6; color: #d1d5db; }
-
-    .vd-comments-header {
-        display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .vd-comments-header h3 { margin: 0; }
-
-    .vd-comment-form { display: flex; gap: 16px; margin-bottom: 32px; }
-    .vd-avatar-small {
-        width: 40px; height: 40px; border-radius: 50%; background: #252a32;
-        flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        font-weight: 800; color: var(--orange); overflow: hidden;
-    }
-    .vd-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
-
-    .vd-comment-input-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; }
-    .vd-comment-input {
-        width: 100%; padding: 12px; background: transparent;
-        border: 1px solid var(--line); color: var(--text);
-        font-size: 14px; resize: vertical; min-height: 48px; outline: none;
-    }
-    .vd-comment-input:focus { border-bottom-color: var(--orange); }
-    .vd-comment-submit-row { display: flex; justify-content: flex-end; }
-    .vd-btn-post {
-        background: var(--orange); color: #111; border-color: var(--orange);
-        padding: 8px 20px; font-weight: 800;
-    }
-    .vd-btn-post:hover { background: var(--orange-hover); }
-
-    .vd-no-comments { text-align: center; padding: 40px 0; color: var(--muted); }
-    .vd-no-comments svg { width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 1.5; margin-bottom: 16px; }
-    .vd-no-comments h4 { margin: 0 0 8px; font-size: 16px; color: var(--text); }
-    .vd-no-comments p { margin: 0; font-size: 13px; }
-
-    .vd-sidebar { background: var(--panel); border: 1px solid var(--line); }
-    .vd-sidebar-header {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 20px; border-bottom: 1px solid var(--line);
-    }
-    .vd-sidebar-header h2 { margin: 0; font-size: 18px; font-weight: 800; }
-    .vd-sidebar-header a { color: var(--orange); font-size: 12px; font-weight: 600; }
-
-    .vd-sidebar-list { display: flex; flex-direction: column; }
-    .vd-sidebar-item {
-        display: flex; gap: 12px; padding: 12px 20px;
-        transition: background 0.2s; border-bottom: 1px solid var(--line);
-    }
-    .vd-sidebar-item:last-child { border-bottom: none; }
-    .vd-sidebar-item:hover { background: var(--panel2); }
-
-    .vd-sidebar-thumb {
-        width: 140px; aspect-ratio: 16/9; background: #000;
-        position: relative; flex-shrink: 0; overflow: hidden;
-    }
-    .vd-sidebar-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .vd-sidebar-duration {
-        position: absolute; bottom: 4px; right: 4px;
-        background: rgba(0,0,0,0.8); color: #fff;
-        padding: 2px 4px; font-size: 10px; font-weight: 700;
+        aspect-ratio: 16 / 9;
+        background: #202020;
+        overflow: hidden;
     }
 
-    .vd-sidebar-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-    .vd-sidebar-title {
-        margin: 0 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    .related-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform .25s ease;
     }
-    .vd-sidebar-channel { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-    .vd-sidebar-meta { font-size: 11px; color: var(--muted); }
 
-    @media (max-width: 1024px) {
-        .vd-layout { grid-template-columns: 1fr; }
-        .vd-sidebar { margin-top: 24px; }
+    .related-video:hover .related-thumbnail img {
+        transform: scale(1.05);
     }
-    @media (max-width: 600px) {
-        .vd-page { padding: 12px; }
-        .vd-title { font-size: 20px; }
-        .vd-actions-row { flex-direction: column; align-items: flex-start; }
-        .vd-btn-subscribe { width: 100%; }
-        .vd-sidebar-thumb { width: 120px; }
-        .vd-top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+    .related-duration {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: rgba(0, 0, 0, .85);
+        color: #fff;
+        font-size: 10px;
+        padding: 3px 5px;
+    }
+
+    .related-title {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.5;
+        color: #eee;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .related-video:hover .related-title {
+        color: var(--ss-orange);
+    }
+
+    .related-meta {
+        color: var(--ss-muted);
+        font-size: 10px;
+        line-height: 1.7;
+        margin-top: 7px;
+    }
+
+    .purchase-panel {
+        margin-top: 20px;
+        padding: 20px;
+        background: var(--ss-panel);
+        border: 1px solid var(--ss-border);
+    }
+
+    .purchase-panel h3 {
+        font-size: 16px;
+        margin: 0 0 8px;
+    }
+
+    .purchase-panel p {
+        color: var(--ss-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .purchase-price {
+        color: var(--ss-orange);
+        font-size: 24px;
+        font-weight: 800;
+        margin: 14px 0;
+    }
+
+    .purchase-btn {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        text-align: center;
+        background: var(--ss-orange);
+        color: #111;
+        font-weight: 800;
+        text-decoration: none;
+        border: 0;
+        cursor: pointer;
+    }
+
+    .purchase-btn:hover {
+        background: #ff9233;
+        color: #111;
+    }
+
+    .owner-label {
+        color: var(--ss-orange);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* UP NEXT MODAL OVERLAY */
+    .up-next-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+    }
+    .up-next-overlay.active {
+        display: flex;
+    }
+    .up-next-overlay h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    .up-next-overlay p {
+        color: #aaa;
+        margin-bottom: 20px;
+    }
+    .up-next-overlay .countdown-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid var(--ss-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0 auto 20px;
+    }
+    .up-next-overlay .up-next-actions {
+        display: flex;
+        gap: 15px;
+    }
+    .up-next-overlay button, .up-next-overlay a {
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+    }
+    .up-next-overlay .btn-cancel {
+        background: transparent;
+        border: 1px solid #555;
+        color: #ccc;
+    }
+    .up-next-overlay .btn-play {
+        background: var(--ss-orange);
+        border: none;
+        color: #000;
+    }
+
+    @media (max-width: 1050px) {
+        .video-layout {
+            grid-template-columns: minmax(0, 1fr) 290px;
+            gap: 20px;
+        }
+        .related-video {
+            grid-template-columns: 115px minmax(0, 1fr);
+        }
+    }
+
+    @media (max-width: 800px) {
+        .video-detail-page {
+            padding: 14px;
+        }
+        .video-layout {
+            grid-template-columns: 1fr;
+        }
+        .related-sidebar {
+            margin-top: 15px;
+        }
+        .video-title {
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .video-detail-page {
+            padding: 8px;
+        }
+        .video-title {
+            font-size: 18px;
+        }
+        .video-meta-row {
+            align-items: flex-start;
+        }
+        .video-actions {
+            width: 100%;
+        }
+        .ss-action-btn {
+            padding: 9px 11px;
+            font-size: 11px;
+        }
+        .creator-row {
+            align-items: flex-start;
+        }
+        .comment-form {
+            flex-direction: column;
+        }
+        .comment-submit {
+            align-self: flex-start;
+        }
+        .related-video {
+            grid-template-columns: 125px minmax(0, 1fr);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="vd-page">
+<div class="video-detail-page">
 
-    <div class="vd-top-bar">
-        <button class="vd-back-btn" onclick="handleBackButton()">
-            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            Back
-        </button>
+    <div class="video-layout">
 
-        <nav class="vd-breadcrumb">
-            <a href="{% url 'home' %}">Home</a> <span>&rsaquo;</span>
-            <a href="{% url 'videos:list' %}">Videos</a> <span>&rsaquo;</span>
-            <span style="color: var(--text);">{{ video.title }}</span>
-        </nav>
-    </div>
+        <!-- MAIN VIDEO COLUMN -->
+        <main class="main-video-column">
 
-    <div class="vd-layout">
-        <main>
-            <div class="vd-player-wrap">
-                <span class="vd-badge-hd">HD</span>
-                <video id="mainVideo" poster="{% if video.thumbnail_url %}{{ video.thumbnail_url }}{% elif video.thumbnail %}{{ video.thumbnail.url }}{% endif %}">
-                    <source src="{{ video.video_file }}" type="video/mp4">
-                </video>
-                
-                <div class="vd-up-next-overlay" id="upNextOverlay">
-                    <h2>Up Next in <span id="countdownTimer">3</span>s</h2>
-                    <div class="vd-up-next-card">
-                        <img id="upNextThumb" src="" alt="Up next thumbnail">
-                        <div class="vd-up-next-info">
-                            <div class="vd-up-next-title" id="upNextTitle"></div>
-                            <div class="vd-up-next-channel" id="upNextChannel"></div>
+            <!-- BACK / NEXT BUTTONS -->
+            <div class="video-nav">
+                <a href="javascript:history.back()" class="nav-btn">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                {% if related_videos %}
+                    <a href="{% url 'videos:detail' related_videos.0.id %}" class="nav-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="video-player-wrapper" id="videoPlayerWrapper">
+
+                {% if can_watch %}
+
+                    {% if video.source == "bunny" and bunny_embed_url %}
+                        <iframe
+                            id="mainVideoPlayer"
+                            src="{{ bunny_embed_url }}{% if request.GET.autoplay == '1' %}?autoplay=true{% endif %}"
+                            title="{{ video.title }}"
+                            loading="lazy"
+                            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                            allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin">
+                        </iframe>
+                    {% elif video.source == "youtube" and video.youtube_video_id %}
+                        <iframe
+                            id="mainVideoPlayer"
+                            src="https://www.youtube-nocookie.com/embed/{{ video.youtube_video_id }}?enablejsapi=1&origin={{ request.scheme }}://{{ request.get_host }}{% if request.GET.autoplay == '1' %}&autoplay=1{% endif %}"
+                            title="{{ video.title }}"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
+                    {% elif video.video_file %}
+                        <video
+                            id="mainVideoPlayer"
+                            controls
+                            playsinline
+                            preload="metadata"
+                            {% if request.GET.autoplay == '1' %}autoplay{% endif %}
+                            poster="{{ video.thumbnail_url|default:'' }}">
+                            <source src="{{ video.video_file }}" type="video/mp4">
+                            Your browser does not support HTML5 video.
+                        </video>
+                    {% else %}
+                        <div class="video-player-placeholder">
+                            <i class="fas fa-video"></i>
+                            <h3>Video unavailable</h3>
+                            <p>This video does not currently have a playable video source.</p>
                         </div>
+                    {% endif %}
+
+                    <!-- UP NEXT OVERLAY -->
+                    {% if related_videos %}
+                        <div class="up-next-overlay" id="upNextOverlay">
+                            <h3>Up Next</h3>
+                            <p>{{ related_videos.0.title }}</p>
+                            <div class="countdown-circle" id="upNextCountdown">3</div>
+                            <div class="up-next-actions">
+                                <button class="btn-cancel" id="cancelUpNextBtn">Cancel</button>
+                                <a href="{% url 'videos:detail' related_videos.0.id %}?autoplay=1" class="btn-play">Play Now</a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+
+                    <div class="video-player-placeholder">
+                        <i class="fas fa-lock"></i>
+                        <h3>Premium video</h3>
+                        <p>Purchase this video to unlock playback.</p>
                     </div>
-                    <div class="vd-up-next-actions">
-                        <button class="vd-btn-cancel" id="cancelNextBtn">Cancel</button>
-                        <button class="vd-btn-play-next" id="playNextBtn">Play Now</button>
+
+                {% endif %}
+
+            </div>
+
+            <!-- VIDEO TITLE -->
+            <div class="video-heading">
+
+                {% if video.is_premium %}
+                    <span class="premium-label">
+                        <i class="fas fa-crown"></i> Premium
+                    </span>
+                {% endif %}
+
+                <h1 class="video-title">{{ video.title }}</h1>
+
+                <div class="video-meta-row">
+
+                    <div class="video-statistics">
+                        <span>
+                            <i class="fas fa-eye"></i>
+                            <span id="viewCount">{{ video.views|default:0 }}</span> views
+                        </span>
+
+                        <span>
+                            <i class="far fa-calendar"></i>
+                            {{ video.created_at|date:"M d, Y" }}
+                        </span>
+
+                        {% if video.duration %}
+                            <span>
+                                <i class="far fa-clock"></i>
+                                {{ video.duration }}
+                            </span>
+                        {% endif %}
                     </div>
-                </div>
 
-                <div class="vd-controls" id="videoControls">
-                    <div class="vd-progress-bar" id="progressBar"><div class="vd-progress-fill" id="progressFill"></div></div>
-                    <div class="vd-controls-row">
-                        <div class="vd-controls-left">
-                            <button id="playPauseBtn" aria-label="Play/Pause">
-                                <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                            </button>
-                            
-                            <button id="nextBtn" aria-label="Next Video" title="Next Video">
-                                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    <div class="video-actions">
+
+                        {% if user.is_authenticated %}
+
+                            <button type="button"
+                                    id="likeBtn"
+                                    data-url="{% url 'videos:toggle_like' video.id %}"
+                                    class="ss-action-btn {% if liked %}active{% endif %}">
+                                <i class="{% if liked %}fas{% else %}far{% endif %} fa-heart" id="likeIcon"></i>
+                                <span id="likeText">Like</span>
+                                <span id="likeCount" style="margin-left: 4px;">({{ like_count }})</span>
                             </button>
 
-                            <span class="vd-time" id="timeDisplay">0:00 / 0:00</span>
-                        </div>
-                        <div class="vd-controls-right">
-                            <button id="muteBtn" aria-label="Mute">
-                                <svg id="volumeIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                                <svg id="muteIcon" viewBox="0 0 24 24" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                            </button>
-                            <button id="fullscreenBtn" aria-label="Fullscreen">
-                                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                            </button>
-                        </div>
+                        {% else %}
+
+                            <a href="{% url 'account_login' %}" class="ss-action-btn">
+                                <i class="far fa-heart"></i> Like ({{ like_count }})
+                            </a>
+
+                        {% endif %}
+
+                        <button type="button"
+                                class="ss-action-btn"
+                                onclick="shareVideo()">
+                            <i class="fas fa-share-alt"></i>
+                            Share
+                        </button>
+
                     </div>
                 </div>
             </div>
 
-            <div class="vd-info-section">
-                <h1 class="vd-title">{{ video.title }}</h1>
-                <div class="vd-meta-row">
-                    <span class="vd-meta-item">{{ video.get_category_display|default:"Video" }}</span>
-                    <span class="vd-meta-item">{{ video.duration|default:"0:00" }}</span>
-                    <span class="vd-meta-item">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        {{ video.views|default:"0" }} views
-                    </span>
-                    <span class="vd-meta-item">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        {{ video.created_at|date:"M j, Y" }}
-                    </span>
-                </div>
+            <!-- CREATOR INFORMATION -->
+            <div class="creator-row">
 
-                <div class="vd-actions-row">
-                    <div class="vd-actions-left">
-                        <button class="vd-btn {% if liked %}vd-btn-active{% endif %}" id="likeBtn" data-url="{% url 'videos:toggle_like' video.pk %}">
-                            <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-                            <span id="likeCount">{{ like_count }}</span>
-                        </button>
+                <div class="creator-info">
 
-                        <a href="#comments" class="vd-btn">
-                            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                            <span id="commentCount">{{ comment_count }}</span> Comments
-                        </a>
-
-                        <div style="position: relative;">
-                            <button class="vd-btn" id="shareBtn" type="button">
-                                <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                                Share
-                            </button>
-                            <div class="vd-share-menu" id="shareMenu">
-                                <button class="vd-share-item" id="copyLinkBtn">
-                                    <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                                    Copy Link
-                                </button>
-                                <button class="vd-share-item" id="shareEmailBtn">
-                                    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                    Email
-                                </button>
-                                <button class="vd-share-item" id="shareTwitterBtn">
-                                    <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
-                                    X (Twitter)
-                                </button>
-                                <button class="vd-share-item" id="shareFacebookBtn">
-                                    <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                                    Facebook
-                                </button>
-                                <button class="vd-share-item" id="shareWhatsAppBtn">
-                                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                                    WhatsApp
-                                </button>
-                                <button class="vd-share-item" id="nativeShareBtn" style="display:none;">
-                                    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                                    More Options...
-                                </button>
-                            </div>
-                        </div>
-
-                        <a href="{% url 'videos:download' video.pk %}" class="vd-btn">
-                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                            Download
-                        </a>
+                    <div class="creator-avatar">
+                        {% if video.creator.profile.avatar_image %}
+                            <img src="{{ video.creator.profile.avatar_image.url }}"
+                                 alt="{{ video.creator.username }}">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
                     </div>
 
                     <div>
-                        {% if request.user != video.creator %}
-                            <button 
-                                class="vd-btn {% if following_creator %}vd-btn-subscribed{% else %}vd-btn-subscribe{% endif %}" 
-                                id="followBtn" 
-                                data-url="{% url 'accounts:toggle_follow' video.creator.username %}"
-                                style="{% if following_creator %}background: transparent; color: var(--text); border-color: var(--line);{% endif %}"
-                            >
-                                <svg viewBox="0 0 24 24" id="followIcon">
-                                    {% if following_creator %}
-                                        <path d="M20 6L9 17l-5-5"/>
-                                    {% else %}
-                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                    {% endif %}
-                                </svg>
-                                <span id="followBtnText">{% if following_creator %}Subscribed{% else %}Subscribe{% endif %}</span>
+                        <div class="creator-name">
+                            {{ video.creator.get_full_name|default:video.creator.username }}
+                        </div>
+
+                        <div class="creator-followers">
+                            {{ follower_count|default:0 }} followers
+                        </div>
+                    </div>
+
+                </div>
+
+                <div>
+                    {% if user.is_authenticated and user == video.creator %}
+                        <span class="owner-label">Your video</span>
+
+                    {% elif user.is_authenticated and following_creator %}
+                        <form method="POST" action="{% url 'accounts:toggle_follow' video.creator.id %}" class="follow-form">
+                            {% csrf_token %}
+                            <button type="submit" class="follow-btn following">
+                                Following
                             </button>
-                        {% endif %}
-                    </div>
-                </div>
+                        </form>
 
-                <div class="vd-channel-bar">
-                    <div class="vd-channel-info">
-                        <a href="{% url 'creators:profile' video.creator.username %}" class="vd-channel-avatar">
-                            {% if video.creator.profile.avatar_image %}
-                                <img src="{{ video.creator.profile.avatar_image.url }}" alt="">
-                            {% else %}
-                                {{ video.creator.username|first|upper }}
-                            {% endif %}
+                    {% elif user.is_authenticated %}
+                        <form method="POST" action="{% url 'accounts:toggle_follow' video.creator.id %}" class="follow-form">
+                            {% csrf_token %}
+                            <button type="submit" class="follow-btn">
+                                Follow
+                            </button>
+                        </form>
+
+                    {% else %}
+                        <a href="{% url 'account_login' %}" class="follow-btn">
+                            Follow
                         </a>
-                        <div>
-                            <a href="{% url 'creators:profile' video.creator.username %}" class="vd-channel-name">
-                                {{ video.creator.get_full_name|default:video.creator.username }} 
-                                <span class="vd-verified" style="color: var(--muted);">&#10003;</span>
-                            </a>
-                            <div class="vd-channel-subs"><span id="subCount">{{ follower_count }}</span> subscribers</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="vd-box">
-                    <h3>About this video</h3>
-                    <p>{{ video.description|default:"No description provided."|linebreaksbr }}</p>
-                </div>
-
-                <div class="vd-box" id="comments">
-                    <div class="vd-comments-header">
-                        <h3>Comments (<span id="commentCountHeader">{{ comment_count }}</span>)</h3>
-                    </div>
-
-                    {% if request.user.is_authenticated %}
-                    <form class="vd-comment-form" id="commentForm" data-url="{% url 'videos:add_comment' video.pk %}">
-                        {% csrf_token %}
-                        <div class="vd-avatar-small">
-                            {% if request.user.profile.avatar_image %}
-                                <img src="{{ request.user.profile.avatar_image.url }}" alt="">
-                            {% else %}
-                                {{ request.user.username|first|upper }}
-                            {% endif %}
-                        </div>
-                        <div class="vd-comment-input-wrap">
-                            <input type="text" name="text" id="commentInput" class="vd-comment-input" placeholder="Add a comment..." required>
-                            <div class="vd-comment-submit-row">
-                                <button type="submit" class="vd-btn vd-btn-post" id="postCommentBtn">Post comment</button>
-                            </div>
-                        </div>
-                    </form>
                     {% endif %}
-
-                    <div id="commentsList">
-                        {% for comment in comments %}
-                            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-                                <div class="vd-avatar-small">
-                                    {% if comment.user.profile.avatar_image %}
-                                        <img src="{{ comment.user.profile.avatar_image.url }}" alt="">
-                                    {% else %}
-                                        {{ comment.user.username|first|upper }}
-                                    {% endif %}
-                                </div>
-                                <div style="flex: 1;">
-                                    <div style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">
-                                        @{{ comment.user.username }}
-                                        <span style="color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 11px;">{{ comment.created_at|timesince }} ago</span>
-                                    </div>
-                                    <div style="font-size: 14px; line-height: 1.5; color: #d1d5db;">{{ comment.text }}</div>
-                                </div>
-                            </div>
-                        {% empty %}
-                            <div class="vd-no-comments" id="noCommentsState">
-                                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                                <h4>No comments yet</h4>
-                                <p>Be the first to share your thoughts!</p>
-                            </div>
-                        {% endfor %}
-                    </div>
                 </div>
+
             </div>
+
+            <!-- VIDEO DESCRIPTION -->
+            <div class="video-description-box">
+
+                <div class="description-top">
+                    <span>{{ video.views|default:0 }} views</span>
+                    <span>{{ video.created_at|date:"F d, Y" }}</span>
+                </div>
+
+                <div class="video-description">
+                    {% if video.description %}
+                        {{ video.description }}
+                    {% else %}
+                        <span style="color:#777;">No description provided.</span>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- COMMENTS -->
+            <section class="comments-section">
+
+                <h2 class="section-heading">
+                    Comments <span id="commentCount">({{ comment_count|default:0 }})</span>
+                </h2>
+
+                {% if user.is_authenticated %}
+
+                    <form method="POST"
+                          action="{% url 'videos:add_comment' video.id %}"
+                          class="comment-form"
+                          id="commentForm">
+                        {% csrf_token %}
+
+                        <textarea name="content"
+                                  id="commentText"
+                                  placeholder="Write a comment..."
+                                  required></textarea>
+
+                        <button type="submit" class="comment-submit" id="commentSubmitBtn">
+                            Comment
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <p style="color:#999;font-size:13px;margin-bottom:20px;">
+                        <a href="{% url 'account_login' %}" style="color:#ff7900;">
+                            Sign in
+                        </a>
+                        to join the conversation.
+                    </p>
+
+                {% endif %}
+
+                <div id="commentsContainer">
+                    {% for comment in comments %}
+
+                        <div class="comment-item" id="comment-{{ comment.id }}">
+
+                            <div class="comment-avatar">
+                                {% if comment.user.profile.avatar_image %}
+                                    <img src="{{ comment.user.profile.avatar_image.url }}"
+                                         alt="{{ comment.user.username }}">
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+
+                            <div class="comment-content">
+
+                                <div class="comment-author">
+                                    {{ comment.user.get_full_name|default:comment.user.username }}
+
+                                    <span class="comment-date">
+                                        {{ comment.created_at|timesince }} ago
+                                    </span>
+                                </div>
+
+                                <div class="comment-text">
+                                    {{ comment.text }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% empty %}
+
+                        <div class="comment-empty" id="noCommentsMsg">
+                            <i class="far fa-comment-dots"
+                               style="font-size:25px;margin-bottom:10px;"></i>
+                            <p>No comments yet. Be the first to comment.</p>
+                        </div>
+
+                    {% endfor %}
+                </div>
+
+            </section>
+
         </main>
 
-        <aside class="vd-sidebar">
-            <div class="vd-sidebar-header">
-                <h2>More videos</h2>
-                <a href="{% url 'videos:list' %}">View all &rarr;</a>
-            </div>
-            <div class="vd-sidebar-list" id="relatedVideosList">
-                {% for related in related_videos %}
-                    <a href="{% url 'videos:detail' related.pk %}" class="vd-sidebar-item" 
-                       data-video-url="{% url 'videos:detail' related.pk %}"
-                       data-video-title="{{ related.title|escapejs }}"
-                       data-video-channel="{{ related.creator.get_full_name|default:related.creator.username|escapejs }}"
-                       data-video-thumb="{% if related.thumbnail_url %}{{ related.thumbnail_url }}{% elif related.thumbnail %}{{ related.thumbnail.url }}{% endif %}">
-                        <div class="vd-sidebar-thumb">
-                            {% if related.thumbnail_url %}<img src="{{ related.thumbnail_url }}" alt="">
-                            {% elif related.thumbnail %}<img src="{{ related.thumbnail.url }}" alt="">
-                            {% else %}<div style="width:100%;height:100%;background:#111;"></div>{% endif %}
-                            {% if related.duration %}<span class="vd-sidebar-duration">{{ related.duration }}</span>{% endif %}
+        <!-- RELATED VIDEOS SIDEBAR -->
+        <aside class="related-sidebar">
+
+            <h2 class="sidebar-heading">Up next</h2>
+
+            {% for related in related_videos %}
+
+                <a href="{% url 'videos:detail' related.id %}"
+                   class="related-video">
+
+                    <div class="related-thumbnail">
+
+                        {% if related.thumbnail_url %}
+                            <img src="{{ related.thumbnail_url }}"
+                                 alt="{{ related.title }}"
+                                 loading="lazy">
+                        {% elif related.custom_thumbnail %}
+                            <img src="{{ related.custom_thumbnail }}"
+                                 alt="{{ related.title }}"
+                                 loading="lazy">
+                        {% else %}
+                            <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#ff7900;">
+                                <i class="fas fa-play-circle fa-2x"></i>
+                            </div>
+                        {% endif %}
+
+                        {% if related.duration %}
+                            <span class="related-duration">
+                                {{ related.duration }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+                        <div class="related-title">
+                            {{ related.title }}
                         </div>
-                        <div class="vd-sidebar-info">
-                            <h3 class="vd-sidebar-title">{{ related.title }}</h3>
-                            <div class="vd-sidebar-channel">{{ related.creator.get_full_name|default:related.creator.username }}</div>
-                            <div class="vd-sidebar-meta">{{ related.views }} views &bull; {{ related.created_at|timesince }} ago</div>
+
+                        <div class="related-meta">
+                            {{ related.creator.username }}<br>
+                            {{ related.views|default:0 }} views
                         </div>
-                    </a>
-                {% endfor %}
-            </div>
+                    </div>
+
+                </a>
+
+            {% empty %}
+
+                <p style="font-size:13px;color:#888;">
+                    No related videos available.
+                </p>
+
+            {% endfor %}
+
+            <!-- PREMIUM PURCHASE PANEL -->
+            {% if video.is_premium and not can_watch %}
+
+                <div class="purchase-panel">
+
+                    <h3>
+                        <i class="fas fa-lock" style="color:#ff7900;"></i>
+                        Unlock this video
+                    </h3>
+
+                    <p>
+                        Purchase this video to get full access and watch it anytime.
+                    </p>
+
+                    <div class="purchase-price">
+                        KSh {{ video.price }}
+                    </div>
+
+                    {% if user.is_authenticated %}
+
+                        <form method="POST"
+                              action="{% url 'videos:purchase' video.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="purchase-btn">
+                                Purchase video
+                            </button>
+                        </form>
+
+                    {% else %}
+
+                        <a href="{% url 'account_login' %}" class="purchase-btn">
+                            Sign in to purchase
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
         </aside>
+
     </div>
 </div>
 
+<!-- Pass dynamic JS variables securely -->
+{{ related_videos.0.id|json_script:"nextVideoId" }}
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-function handleBackButton() {
-    if (window.history.length > 2) {
-        window.history.back();
-    } else {
-        window.location.href = "{% url 'home' %}";
+// --- Global variables ---
+const videoSource = "{{ video.source }}";
+const nextVideoId = JSON.parse(document.getElementById('nextVideoId').textContent);
+
+// --- 1. LIKE BUTTON (AJAX) ---
+const likeBtn = document.getElementById('likeBtn');
+if (likeBtn) {
+    likeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = this.dataset.url;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const icon = document.getElementById('likeIcon');
+            const text = document.getElementById('likeText');
+            const countSpan = document.getElementById('likeCount');
+            
+            // Update Count
+            if (countSpan) countSpan.textContent = `(${data.count})`;
+
+            if (data.liked) {
+                likeBtn.classList.add('active');
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                text.textContent = 'Liked';
+            } else {
+                likeBtn.classList.remove('active');
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                text.textContent = 'Like';
+            }
+        })
+        .catch(err => console.error('Error liking video:', err));
+    });
+}
+
+// --- 2. COMMENT FORM (AJAX) ---
+const commentForm = document.getElementById('commentForm');
+if (commentForm) {
+    commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const submitBtn = document.getElementById('commentSubmitBtn');
+        const textarea = document.getElementById('commentText');
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Clear textarea
+                textarea.value = '';
+                
+                // Remove "No comments yet" if it exists
+                const emptyMsg = document.getElementById('noCommentsMsg');
+                if (emptyMsg) emptyMsg.remove();
+
+                // Create new comment HTML
+                const commentHtml = `
+                    <div class="comment-item" id="comment-${data.comment_id}">
+                        <div class="comment-avatar">
+                            ${data.avatar ? `<img src="${data.avatar}" alt="${data.username}">` : `<i class="fas fa-user"></i>`}
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-author">
+                                ${data.username}
+                                <span class="comment-date">Just now</span>
+                            </div>
+                            <div class="comment-text">${data.text}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Prepend to container
+                const container = document.getElementById('commentsContainer');
+                container.insertAdjacentHTML('afterbegin', commentHtml);
+
+                // Update count
+                const countSpan = document.getElementById('commentCount');
+                if (countSpan) countSpan.textContent = `(${data.comment_count})`;
+            }
+        })
+        .catch(err => console.error('Error posting comment:', err))
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Comment';
+        });
+    });
+}
+
+// --- 3. UP NEXT LOGIC ---
+let countdownTimer;
+let currentCountdown = 3;
+
+function startUpNext() {
+    const overlay = document.getElementById('upNextOverlay');
+    const countdownEl = document.getElementById('upNextCountdown');
+    
+    if (!overlay || !nextVideoId) return;
+
+    overlay.classList.add('active');
+    currentCountdown = 3;
+    countdownEl.textContent = currentCountdown;
+
+    countdownTimer = setInterval(() => {
+        currentCountdown--;
+        countdownEl.textContent = currentCountdown;
+
+        if (currentCountdown <= 0) {
+            clearInterval(countdownTimer);
+            window.location.href = `/videos/${nextVideoId}/?autoplay=1`;
+        }
+    }, 1000);
+}
+
+function cancelUpNext() {
+    const overlay = document.getElementById('upNextOverlay');
+    if (overlay) overlay.classList.remove('active');
+    clearInterval(countdownTimer);
+}
+
+// Bind cancel button
+const cancelBtn = document.getElementById('cancelUpNextBtn');
+if (cancelBtn) {
+    cancelBtn.addEventListener('click', cancelUpNext);
+}
+
+// A) HTML5 Video (Cloudinary)
+const html5Video = document.getElementById('mainVideoPlayer');
+if (videoSource === 'cloudinary' && html5Video && html5Video.tagName === 'VIDEO') {
+    html5Video.addEventListener('ended', startUpNext);
+}
+
+// B) YouTube API
+let ytPlayer;
+function onYouTubeIframeAPIReady() {
+    if (videoSource === 'youtube' && document.getElementById('mainVideoPlayer')) {
+        ytPlayer = new YT.Player('mainVideoPlayer', {
+            events: {
+                'onStateChange': function(event) {
+                    if (event.data === YT.PlayerState.ENDED) {
+                        startUpNext();
+                    }
+                }
+            }
+        });
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrfToken = getCookie('csrftoken');
-
-    const video = document.getElementById('mainVideo');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const playIcon = document.getElementById('playIcon');
-    const pauseIcon = document.getElementById('pauseIcon');
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    const timeDisplay = document.getElementById('timeDisplay');
-    const muteBtn = document.getElementById('muteBtn');
-    const volumeIcon = document.getElementById('volumeIcon');
-    const muteIcon = document.getElementById('muteIcon');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    const upNextOverlay = document.getElementById('upNextOverlay');
-    const countdownTimer = document.getElementById('countdownTimer');
-    const upNextThumb = document.getElementById('upNextThumb');
-    const upNextTitle = document.getElementById('upNextTitle');
-    const upNextChannel = document.getElementById('upNextChannel');
-    const cancelNextBtn = document.getElementById('cancelNextBtn');
-    const playNextBtn = document.getElementById('playNextBtn');
-
-    const firstRelatedItem = document.querySelector('#relatedVideosList .vd-sidebar-item');
-    let nextVideoUrl = null;
-    let countdownInterval = null;
-
-    if (firstRelatedItem) {
-        const baseUrl = firstRelatedItem.getAttribute('data-video-url');
-        nextVideoUrl = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'autoplay=1';
-        
-        upNextThumb.src = firstRelatedItem.getAttribute('data-video-thumb');
-        upNextTitle.textContent = firstRelatedItem.getAttribute('data-video-title');
-        upNextChannel.textContent = firstRelatedItem.getAttribute('data-video-channel');
-    }
-
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const m = Math.floor(seconds / 60);
-        const s = Math.floor(seconds % 60);
-        return m + ":" + (s < 10 ? "0" : "") + s;
-    }
-
-    // --- AUTOPLAY ON PAGE LOAD ---
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('autoplay') === '1' && video) {
-        video.play().catch(() => {
-            video.muted = true;
-            video.play().catch(e => console.log("Autoplay blocked:", e));
-        });
-    }
-
-    // --- PLAY/PAUSE CLICK ON VIDEO ITSELF ---
-    if (video) {
-        video.addEventListener('click', function(e) {
-            // Ensure we don't trigger if a control button was clicked
-            if (e.target.closest('#videoControls')) return;
-            
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
-    }
-
-    if(playPauseBtn) {
-        playPauseBtn.addEventListener('click', function() {
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
-    }
-
-    if(video) {
-        video.addEventListener('play', function() {
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-        });
-        video.addEventListener('pause', function() {
-            playIcon.style.display = 'block';
-            pauseIcon.style.display = 'none';
-        });
-
-        video.addEventListener('timeupdate', function() {
-            if (video.duration) {
-                const percent = (video.currentTime / video.duration) * 100;
-                progressFill.style.width = percent + '%';
-                timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
-            }
-        });
-
-        video.addEventListener('ended', function() {
-            if (!nextVideoUrl) return;
-            upNextOverlay.classList.add('is-active');
-            let timeLeft = 3;
-            countdownTimer.textContent = timeLeft;
-
-            countdownInterval = setInterval(() => {
-                timeLeft -= 1;
-                countdownTimer.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = nextVideoUrl;
-                }
-            }, 1000);
-        });
-    }
-
-    if (cancelNextBtn) {
-        cancelNextBtn.addEventListener('click', function() {
-            clearInterval(countdownInterval);
-            upNextOverlay.classList.remove('is-active');
-        });
-    }
-    if (playNextBtn) {
-        playNextBtn.addEventListener('click', function() {
-            clearInterval(countdownInterval);
-            window.location.href = nextVideoUrl;
-        });
-    }
-
-    if(nextBtn) {
-        nextBtn.addEventListener('click', function() {
-            if (nextVideoUrl) {
-                window.location.href = nextVideoUrl;
-            } else {
-                alert("No more videos available to play next.");
-            }
-        });
-    }
-
-    if(progressBar) {
-        progressBar.addEventListener('click', function(e) {
-            const rect = progressBar.getBoundingClientRect();
-            const pos = (e.clientX - rect.left) / rect.width;
-            video.currentTime = pos * video.duration;
-        });
-    }
+// C) Bunny Stream API (Fallback via postMessage)
+window.addEventListener('message', function(event) {
+    if (videoSource !== 'bunny') return;
     
-    if(muteBtn) {
-        muteBtn.addEventListener('click', function() {
-            video.muted = !video.muted;
-            volumeIcon.style.display = video.muted ? 'none' : 'block';
-            muteIcon.style.display = video.muted ? 'block' : 'none';
-        });
+    try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'ended' || data.type === 'ended') {
+            startUpNext();
+        }
+    } catch (e) {
+        // Not a JSON message, ignore
     }
-    if(fullscreenBtn) {
-        fullscreenBtn.addEventListener('click', function() {
-            if (video.requestFullscreen) { video.requestFullscreen(); }
-        });
-    }
+});
 
-    // --- AJAX LIKE ---
-    const likeBtn = document.getElementById('likeBtn');
-    if (likeBtn) {
-        likeBtn.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                likeBtn.classList.toggle('vd-btn-active', data.liked);
-                document.getElementById('likeCount').textContent = data.count;
-            });
-        });
-    }
 
-    // --- AJAX FOLLOW / SUBSCRIBE ---
-    const followBtn = document.getElementById('followBtn');
-    if (followBtn) {
-        followBtn.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                const btn = document.getElementById('followBtn');
-                const txt = document.getElementById('followBtnText');
-                const icon = document.getElementById('followIcon');
-                const subCount = document.getElementById('subCount');
-
-                if (data.following) {
-                    btn.classList.remove('vd-btn-subscribe');
-                    btn.style.background = 'transparent';
-                    btn.style.color = 'var(--text)';
-                    btn.style.borderColor = 'var(--line)';
-                    txt.textContent = 'Subscribed';
-                    icon.innerHTML = '<path d="M20 6L9 17l-5-5"/>';
-                } else {
-                    btn.classList.add('vd-btn-subscribe');
-                    btn.style.background = 'var(--orange)';
-                    btn.style.color = '#111';
-                    btn.style.borderColor = 'var(--orange)';
-                    txt.textContent = 'Subscribe';
-                    icon.innerHTML = '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>';
-                }
-                subCount.textContent = data.count;
-            });
-        });
-    }
-
-    // --- AJAX COMMENT ---
-    const commentForm = document.getElementById('commentForm');
-    if (commentForm) {
-        commentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const url = this.getAttribute('data-url');
-            const input = document.getElementById('commentInput');
-            const postBtn = document.getElementById('postCommentBtn');
-            const text = input.value.trim();
-            if (!text) return;
-
-            postBtn.disabled = true;
-            postBtn.textContent = 'Posting...';
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({ text: text })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const noComments = document.getElementById('noCommentsState');
-                    if (noComments) noComments.remove();
-
-                    const avatarHTML = data.avatar ? `<img src="${data.avatar}" alt="">` : data.username.charAt(0).toUpperCase();
-                    const newCommentHTML = `
-                        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-                            <div class="vd-avatar-small">${avatarHTML}</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 700; margin-bottom: 4px;">
-                                    @${data.username}
-                                    <span style="color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 11px;">Just now</span>
-                                </div>
-                                <div style="font-size: 14px; line-height: 1.5; color: #d1d5db;">${data.text}</div>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('commentsList').insertAdjacentHTML('afterbegin', newCommentHTML);
-                    document.getElementById('commentCount').textContent = data.comment_count;
-                    document.getElementById('commentCountHeader').textContent = data.comment_count;
-                    input.value = '';
-                } else {
-                    alert(data.error || 'Something went wrong.');
-                }
-            })
-            .finally(() => {
-                postBtn.disabled = false;
-                postBtn.textContent = 'Post comment';
-            });
-        });
-    }
-
-    // --- SHARE MENU ---
-    const shareBtn = document.getElementById('shareBtn');
-    const shareMenu = document.getElementById('shareMenu');
-    const currentUrl = window.location.href;
-    const shareTitle = "{{ video.title|escapejs }}";
+// --- 4. SHARE LOGIC ---
+function shareVideo() {
+    const shareData = {
+        title: document.title,
+        text: "{{ video.title|escapejs }}",
+        url: window.location.href
+    };
 
     if (navigator.share) {
-        document.getElementById('nativeShareBtn').style.display = 'flex';
-    }
-
-    if (shareBtn) {
-        shareBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            shareMenu.classList.toggle('is-open');
+        navigator.share(shareData).catch(function(error) {
+            console.log("Sharing cancelled or unavailable:", error);
         });
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href)
+            .then(function() {
+                alert("Video link copied!");
+            })
+            .catch(function() {
+                prompt("Copy this video link:", window.location.href);
+            });
+    } else {
+        prompt("Copy this video link:", window.location.href);
     }
-    document.addEventListener('click', function() {
-        if (shareMenu) shareMenu.classList.remove('is-open');
-    });
-
-    document.getElementById('copyLinkBtn').addEventListener('click', function() {
-        navigator.clipboard.writeText(currentUrl).then(() => {
-            this.classList.add('copied');
-            const original = this.innerHTML;
-            this.innerHTML = this.innerHTML.replace('Copy Link', 'Copied!');
-            setTimeout(() => { this.innerHTML = original; this.classList.remove('copied'); }, 2000);
-        });
-    });
-
-    document.getElementById('shareEmailBtn').addEventListener('click', function() {
-        window.location.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent('Check out this video: ' + currentUrl)}`;
-    });
-
-    document.getElementById('shareTwitterBtn').addEventListener('click', function() {
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(currentUrl)}`, '_blank');
-    });
-
-    document.getElementById('shareFacebookBtn').addEventListener('click', function() {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
-    });
-
-    document.getElementById('shareWhatsAppBtn').addEventListener('click', function() {
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareTitle + ' ' + currentUrl)}`, '_blank');
-    });
-
-    document.getElementById('nativeShareBtn').addEventListener('click', function() {
-        if (navigator.share) {
-            navigator.share({ title: shareTitle, url: currentUrl });
-        }
-    });
-});
+}
 </script>
 {% endblock %}
