@@ -1,0 +1,99 @@
+
+<div class="catalog-grid">
+
+    {% for title in results %}
+
+        <a
+            href="{% url 'catalog:detail' title.media_type title.id %}"
+            class="catalog-card"
+        >
+
+            <!-- POSTER -->
+            <div class="catalog-poster">
+
+                {% if title.poster_url %}
+
+                    <img
+                        src="{{ title.poster_url }}"
+                        alt="{{ title.display_title }}"
+                        loading="lazy"
+                    >
+
+                {% else %}
+
+                    <div class="catalog-poster-placeholder">
+                        Poster unavailable
+                    </div>
+
+                {% endif %}
+
+                <!-- MEDIA TYPE -->
+                <span class="catalog-type">
+                    {% if title.media_type == 'tv' %}
+                        TV SERIES
+                    {% else %}
+                        MOVIE
+                    {% endif %}
+                </span>
+
+                <!-- RATING -->
+                {% if title.vote_average %}
+                    <span class="catalog-rating">
+                        {{ title.vote_average|floatformat:1 }} / 10
+                    </span>
+                {% endif %}
+
+            </div>
+
+
+            <!-- TITLE INFORMATION -->
+            <div class="catalog-card-info">
+
+                <h3 title="{{ title.display_title }}">
+                    {{ title.display_title }}
+                </h3>
+
+                <div class="catalog-card-meta">
+
+                    <span>
+                        {{ title.display_date|default:"Date unavailable"|slice:":4" }}
+                    </span>
+
+                    <span>
+                        {% if title.media_type == 'tv' %}
+                            SERIES
+                        {% else %}
+                            FILM
+                        {% endif %}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    {% empty %}
+
+        <!-- EMPTY SEARCH RESULTS -->
+        <div class="catalog-empty">
+
+            <h3>No titles found</h3>
+
+            <p>
+                We couldn't find any movies or TV series matching your search.
+                Try another title or check your spelling.
+            </p>
+
+            <a
+                href="?type={{ category }}"
+                style="display:inline-block; margin-top:20px; padding:11px 20px; border:1px solid #343a3e; color:#ff7900; font-size:11px; font-weight:700; text-decoration:none;"
+            >
+                Browse titles
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+</div>

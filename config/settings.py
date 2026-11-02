@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "earnings",
     "chat",
     "moderation",
+    "catalog",
 ]
 
 
@@ -321,10 +322,21 @@ BUNNY_STREAM_LIBRARY_ID = os.environ.get(
 BUNNY_STREAM_API_KEY = os.environ.get(
     "BUNNY_STREAM_API_KEY", ""
 )
+# Bunny Stream Configuration
+
+BUNNY_STREAM_CDN_HOST = os.environ.get(
+    "BUNNY_STREAM_CDN_HOST", ""
+)
+
+BUNNY_STREAM_TOKEN_KEY = os.environ.get(
+    "BUNNY_STREAM_TOKEN_KEY", ""
+)
 
 
+TMDB_ACCESS_TOKEN = os.environ.get("TMDB_ACCESS_TOKEN", "")
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY", "")
 XVIDEOS_SEARCH_ENABLED = os.getenv(
-    "XVIDEOS_SEARCH_ENABLED", "False"
+    "XVIDEOS_SEARCH_ENABLED", "True"
 ).lower() == "true"
 
 XVIDEOS_SEARCH_API_URL = os.getenv(

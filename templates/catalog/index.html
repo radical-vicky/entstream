@@ -1,0 +1,777 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Movies & TV | EnStreamVideos{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================
+   ENSTREAMVIDEOS - MOVIES & TV CATALOG
+========================================= */
+
+.catalog-page {
+    --catalog-bg: #0b0d0e;
+    --catalog-panel: #111416;
+    --catalog-panel-light: #171b1e;
+    --catalog-border: #252a2e;
+    --catalog-muted: #858d93;
+    --catalog-orange: #ff7900;
+    color: #f1f3f4;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--catalog-bg);
+    padding: 30px 32px 55px;
+}
+
+.catalog-inner {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* HERO */
+
+.catalog-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    min-height: 205px;
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 85% 40%, rgba(255,121,0,.19), transparent 40%),
+        linear-gradient(110deg, #191b1d 0%, #111416 55%, #17130f 100%);
+    border: 1px solid #292c2e;
+}
+
+.catalog-hero::after {
+    content: "";
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    right: 5%;
+    top: -170px;
+    border: 1px solid rgba(255,121,0,.12);
+    transform: rotate(35deg);
+    pointer-events: none;
+}
+
+.catalog-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 650px;
+}
+
+.catalog-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    color: var(--catalog-orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+}
+
+.catalog-eyebrow::before {
+    content: "";
+    width: 23px;
+    height: 2px;
+    background: var(--catalog-orange);
+}
+
+.catalog-hero h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1.8px;
+}
+
+.catalog-hero h1 span {
+    color: var(--catalog-orange);
+}
+
+.catalog-hero p {
+    margin: 13px 0 0;
+    color: #9ba1a5;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.catalog-hero-mark {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 115px;
+    height: 115px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,121,0,.3);
+    background: rgba(255,121,0,.06);
+}
+
+.catalog-hero-mark span {
+    color: var(--catalog-orange);
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -4px;
+}
+
+/* TOOLBAR */
+
+.catalog-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.catalog-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--catalog-border);
+    background: #101315;
+}
+
+.catalog-tab {
+    display: block;
+    padding: 11px 21px;
+    color: #92999e;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.catalog-tab:hover {
+    color: #fff;
+    background: #1a1e20;
+}
+
+.catalog-tab.active {
+    color: #111;
+    background: var(--catalog-orange);
+}
+
+.catalog-search {
+    display: flex;
+    width: min(470px, 100%);
+    min-height: 44px;
+    border: 1px solid #30363a;
+    background: #111416;
+}
+
+.catalog-search input {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding: 0 15px;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font-size: 12px;
+}
+
+.catalog-search input::placeholder {
+    color: #697177;
+}
+
+.catalog-search:focus-within {
+    border-color: var(--catalog-orange);
+}
+
+.catalog-search button {
+    flex-shrink: 0;
+    padding: 0 22px;
+    color: #111;
+    background: var(--catalog-orange);
+    border: 0;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.catalog-search button:hover {
+    background: #ff9133;
+}
+
+/* SEARCH INFORMATION */
+
+.catalog-search-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: -7px 0 28px;
+    color: var(--catalog-muted);
+    font-size: 12px;
+}
+
+.catalog-search-info strong {
+    color: #fff;
+}
+
+.catalog-search-info a {
+    color: var(--catalog-orange);
+    text-decoration: none;
+}
+
+/* COLLECTION */
+
+.catalog-section {
+    margin-bottom: 43px;
+}
+
+.catalog-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 19px;
+}
+
+.catalog-heading-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.catalog-heading-accent {
+    width: 3px;
+    height: 28px;
+    background: var(--catalog-orange);
+}
+
+.catalog-section-heading h2 {
+    margin: 0;
+    color: #f5f5f5;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+}
+
+.catalog-section-heading p {
+    margin: 4px 0 0;
+    color: #747d82;
+    font-size: 10px;
+}
+
+.catalog-count {
+    color: #747d82;
+    font-size: 11px;
+}
+
+/* POSTER GRID */
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 26px 17px;
+}
+
+.catalog-card {
+    display: block;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.catalog-poster {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: #15191b;
+    border: 1px solid #292e31;
+}
+
+.catalog-poster img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease, opacity .3s ease;
+}
+
+.catalog-card:hover .catalog-poster img {
+    transform: scale(1.055);
+    opacity: .88;
+}
+
+.catalog-poster::after {
+    content: "";
+    position: absolute;
+    inset: 35% 0 0;
+    background: linear-gradient(transparent, rgba(0,0,0,.62));
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.catalog-card:hover .catalog-poster::after {
+    opacity: 1;
+}
+
+.catalog-type {
+    position: absolute;
+    z-index: 2;
+    top: 9px;
+    left: 9px;
+    padding: 5px 7px;
+    color: #fff;
+    background: rgba(0,0,0,.82);
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .8px;
+}
+
+.catalog-rating {
+    position: absolute;
+    z-index: 2;
+    right: 9px;
+    bottom: 9px;
+    padding: 6px 8px;
+    color: #ffad58;
+    background: rgba(0,0,0,.88);
+    border: 1px solid rgba(255,255,255,.12);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.catalog-poster-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    color: #70797e;
+    text-align: center;
+    font-size: 11px;
+}
+
+.catalog-card-info {
+    padding-top: 11px;
+}
+
+.catalog-card-info h3 {
+    margin: 0;
+    overflow: hidden;
+    color: #e6e9eb;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color .2s ease;
+}
+
+.catalog-card:hover .catalog-card-info h3 {
+    color: var(--catalog-orange);
+}
+
+.catalog-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 5px;
+    color: #747d82;
+    font-size: 10px;
+}
+
+.catalog-card-meta span:last-child {
+    color: #92999e;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+/* EMPTY STATE */
+
+.catalog-empty {
+    grid-column: 1 / -1;
+    padding: 65px 20px;
+    text-align: center;
+    background: #111416;
+    border: 1px solid var(--catalog-border);
+}
+
+.catalog-empty h3 {
+    margin: 0;
+    color: #f1f3f4;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.catalog-empty p {
+    margin: 9px 0 0;
+    color: #81898e;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* FOOTER */
+
+.catalog-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding-top: 22px;
+    margin-top: 48px;
+    border-top: 1px solid #22272a;
+    color: #737c81;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.catalog-footer strong {
+    color: #a5aaad;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1250px) {
+    .catalog-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1000px) {
+    .catalog-page {
+        padding: 25px 22px 45px;
+    }
+
+    .catalog-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .catalog-page {
+        padding: 20px 14px 35px;
+    }
+
+    .catalog-hero {
+        min-height: 175px;
+        padding: 25px 21px;
+    }
+
+    .catalog-hero-mark {
+        width: 65px;
+        height: 65px;
+    }
+
+    .catalog-hero-mark span {
+        font-size: 26px;
+    }
+
+    .catalog-hero h1 {
+        font-size: 31px;
+    }
+
+    .catalog-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .catalog-tabs {
+        width: 100%;
+    }
+
+    .catalog-tab {
+        flex: 1;
+        text-align: center;
+    }
+
+    .catalog-search {
+        width: 100%;
+    }
+
+    .catalog-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px 11px;
+    }
+
+    .catalog-section-heading h2 {
+        font-size: 16px;
+    }
+
+    .catalog-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 390px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .catalog-hero-mark {
+        display: none;
+    }
+
+    .catalog-search button {
+        padding: 0 14px;
+    }
+}
+</style>
+
+
+<div class="catalog-page">
+<div class="catalog-inner">
+
+    <!-- CINEMATIC HEADER -->
+    <header class="catalog-hero">
+
+        <div class="catalog-hero-content">
+
+            <div class="catalog-eyebrow">
+                Your entertainment destination
+            </div>
+
+            <h1>
+                Movies <span>&</span> TV
+            </h1>
+
+            <p>
+                Discover the latest movies, explore incredible TV series
+                and find something worth watching.
+            </p>
+
+        </div>
+
+        <div class="catalog-hero-mark" aria-hidden="true">
+            <span>EN</span>
+        </div>
+
+    </header>
+
+
+    <!-- CATEGORY NAVIGATION AND SEARCH -->
+    <div class="catalog-toolbar">
+
+        <nav class="catalog-tabs" aria-label="Catalog category">
+
+            <a href="?type=movie"
+               class="catalog-tab {% if category == 'movie' %}active{% endif %}">
+                Movies
+            </a>
+
+            <a href="?type=tv"
+               class="catalog-tab {% if category == 'tv' %}active{% endif %}">
+                TV Series
+            </a>
+
+        </nav>
+
+
+        <form method="get" class="catalog-search">
+
+            <input type="hidden" name="type" value="{{ category }}">
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query|default:'' }}"
+                placeholder="Search movies and TV series..."
+                aria-label="Search movies and TV series"
+            >
+
+            <button type="submit">SEARCH</button>
+
+        </form>
+
+    </div>
+
+
+    {% if searching and query %}
+        <div class="catalog-search-info">
+            <span>
+                Results for <strong>"{{ query }}"</strong>
+            </span>
+
+            <a href="?type={{ category }}">Clear search</a>
+        </div>
+    {% endif %}
+
+
+    <!-- SEARCH RESULTS -->
+    {% if searching %}
+
+        <section class="catalog-section">
+
+            <div class="catalog-section-heading">
+
+                <div class="catalog-heading-left">
+                    <span class="catalog-heading-accent"></span>
+
+                    <div>
+                        <h2>Search results</h2>
+                        <p>Titles matching your search</p>
+                    </div>
+                </div>
+
+            </div>
+
+            {% include "catalog/includes/title_grid.html" %}
+
+        </section>
+
+
+    {% else %}
+
+        <!-- DISCOVERY COLLECTIONS -->
+        {% for section in collections %}
+
+            <section class="catalog-section">
+
+                <div class="catalog-section-heading">
+
+                    <div class="catalog-heading-left">
+
+                        <span class="catalog-heading-accent"></span>
+
+                        <div>
+                            <h2>{{ section.title }}</h2>
+                            <p>Explore our entertainment collection</p>
+                        </div>
+
+                    </div>
+
+                    <span class="catalog-count">
+                        {{ section.items|length }} TITLES
+                    </span>
+
+                </div>
+
+
+                <div class="catalog-grid">
+
+                    {% for title in section.items %}
+
+                        <a href="{% url 'catalog:detail' title.media_type title.id %}"
+                           class="catalog-card">
+
+                            <div class="catalog-poster">
+
+                                {% if title.poster_url %}
+
+                                    <img
+                                        src="{{ title.poster_url }}"
+                                        alt="{{ title.display_title }}"
+                                        loading="lazy"
+                                    >
+
+                                {% else %}
+
+                                    <div class="catalog-poster-placeholder">
+                                        Poster unavailable
+                                    </div>
+
+                                {% endif %}
+
+
+                                <span class="catalog-type">
+                                    {% if title.media_type == 'tv' %}
+                                        TV SERIES
+                                    {% else %}
+                                        MOVIE
+                                    {% endif %}
+                                </span>
+
+
+                                {% if title.vote_average %}
+                                    <span class="catalog-rating">
+                                        {{ title.vote_average|floatformat:1 }} / 10
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="catalog-card-info">
+
+                                <h3 title="{{ title.display_title }}">
+                                    {{ title.display_title }}
+                                </h3>
+
+                                <div class="catalog-card-meta">
+
+                                    <span>
+                                        {{ title.display_date|default:"Date unavailable"|slice:":4" }}
+                                    </span>
+
+                                    <span>
+                                        {% if title.media_type == 'tv' %}
+                                            SERIES
+                                        {% else %}
+                                            FILM
+                                        {% endif %}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    {% empty %}
+
+                        <div class="catalog-empty">
+                            <h3>No titles available</h3>
+                            <p>This collection does not have any titles to display yet.</p>
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+        {% empty %}
+
+            <div class="catalog-empty">
+                <h3>Your entertainment library is empty</h3>
+                <p>Movies and television collections will appear here when available.</p>
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- TMDB ATTRIBUTION -->
+    <footer class="catalog-footer">
+
+        <span>
+            Movie and television metadata provided by TMDB.
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+        </span>
+
+        <strong>EnStreamVideos</strong>
+
+    </footer>
+
+</div>
+</div>
+
+{% endblock %}
