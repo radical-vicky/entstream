@@ -1,0 +1,112 @@
+
+{% extends "base.html" %}
+
+{% block title %}Premium Access Required | EnStreamVideos{% endblock %}
+
+{% block content %}
+<style>
+    .access-page {
+        width: min(620px, calc(100% - 32px));
+        margin: 90px auto;
+        padding: 42px 30px;
+        text-align: center;
+        background: #101112;
+        border: 1px solid #292929;
+        color: #f4f4f5;
+    }
+
+    .access-mark {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 22px;
+        border: 1px solid #713b1c;
+        color: #fb923c;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .access-page h1 {
+        font-size: 25px;
+        margin: 0 0 12px;
+    }
+
+    .access-page p {
+        color: #a1a1aa;
+        font-size: 13px;
+        line-height: 1.8;
+        margin: 0 auto 24px;
+        max-width: 440px;
+    }
+
+    .access-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .access-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 19px;
+        background: #f97316;
+        color: #111;
+        font-weight: 750;
+        font-size: 12px;
+        text-decoration: none;
+        border: 1px solid #f97316;
+    }
+
+    .access-button:hover { background: #fb923c; }
+
+    .access-secondary {
+        background: transparent;
+        color: #ddd;
+        border-color: #383838;
+    }
+</style>
+
+<div class="access-page">
+    <div class="access-mark">E</div>
+
+    {% if requires_login %}
+        <h1>Sign in to continue</h1>
+        <p>
+            Sign in to your EnStreamVideos account to check your
+            subscription and access this premium title.
+        </p>
+
+        <div class="access-actions">
+            <a href="{% url 'account_login' %}" class="access-button">
+                Sign in
+            </a>
+
+            <a href="{% url 'catalog:detail' title.media_type title.tmdb_id %}"
+               class="access-button access-secondary">
+                Back to title
+            </a>
+        </div>
+    {% else %}
+        <h1>Premium subscription required</h1>
+        <p>
+            {{ title.title }} is available to premium subscribers.
+            Your account does not currently have an active subscription.
+            Choose a subscription plan to unlock this content.
+        </p>
+
+        <div class="access-actions">
+            <a href="{% url 'subscriptions:plans' %}" class="access-button">
+                View subscription plans
+            </a>
+
+            <a href="{% url 'catalog:detail' title.media_type title.tmdb_id %}"
+               class="access-button access-secondary">
+                Back to title
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -12,9 +12,9 @@
 
     <meta name="theme-color" content="#090b0e">
 
-    <title>{% block title %}EnStreamVideos | Watch. Create. Earn.{% endblock %}</title>
+    <title>{% block title %}EntstreamVideos | Watch. Create. Earn.{% endblock %}</title>
 
-<meta name="description" content="{% block meta_description %}Discover videos, follow creators, watch live streams and build your audience on EnStreamVideos.{% endblock %}">
+<meta name="description" content="{% block meta_description %}Discover videos, follow creators, watch live streams and build your audience on EntstreamVideos.{% endblock %}">
 
 <link rel="icon" type="image/png" href="{% static 'images/enstreamvideos-logo.jpg' %}">
 
@@ -2410,7 +2410,7 @@
 
         }
 
-        /* EnStreamVideos brand logo */
+        /* EntstreamVideos brand logo */
 
 .ss-brand {
 
@@ -2534,13 +2534,13 @@
 
         </button>
 
-        <a class="ss-brand" href="/" aria-label="EnStreamVideos home">
+        <a class="ss-brand" href="/" aria-label="EntstreamVideos home">
 
     <img
 
         src="{% static 'images/enstreamvideos-logo.jpg' %}"
 
-        alt="EnStreamVideos — Watch. Create. Earn."
+        alt="EntstreamVideos — Watch. Create. Earn."
 
     >
 
@@ -2785,11 +2785,7 @@
 
                 {% if user.is_staff %}
 
-                    <a href="/moderation/" class="ss-side-link">
-
-                        <span class="ss-side-link-label">Moderation</span>
-
-                    </a>
+                    
 
                     <a href="/admin/" class="ss-side-link">
 
@@ -2825,7 +2821,7 @@
 
                             <strong>{{ user.get_full_name|default:user.username }}</strong>
 
-                            <span>StreamSphere member</span>
+                            <span>Entstream member</span>
 
                         </div>
 
@@ -2879,7 +2875,7 @@
 
                 <footer class="ss-footer">
 
-                    <span>Copyright {% now "Y" %} StreamSphere</span>
+                    <span>Copyright {% now "Y" %} Entstream</span>
 
                     <nav class="ss-footer-links" aria-label="Footer">
 

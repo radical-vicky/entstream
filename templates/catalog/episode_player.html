@@ -1,0 +1,181 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ episode.title }} — {{ title.title }} | EnStreamVideos{% endblock %}
+
+{% block content %}
+<style>
+    .episode-page {
+        width: min(1440px, calc(100% - 40px));
+        margin: 34px auto 70px;
+        color: #f4f4f5;
+    }
+
+    .episode-back {
+        display: inline-flex;
+        gap: 9px;
+        color: #a1a1aa;
+        text-decoration: none;
+        font-size: 13px;
+        margin-bottom: 22px;
+    }
+
+    .episode-back:hover { color: #f97316; }
+
+    .episode-heading { margin-bottom: 18px; }
+
+    .episode-label {
+        color: #fb923c;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .episode-heading h1 {
+        font-size: clamp(22px, 3vw, 32px);
+        font-weight: 750;
+        letter-spacing: -1px;
+        margin: 7px 0;
+    }
+
+    .episode-heading p {
+        color: #92929b;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .episode-player {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border: 1px solid #292929;
+        overflow: hidden;
+    }
+
+    .episode-player iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    .episode-description {
+        color: #a1a1aa;
+        font-size: 13px;
+        line-height: 1.8;
+        padding: 18px 0;
+        border-bottom: 1px solid #252525;
+    }
+
+    .episode-navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .episode-nav-link {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 12px 15px;
+        border: 1px solid #303030;
+        color: #f4f4f5;
+        text-decoration: none;
+        min-width: 150px;
+        transition: border-color .2s;
+    }
+
+    .episode-nav-link:hover { border-color: #f97316; }
+
+    .episode-nav-link small {
+        color: #92929b;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+    }
+
+    .episode-nav-link strong { font-size: 12px; }
+
+    .episode-next { text-align: right; }
+
+    @media (max-width: 640px) {
+        .episode-page {
+            width: calc(100% - 24px);
+            margin-top: 22px;
+        }
+
+        .episode-navigation { gap: 8px; }
+
+        .episode-nav-link {
+            min-width: 0;
+            flex: 1;
+            padding: 11px;
+        }
+    }
+</style>
+
+<div class="episode-page">
+    <a
+        href="{% url 'catalog:detail' 'tv' title.tmdb_id %}"
+        class="episode-back">
+        <span aria-hidden="true">←</span>
+        Back to {{ title.title }}
+    </a>
+
+    <div class="episode-heading">
+        <div class="episode-label">
+            Season {{ episode.season.season_number }}
+            · Episode {{ episode.episode_number }}
+        </div>
+
+        <h1>{{ episode.title }}</h1>
+        <p>{{ title.title }}</p>
+    </div>
+
+    <div class="episode-player">
+        <iframe
+            src="{{ embed_url }}"
+            loading="eager"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+            allowfullscreen
+            referrerpolicy="origin"
+            title="{{ episode.title }} video player">
+        </iframe>
+    </div>
+
+    {% if episode.overview %}
+        <div class="episode-description">
+            {{ episode.overview }}
+        </div>
+    {% endif %}
+
+    <div class="episode-navigation">
+        <div>
+            {% if previous_episode %}
+                <a
+                    href="{% url 'catalog:episode_player' previous_episode.pk %}"
+                    class="episode-nav-link">
+                    <small>Previous episode</small>
+                    <strong>{{ previous_episode.title }}</strong>
+                </a>
+            {% endif %}
+        </div>
+
+        <div>
+            {% if next_episode %}
+                <a
+                    href="{% url 'catalog:episode_player' next_episode.pk %}"
+                    class="episode-nav-link episode-next">
+                    <small>Next episode</small>
+                    <strong>{{ next_episode.title }}</strong>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

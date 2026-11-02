@@ -1,0 +1,67 @@
+
+{% extends "base.html" %}
+
+{% block title %}Video Unavailable | EnStreamVideos{% endblock %}
+
+{% block content %}
+<style>
+    .unavailable-page {
+        width: min(620px, calc(100% - 32px));
+        margin: 90px auto;
+        padding: 42px 30px;
+        text-align: center;
+        background: #101112;
+        border: 1px solid #292929;
+        color: #f4f4f5;
+    }
+
+    .unavailable-mark {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 22px;
+        border: 1px solid #713b1c;
+        color: #fb923c;
+        font-size: 23px;
+    }
+
+    .unavailable-page h1 {
+        font-size: 24px;
+        margin: 0 0 12px;
+    }
+
+    .unavailable-page p {
+        color: #a1a1aa;
+        font-size: 13px;
+        line-height: 1.8;
+        margin: 0 auto 24px;
+        max-width: 440px;
+    }
+
+    .unavailable-button {
+        display: inline-flex;
+        padding: 12px 19px;
+        background: #f97316;
+        color: #111;
+        font-weight: 750;
+        font-size: 12px;
+        text-decoration: none;
+    }
+</style>
+
+<div class="unavailable-page">
+    <div class="unavailable-mark">!</div>
+
+    <h1>Video temporarily unavailable</h1>
+
+    <p>
+        {{ title }} is listed in our catalog, but its video is not
+        currently ready to stream. Please check back later.
+    </p>
+
+    <a href="{% url 'catalog:home' %}" class="unavailable-button">
+        Back to movies and series
+    </a>
+</div>
+{% endblock %}
