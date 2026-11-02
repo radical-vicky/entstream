@@ -52,7 +52,6 @@ djangorestframework>=3.15
 # DEPLOYMENT
 # ============================================================
 gunicorn>=21.2
-unofficial-api-for-xvideos==2.5.2
+unofficial-api-for-xvideos
 xvideos_api==2.2.2
-eaf-base-api==2.5.4
-
+eaf-base-api
