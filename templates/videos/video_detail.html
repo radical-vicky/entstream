@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -34,7 +35,8 @@
         min-width: 0;
     }
 
-    /* NAVIGATION BUTTONS */
+    /* VIDEO NAVIGATION */
+
     .video-nav {
         display: flex;
         justify-content: space-between;
@@ -49,17 +51,19 @@
         text-decoration: none;
         font-size: 13px;
         font-weight: 600;
-        padding: 6px 12px;
+        padding: 8px 12px;
         background: var(--ss-panel);
         border: 1px solid var(--ss-border);
-        border-radius: 4px;
-        transition: 0.2s;
+        border-radius: 0;
+        transition: .2s ease;
     }
 
     .nav-btn:hover {
         color: #fff;
         border-color: var(--ss-orange);
     }
+
+    /* VIDEO PLAYER */
 
     .video-player-wrapper {
         width: 100%;
@@ -97,6 +101,8 @@
         color: var(--ss-orange);
         margin-bottom: 15px;
     }
+
+    /* VIDEO HEADING */
 
     .video-heading {
         margin-top: 22px;
@@ -158,6 +164,7 @@
         align-items: center;
         gap: 8px;
         transition: .2s ease;
+        border-radius: 0;
     }
 
     .ss-action-btn:hover {
@@ -169,6 +176,8 @@
         color: var(--ss-orange);
         border-color: var(--ss-orange);
     }
+
+    /* CREATOR */
 
     .creator-row {
         display: flex;
@@ -229,6 +238,8 @@
         cursor: pointer;
         text-decoration: none;
         white-space: nowrap;
+        display: inline-block;
+        border-radius: 0;
     }
 
     .follow-btn:hover {
@@ -241,6 +252,8 @@
         color: #fff;
         border: 1px solid #444;
     }
+
+    /* DESCRIPTION */
 
     .video-description-box {
         background: var(--ss-panel);
@@ -276,7 +289,10 @@
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: .7px;
+        margin-bottom: 10px;
     }
+
+    /* COMMENTS */
 
     .comments-section {
         margin-top: 32px;
@@ -305,6 +321,7 @@
         padding: 13px;
         outline: none;
         font-family: inherit;
+        border-radius: 0;
     }
 
     .comment-form textarea:focus {
@@ -319,6 +336,12 @@
         font-weight: 750;
         padding: 12px 18px;
         cursor: pointer;
+        border-radius: 0;
+    }
+
+    .comment-submit:disabled {
+        opacity: .6;
+        cursor: not-allowed;
     }
 
     .comment-item {
@@ -379,6 +402,8 @@
         color: var(--ss-muted);
         font-size: 13px;
     }
+
+    /* RELATED VIDEOS */
 
     .sidebar-heading {
         font-size: 16px;
@@ -446,6 +471,8 @@
         margin-top: 7px;
     }
 
+    /* PURCHASE PANEL */
+
     .purchase-panel {
         margin-top: 20px;
         padding: 20px;
@@ -482,6 +509,7 @@
         text-decoration: none;
         border: 0;
         cursor: pointer;
+        border-radius: 0;
     }
 
     .purchase-btn:hover {
@@ -495,11 +523,12 @@
         font-weight: 700;
     }
 
-    /* UP NEXT MODAL OVERLAY */
+    /* UP NEXT OVERLAY */
+
     .up-next-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, 0.85);
+        background: rgba(0, 0, 0, .90);
         z-index: 10;
         display: none;
         flex-direction: column;
@@ -509,49 +538,70 @@
         text-align: center;
         padding: 20px;
     }
+
     .up-next-overlay.active {
         display: flex;
     }
+
     .up-next-overlay h3 {
-        font-size: 20px;
-        margin-bottom: 10px;
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 10px;
     }
+
     .up-next-overlay p {
         color: #aaa;
-        margin-bottom: 20px;
+        margin: 0 0 20px;
+        font-size: 14px;
     }
+
     .up-next-overlay .countdown-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        width: 65px;
+        height: 65px;
         border: 3px solid var(--ss-orange);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin: 0 auto 20px;
+        font-size: 25px;
+        font-weight: 800;
+        margin: 0 auto 22px;
+        border-radius: 0;
     }
-    .up-next-overlay .up-next-actions {
+
+    .up-next-actions {
         display: flex;
-        gap: 15px;
+        gap: 12px;
     }
-    .up-next-overlay button, .up-next-overlay a {
-        padding: 10px 20px;
-        border-radius: 4px;
+
+    .up-next-overlay button,
+    .up-next-overlay a {
+        padding: 11px 20px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 750;
         text-decoration: none;
+        border-radius: 0;
+        font-size: 12px;
     }
+
     .up-next-overlay .btn-cancel {
         background: transparent;
         border: 1px solid #555;
         color: #ccc;
     }
+
+    .up-next-overlay .btn-cancel:hover {
+        border-color: #fff;
+        color: #fff;
+    }
+
     .up-next-overlay .btn-play {
         background: var(--ss-orange);
-        border: none;
+        border: 1px solid var(--ss-orange);
         color: #000;
+    }
+
+    .up-next-overlay .btn-play:hover {
+        background: #ff9233;
     }
 
     @media (max-width: 1050px) {
@@ -559,6 +609,7 @@
             grid-template-columns: minmax(0, 1fr) 290px;
             gap: 20px;
         }
+
         .related-video {
             grid-template-columns: 115px minmax(0, 1fr);
         }
@@ -568,12 +619,15 @@
         .video-detail-page {
             padding: 14px;
         }
+
         .video-layout {
             grid-template-columns: 1fr;
         }
+
         .related-sidebar {
             margin-top: 15px;
         }
+
         .video-title {
             font-size: 20px;
         }
@@ -583,30 +637,42 @@
         .video-detail-page {
             padding: 8px;
         }
+
         .video-title {
             font-size: 18px;
         }
+
         .video-meta-row {
             align-items: flex-start;
         }
+
         .video-actions {
             width: 100%;
         }
+
         .ss-action-btn {
             padding: 9px 11px;
             font-size: 11px;
         }
+
         .creator-row {
             align-items: flex-start;
         }
+
         .comment-form {
             flex-direction: column;
         }
+
         .comment-submit {
             align-self: flex-start;
         }
+
         .related-video {
             grid-template-columns: 125px minmax(0, 1fr);
+        }
+
+        .up-next-overlay h3 {
+            font-size: 19px;
         }
     }
 </style>
@@ -620,42 +686,54 @@
         <!-- MAIN VIDEO COLUMN -->
         <main class="main-video-column">
 
-            <!-- BACK / NEXT BUTTONS -->
+            <!-- BACK / NEXT NAVIGATION -->
             <div class="video-nav">
+
                 <a href="javascript:history.back()" class="nav-btn">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-arrow-left"></i>
+                    Back
                 </a>
+
                 {% if related_videos %}
-                    <a href="{% url 'videos:detail' related_videos.0.id %}" class="nav-btn">
-                        Next <i class="fas fa-arrow-right"></i>
+                    <a href="{% url 'videos:detail' related_videos.0.id %}?autoplay=1"
+                       class="nav-btn">
+                        Next
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 {% endif %}
+
             </div>
 
+            <!-- VIDEO PLAYER -->
             <div class="video-player-wrapper" id="videoPlayerWrapper">
 
                 {% if can_watch %}
 
                     {% if video.source == "bunny" and bunny_embed_url %}
+
                         <iframe
                             id="mainVideoPlayer"
-                            src="{{ bunny_embed_url }}{% if request.GET.autoplay == '1' %}?autoplay=true{% endif %}"
+                            src="{{ bunny_embed_url }}{% if request.GET.autoplay == '1' %}&amp;autoplay=true{% endif %}"
                             title="{{ video.title }}"
                             loading="lazy"
                             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                             allowfullscreen
                             referrerpolicy="strict-origin-when-cross-origin">
                         </iframe>
+
                     {% elif video.source == "youtube" and video.youtube_video_id %}
+
                         <iframe
                             id="mainVideoPlayer"
-                            src="https://www.youtube-nocookie.com/embed/{{ video.youtube_video_id }}?enablejsapi=1&origin={{ request.scheme }}://{{ request.get_host }}{% if request.GET.autoplay == '1' %}&autoplay=1{% endif %}"
+                            src="https://www.youtube-nocookie.com/embed/{{ video.youtube_video_id }}?enablejsapi=1&amp;origin={{ request.scheme }}://{{ request.get_host }}{% if request.GET.autoplay == '1' %}&amp;autoplay=1{% endif %}"
                             title="{{ video.title }}"
                             loading="lazy"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen>
                         </iframe>
+
                     {% elif video.video_file %}
+
                         <video
                             id="mainVideoPlayer"
                             controls
@@ -663,28 +741,55 @@
                             preload="metadata"
                             {% if request.GET.autoplay == '1' %}autoplay{% endif %}
                             poster="{{ video.thumbnail_url|default:'' }}">
+
                             <source src="{{ video.video_file }}" type="video/mp4">
+
                             Your browser does not support HTML5 video.
+
                         </video>
+
                     {% else %}
+
                         <div class="video-player-placeholder">
                             <i class="fas fa-video"></i>
                             <h3>Video unavailable</h3>
                             <p>This video does not currently have a playable video source.</p>
                         </div>
+
                     {% endif %}
 
                     <!-- UP NEXT OVERLAY -->
                     {% if related_videos %}
+
                         <div class="up-next-overlay" id="upNextOverlay">
+
                             <h3>Up Next</h3>
-                            <p>{{ related_videos.0.title }}</p>
-                            <div class="countdown-circle" id="upNextCountdown">3</div>
-                            <div class="up-next-actions">
-                                <button class="btn-cancel" id="cancelUpNextBtn">Cancel</button>
-                                <a href="{% url 'videos:detail' related_videos.0.id %}?autoplay=1" class="btn-play">Play Now</a>
+
+                            <p>
+                                {{ related_videos.0.title }}
+                            </p>
+
+                            <div class="countdown-circle" id="upNextCountdown">
+                                5
                             </div>
+
+                            <div class="up-next-actions">
+
+                                <button type="button"
+                                        class="btn-cancel"
+                                        id="cancelUpNextBtn">
+                                    Cancel
+                                </button>
+
+                                <a href="{% url 'videos:detail' related_videos.0.id %}?autoplay=1"
+                                   class="btn-play">
+                                    Play Now
+                                </a>
+
+                            </div>
+
                         </div>
+
                     {% endif %}
 
                 {% else %}
@@ -704,18 +809,23 @@
 
                 {% if video.is_premium %}
                     <span class="premium-label">
-                        <i class="fas fa-crown"></i> Premium
+                        <i class="fas fa-crown"></i>
+                        Premium
                     </span>
                 {% endif %}
 
-                <h1 class="video-title">{{ video.title }}</h1>
+                <h1 class="video-title">
+                    {{ video.title }}
+                </h1>
 
                 <div class="video-meta-row">
 
                     <div class="video-statistics">
+
                         <span>
                             <i class="fas fa-eye"></i>
-                            <span id="viewCount">{{ video.views|default:0 }}</span> views
+                            <span id="viewCount">{{ video.views|default:0 }}</span>
+                            views
                         </span>
 
                         <span>
@@ -729,6 +839,7 @@
                                 {{ video.duration }}
                             </span>
                         {% endif %}
+
                     </div>
 
                     <div class="video-actions">
@@ -739,28 +850,40 @@
                                     id="likeBtn"
                                     data-url="{% url 'videos:toggle_like' video.id %}"
                                     class="ss-action-btn {% if liked %}active{% endif %}">
-                                <i class="{% if liked %}fas{% else %}far{% endif %} fa-heart" id="likeIcon"></i>
-                                <span id="likeText">Like</span>
-                                <span id="likeCount" style="margin-left: 4px;">({{ like_count }})</span>
+
+                                <i class="{% if liked %}fas{% else %}far{% endif %} fa-heart"
+                                   id="likeIcon"></i>
+
+                                <span id="likeText">
+                                    {% if liked %}Liked{% else %}Like{% endif %}
+                                </span>
+
+                                <span id="likeCount" style="margin-left: 4px;">
+                                    ({{ like_count }})
+                                </span>
+
                             </button>
 
                         {% else %}
 
                             <a href="{% url 'account_login' %}" class="ss-action-btn">
-                                <i class="far fa-heart"></i> Like ({{ like_count }})
+                                <i class="far fa-heart"></i>
+                                Like ({{ like_count }})
                             </a>
 
                         {% endif %}
 
                         <button type="button"
                                 class="ss-action-btn"
-                                onclick="shareVideo()">
+                                id="shareVideoBtn">
                             <i class="fas fa-share-alt"></i>
                             Share
                         </button>
 
                     </div>
+
                 </div>
+
             </div>
 
             <!-- CREATOR INFORMATION -->
@@ -769,15 +892,22 @@
                 <div class="creator-info">
 
                     <div class="creator-avatar">
+
                         {% if video.creator.profile.avatar_image %}
+
                             <img src="{{ video.creator.profile.avatar_image.url }}"
                                  alt="{{ video.creator.username }}">
+
                         {% else %}
+
                             <i class="fas fa-user"></i>
+
                         {% endif %}
+
                     </div>
 
                     <div>
+
                         <div class="creator-name">
                             {{ video.creator.get_full_name|default:video.creator.username }}
                         </div>
@@ -785,35 +915,49 @@
                         <div class="creator-followers">
                             {{ follower_count|default:0 }} followers
                         </div>
+
                     </div>
 
                 </div>
 
                 <div>
+
                     {% if user.is_authenticated and user == video.creator %}
-                        <span class="owner-label">Your video</span>
+
+                        <span class="owner-label">
+                            Your video
+                        </span>
 
                     {% elif user.is_authenticated and following_creator %}
-                        <form method="POST" action="{% url 'accounts:toggle_follow' video.creator.id %}" class="follow-form">
+
+                        <form method="POST"
+                              action="{% url 'accounts:toggle_follow' video.creator.id %}">
                             {% csrf_token %}
+
                             <button type="submit" class="follow-btn following">
                                 Following
                             </button>
                         </form>
 
                     {% elif user.is_authenticated %}
-                        <form method="POST" action="{% url 'accounts:toggle_follow' video.creator.id %}" class="follow-form">
+
+                        <form method="POST"
+                              action="{% url 'accounts:toggle_follow' video.creator.id %}">
                             {% csrf_token %}
+
                             <button type="submit" class="follow-btn">
                                 Follow
                             </button>
                         </form>
 
                     {% else %}
+
                         <a href="{% url 'account_login' %}" class="follow-btn">
                             Follow
                         </a>
+
                     {% endif %}
+
                 </div>
 
             </div>
@@ -827,11 +971,19 @@
                 </div>
 
                 <div class="video-description">
+
                     {% if video.description %}
+
                         {{ video.description }}
+
                     {% else %}
-                        <span style="color:#777;">No description provided.</span>
+
+                        <span style="color:#777;">
+                            No description provided.
+                        </span>
+
                     {% endif %}
+
                 </div>
 
             </div>
@@ -840,7 +992,10 @@
             <section class="comments-section">
 
                 <h2 class="section-heading">
-                    Comments <span id="commentCount">({{ comment_count|default:0 }})</span>
+                    Comments
+                    <span id="commentCount">
+                        ({{ comment_count|default:0 }})
+                    </span>
                 </h2>
 
                 {% if user.is_authenticated %}
@@ -849,6 +1004,7 @@
                           action="{% url 'videos:add_comment' video.id %}"
                           class="comment-form"
                           id="commentForm">
+
                         {% csrf_token %}
 
                         <textarea name="content"
@@ -856,44 +1012,60 @@
                                   placeholder="Write a comment..."
                                   required></textarea>
 
-                        <button type="submit" class="comment-submit" id="commentSubmitBtn">
+                        <button type="submit"
+                                class="comment-submit"
+                                id="commentSubmitBtn">
                             Comment
                         </button>
+
                     </form>
 
                 {% else %}
 
                     <p style="color:#999;font-size:13px;margin-bottom:20px;">
-                        <a href="{% url 'account_login' %}" style="color:#ff7900;">
+
+                        <a href="{% url 'account_login' %}"
+                           style="color:#ff7900;">
                             Sign in
                         </a>
+
                         to join the conversation.
+
                     </p>
 
                 {% endif %}
 
                 <div id="commentsContainer">
+
                     {% for comment in comments %}
 
                         <div class="comment-item" id="comment-{{ comment.id }}">
 
                             <div class="comment-avatar">
+
                                 {% if comment.user.profile.avatar_image %}
+
                                     <img src="{{ comment.user.profile.avatar_image.url }}"
                                          alt="{{ comment.user.username }}">
+
                                 {% else %}
+
                                     <i class="fas fa-user"></i>
+
                                 {% endif %}
+
                             </div>
 
                             <div class="comment-content">
 
                                 <div class="comment-author">
+
                                     {{ comment.user.get_full_name|default:comment.user.username }}
 
                                     <span class="comment-date">
                                         {{ comment.created_at|timesince }} ago
                                     </span>
+
                                 </div>
 
                                 <div class="comment-text">
@@ -909,10 +1081,12 @@
                         <div class="comment-empty" id="noCommentsMsg">
                             <i class="far fa-comment-dots"
                                style="font-size:25px;margin-bottom:10px;"></i>
+
                             <p>No comments yet. Be the first to comment.</p>
                         </div>
 
                     {% endfor %}
+
                 </div>
 
             </section>
@@ -922,7 +1096,9 @@
         <!-- RELATED VIDEOS SIDEBAR -->
         <aside class="related-sidebar">
 
-            <h2 class="sidebar-heading">Up next</h2>
+            <h2 class="sidebar-heading">
+                Up next
+            </h2>
 
             {% for related in related_videos %}
 
@@ -932,17 +1108,23 @@
                     <div class="related-thumbnail">
 
                         {% if related.thumbnail_url %}
+
                             <img src="{{ related.thumbnail_url }}"
                                  alt="{{ related.title }}"
                                  loading="lazy">
+
                         {% elif related.custom_thumbnail %}
+
                             <img src="{{ related.custom_thumbnail }}"
                                  alt="{{ related.title }}"
                                  loading="lazy">
+
                         {% else %}
+
                             <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#ff7900;">
                                 <i class="fas fa-play-circle fa-2x"></i>
                             </div>
+
                         {% endif %}
 
                         {% if related.duration %}
@@ -954,6 +1136,7 @@
                     </div>
 
                     <div>
+
                         <div class="related-title">
                             {{ related.title }}
                         </div>
@@ -962,6 +1145,7 @@
                             {{ related.creator.username }}<br>
                             {{ related.views|default:0 }} views
                         </div>
+
                     </div>
 
                 </a>
@@ -996,10 +1180,13 @@
 
                         <form method="POST"
                               action="{% url 'videos:purchase' video.id %}">
+
                             {% csrf_token %}
+
                             <button type="submit" class="purchase-btn">
                                 Purchase video
                             </button>
+
                         </form>
 
                     {% else %}
@@ -1017,168 +1204,154 @@
         </aside>
 
     </div>
+
 </div>
 
-<!-- Pass dynamic JS variables securely -->
-{{ related_videos.0.id|json_script:"nextVideoId" }}
+<!-- PLAYER LIBRARIES -->
+<script src="https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-// --- Global variables ---
-const videoSource = "{{ video.source }}";
-const nextVideoId = JSON.parse(document.getElementById('nextVideoId').textContent);
+(function () {
+    "use strict";
 
-// --- 1. LIKE BUTTON (AJAX) ---
-const likeBtn = document.getElementById('likeBtn');
-if (likeBtn) {
-    likeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = this.dataset.url;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const icon = document.getElementById('likeIcon');
-            const text = document.getElementById('likeText');
-            const countSpan = document.getElementById('likeCount');
-            
-            // Update Count
-            if (countSpan) countSpan.textContent = `(${data.count})`;
+    // =================================================
+    // 1. UP NEXT
+    // =================================================
 
-            if (data.liked) {
-                likeBtn.classList.add('active');
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                text.textContent = 'Liked';
-            } else {
-                likeBtn.classList.remove('active');
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                text.textContent = 'Like';
-            }
-        })
-        .catch(err => console.error('Error liking video:', err));
-    });
-}
+    const overlay = document.getElementById("upNextOverlay");
+    const countdownElement = document.getElementById("upNextCountdown");
+    const cancelButton = document.getElementById("cancelUpNextBtn");
+    const playNextLink = overlay
+        ? overlay.querySelector(".btn-play")
+        : null;
 
-// --- 2. COMMENT FORM (AJAX) ---
-const commentForm = document.getElementById('commentForm');
-if (commentForm) {
-    commentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const submitBtn = document.getElementById('commentSubmitBtn');
-        const textarea = document.getElementById('commentText');
-        
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Posting...';
+    const nextVideoUrl = playNextLink
+        ? playNextLink.href
+        : null;
 
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                // Clear textarea
-                textarea.value = '';
-                
-                // Remove "No comments yet" if it exists
-                const emptyMsg = document.getElementById('noCommentsMsg');
-                if (emptyMsg) emptyMsg.remove();
+    let countdownTimer = null;
+    let countdown = 5;
+    let nextStarted = false;
 
-                // Create new comment HTML
-                const commentHtml = `
-                    <div class="comment-item" id="comment-${data.comment_id}">
-                        <div class="comment-avatar">
-                            ${data.avatar ? `<img src="${data.avatar}" alt="${data.username}">` : `<i class="fas fa-user"></i>`}
-                        </div>
-                        <div class="comment-content">
-                            <div class="comment-author">
-                                ${data.username}
-                                <span class="comment-date">Just now</span>
-                            </div>
-                            <div class="comment-text">${data.text}</div>
-                        </div>
-                    </div>
-                `;
-                
-                // Prepend to container
-                const container = document.getElementById('commentsContainer');
-                container.insertAdjacentHTML('afterbegin', commentHtml);
-
-                // Update count
-                const countSpan = document.getElementById('commentCount');
-                if (countSpan) countSpan.textContent = `(${data.comment_count})`;
-            }
-        })
-        .catch(err => console.error('Error posting comment:', err))
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Comment';
-        });
-    });
-}
-
-// --- 3. UP NEXT LOGIC ---
-let countdownTimer;
-let currentCountdown = 3;
-
-function startUpNext() {
-    const overlay = document.getElementById('upNextOverlay');
-    const countdownEl = document.getElementById('upNextCountdown');
-    
-    if (!overlay || !nextVideoId) return;
-
-    overlay.classList.add('active');
-    currentCountdown = 3;
-    countdownEl.textContent = currentCountdown;
-
-    countdownTimer = setInterval(() => {
-        currentCountdown--;
-        countdownEl.textContent = currentCountdown;
-
-        if (currentCountdown <= 0) {
-            clearInterval(countdownTimer);
-            window.location.href = `/videos/${nextVideoId}/?autoplay=1`;
+    function startUpNext() {
+        if (!overlay || !nextVideoUrl || nextStarted) {
+            return;
         }
-    }, 1000);
-}
 
-function cancelUpNext() {
-    const overlay = document.getElementById('upNextOverlay');
-    if (overlay) overlay.classList.remove('active');
-    clearInterval(countdownTimer);
-}
+        nextStarted = true;
+        countdown = 5;
 
-// Bind cancel button
-const cancelBtn = document.getElementById('cancelUpNextBtn');
-if (cancelBtn) {
-    cancelBtn.addEventListener('click', cancelUpNext);
-}
+        overlay.classList.add("active");
 
-// A) HTML5 Video (Cloudinary)
-const html5Video = document.getElementById('mainVideoPlayer');
-if (videoSource === 'cloudinary' && html5Video && html5Video.tagName === 'VIDEO') {
-    html5Video.addEventListener('ended', startUpNext);
-}
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
+        }
 
-// B) YouTube API
-let ytPlayer;
-function onYouTubeIframeAPIReady() {
-    if (videoSource === 'youtube' && document.getElementById('mainVideoPlayer')) {
-        ytPlayer = new YT.Player('mainVideoPlayer', {
+        countdownTimer = setInterval(function () {
+            countdown--;
+
+            if (countdownElement) {
+                countdownElement.textContent = countdown;
+            }
+
+            if (countdown <= 0) {
+                clearInterval(countdownTimer);
+                window.location.assign(nextVideoUrl);
+            }
+
+        }, 1000);
+    }
+
+    function cancelUpNext() {
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+        }
+
+        if (overlay) {
+            overlay.classList.remove("active");
+        }
+
+        nextStarted = false;
+    }
+
+    if (cancelButton) {
+        cancelButton.addEventListener("click", cancelUpNext);
+    }
+
+    // =================================================
+    // 2. HTML5 VIDEO
+    // =================================================
+
+    const html5Video = document.getElementById("mainVideoPlayer");
+
+    if (html5Video && html5Video.tagName === "VIDEO") {
+        html5Video.addEventListener("ended", startUpNext);
+    }
+
+    // =================================================
+    // 3. BUNNY STREAM PLAYER.JS
+    // =================================================
+
+    const bunnyIframe = (
+        "{{ video.source|escapejs }}" === "bunny" &&
+        html5Video &&
+        html5Video.tagName === "IFRAME"
+    ) ? html5Video : null;
+
+    if (bunnyIframe) {
+        function initializeBunnyPlayer() {
+            if (!window.playerjs) {
+                console.warn("Bunny Player.js library is unavailable.");
+                return;
+            }
+
+            const bunnyPlayer = new playerjs.Player(bunnyIframe);
+
+            bunnyPlayer.on("ready", function () {
+                bunnyPlayer.on("ended", function () {
+                    startUpNext();
+                });
+            });
+        }
+
+        if (window.playerjs) {
+            initializeBunnyPlayer();
+        } else {
+            bunnyIframe.addEventListener("load", initializeBunnyPlayer, {
+                once: true
+            });
+        }
+    }
+
+    // =================================================
+    // 4. YOUTUBE PLAYER
+    // =================================================
+
+    const videoSource = "{{ video.source|escapejs }}";
+    let youtubePlayerInitialized = false;
+
+    function initializeYouTubePlayer() {
+        if (
+            videoSource !== "youtube" ||
+            youtubePlayerInitialized ||
+            !window.YT ||
+            !window.YT.Player
+        ) {
+            return;
+        }
+
+        const youtubeIframe = document.getElementById("mainVideoPlayer");
+
+        if (!youtubeIframe || youtubeIframe.tagName !== "IFRAME") {
+            return;
+        }
+
+        youtubePlayerInitialized = true;
+
+        new YT.Player("mainVideoPlayer", {
             events: {
-                'onStateChange': function(event) {
+                onStateChange: function (event) {
                     if (event.data === YT.PlayerState.ENDED) {
                         startUpNext();
                     }
@@ -1186,46 +1359,273 @@ function onYouTubeIframeAPIReady() {
             }
         });
     }
-}
 
-// C) Bunny Stream API (Fallback via postMessage)
-window.addEventListener('message', function(event) {
-    if (videoSource !== 'bunny') return;
-    
-    try {
-        const data = JSON.parse(event.data);
-        if (data.event === 'ended' || data.type === 'ended') {
-            startUpNext();
-        }
-    } catch (e) {
-        // Not a JSON message, ignore
+    window.onYouTubeIframeAPIReady = initializeYouTubePlayer;
+
+    if (window.YT && window.YT.Player) {
+        initializeYouTubePlayer();
     }
-});
 
+    // =================================================
+    // 5. LIKE BUTTON
+    // =================================================
 
-// --- 4. SHARE LOGIC ---
-function shareVideo() {
-    const shareData = {
-        title: document.title,
-        text: "{{ video.title|escapejs }}",
-        url: window.location.href
-    };
+    const likeButton = document.getElementById("likeBtn");
 
-    if (navigator.share) {
-        navigator.share(shareData).catch(function(error) {
-            console.log("Sharing cancelled or unavailable:", error);
-        });
-    } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(window.location.href)
-            .then(function() {
-                alert("Video link copied!");
+    if (likeButton) {
+        likeButton.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            fetch(likeButton.dataset.url, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
             })
-            .catch(function() {
-                prompt("Copy this video link:", window.location.href);
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("Could not update like.");
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                const icon = document.getElementById("likeIcon");
+                const text = document.getElementById("likeText");
+                const count = document.getElementById("likeCount");
+
+                if (count) {
+                    count.textContent = "(" + data.count + ")";
+                }
+
+                if (data.liked) {
+                    likeButton.classList.add("active");
+                    icon.classList.remove("far");
+                    icon.classList.add("fas");
+                    text.textContent = "Liked";
+                } else {
+                    likeButton.classList.remove("active");
+                    icon.classList.remove("fas");
+                    icon.classList.add("far");
+                    text.textContent = "Like";
+                }
+            })
+            .catch(function (error) {
+                console.error("Like error:", error);
             });
-    } else {
-        prompt("Copy this video link:", window.location.href);
+        });
     }
-}
+
+    // =================================================
+    // 6. COMMENT FORM
+    // =================================================
+
+    const commentForm = document.getElementById("commentForm");
+
+    if (commentForm) {
+        commentForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const submitButton = document.getElementById("commentSubmitBtn");
+            const textarea = document.getElementById("commentText");
+            const formData = new FormData(commentForm);
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Posting...";
+
+            fetch(commentForm.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("Could not post comment.");
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data.success) {
+                    return;
+                }
+
+                textarea.value = "";
+
+                const emptyMessage = document.getElementById("noCommentsMsg");
+
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+
+                const container = document.getElementById("commentsContainer");
+
+                const item = document.createElement("div");
+                item.className = "comment-item";
+                item.id = "comment-" + data.comment_id;
+
+                const content = document.createElement("div");
+                content.className = "comment-content";
+
+                const author = document.createElement("div");
+                author.className = "comment-author";
+                author.textContent = data.username;
+
+                const date = document.createElement("span");
+                date.className = "comment-date";
+                date.textContent = "Just now";
+
+                author.appendChild(date);
+
+                const commentText = document.createElement("div");
+                commentText.className = "comment-text";
+                commentText.textContent = data.text;
+
+                content.appendChild(author);
+                content.appendChild(commentText);
+                item.appendChild(content);
+
+                container.insertBefore(item, container.firstChild);
+
+                const countElement = document.getElementById("commentCount");
+
+                if (countElement) {
+                    countElement.textContent = "(" + data.comment_count + ")";
+                }
+            })
+            .catch(function (error) {
+                console.error("Comment error:", error);
+            })
+            .finally(function () {
+                submitButton.disabled = false;
+                submitButton.textContent = "Comment";
+            });
+        });
+    }
+
+    // =================================================
+    // 7. SHARE VIDEO
+    // =================================================
+
+    const shareButton = document.getElementById("shareVideoBtn");
+
+    function shareVideo() {
+        const shareData = {
+            title: document.title,
+            text: "{{ video.title|escapejs }}",
+            url: window.location.href
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData).catch(function (error) {
+                console.log("Sharing cancelled:", error);
+            });
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.location.href)
+                .then(function () {
+                    alert("Video link copied!");
+                })
+                .catch(function () {
+                    prompt("Copy this video link:", window.location.href);
+                });
+        } else {
+            prompt("Copy this video link:", window.location.href);
+        }
+    }
+
+    if (shareButton) {
+        shareButton.addEventListener("click", shareVideo);
+    }
+
+})();
+
+
+
+/* =========================================
+   BACKGROUND PLAYBACK & LOCK-SCREEN CONTROLS
+========================================= */
+
+(function () {
+    const player = document.getElementById("mainVideoPlayer");
+
+    if (!player) return;
+
+    const videoTitle = "{{ video.title|escapejs }}";
+    const videoArtwork = "{{ video.thumbnail_url|default:''|escapejs }}";
+
+    // Register lock-screen media information.
+    if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: videoTitle,
+            artist: "{{ video.creator.username|escapejs }}",
+            artwork: videoArtwork ? [
+                {
+                    src: videoArtwork,
+                    sizes: "512x512",
+                    type: "image/jpeg"
+                }
+            ] : []
+        });
+
+        // Lock-screen play and pause controls.
+        navigator.mediaSession.setActionHandler("play", function () {
+            if (player.tagName === "VIDEO") {
+                player.play().catch(console.error);
+            } else {
+                window.focus();
+            }
+        });
+
+        navigator.mediaSession.setActionHandler("pause", function () {
+            if (player.tagName === "VIDEO") {
+                player.pause();
+            }
+        });
+
+        navigator.mediaSession.setActionHandler("seekbackward", function () {
+            if (player.tagName === "VIDEO") {
+                player.currentTime = Math.max(0, player.currentTime - 10);
+            }
+        });
+
+        navigator.mediaSession.setActionHandler("seekforward", function () {
+            if (player.tagName === "VIDEO") {
+                player.currentTime = Math.min(
+                    player.duration || Infinity,
+                    player.currentTime + 10
+                );
+            }
+        });
+
+        navigator.mediaSession.setActionHandler("seekto", function (details) {
+            if (
+                player.tagName === "VIDEO" &&
+                Number.isFinite(details.seekTime)
+            ) {
+                player.currentTime = details.seekTime;
+            }
+        });
+    }
+
+    // Update playback status for native HTML5 video.
+    if (player.tagName === "VIDEO" && "mediaSession" in navigator) {
+        player.addEventListener("play", function () {
+            navigator.mediaSession.playbackState = "playing";
+        });
+
+        player.addEventListener("pause", function () {
+            navigator.mediaSession.playbackState = "paused";
+        });
+
+        player.addEventListener("ended", function () {
+            navigator.mediaSession.playbackState = "none";
+        });
+    }
+})();
+
 </script>
+
 {% endblock %}
