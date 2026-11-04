@@ -1,8 +1,7 @@
-
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Entstream | Discover Videos, Creators and Live Streams{% endblock %}
+{% block title %}Entstream | Discover Videos, Creators and Live TV{% endblock %}
 
 {% block meta_description %}
 Discover trending videos, follow your favourite creators, watch live streams and explore Entstream.
@@ -526,62 +525,65 @@ Discover trending videos, follow your favourite creators, watch live streams and
     overflow: hidden;
     padding: 28px 30px;
     background:
-        linear-gradient(100deg, rgba(71,29,15,.65), rgba(17,21,27,.97) 65%),
-        #15191f;
-    border: 1px solid #493021;
+        linear-gradient(100deg, rgba(71,29,8,.88), rgba(24,19,17,.96));
+    border: 1px solid rgba(255,121,0,.25);
 }
 
 .home-live-copy {
-    position: relative;
-    z-index: 1;
+    min-width: 0;
 }
 
 .home-live-heading {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: 11px;
 }
 
 .home-live-dot {
     width: 9px;
     height: 9px;
-    background: #f04444;
-    box-shadow: 0 0 0 5px rgba(240,68,68,.13);
+    border-radius: 50%;
+    background: #ff4b4b;
+    box-shadow: 0 0 0 5px rgba(255,75,75,.12);
     flex-shrink: 0;
 }
 
 .home-live-title {
     margin: 0;
     color: #fff;
-    font-size: 21px;
-    font-weight: 850;
+    font-size: 20px;
+    font-weight: 800;
 }
 
 .home-live-description {
-    margin: 0;
-    color: #aab2bd;
+    margin: 9px 0 0 20px;
+    color: #b8a99e;
     font-size: 12px;
     line-height: 1.6;
+}
+
+.home-live-strip .ss-btn {
+    flex-shrink: 0;
 }
 
 /* CREATOR BANNER */
 
 .home-creator-banner {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 25px;
-    padding: 27px 30px;
-    background: var(--surface);
+    align-items: center;
+    gap: 28px;
+    padding: 34px;
+    background: #11151b;
     border: 1px solid var(--border);
 }
 
 .home-creator-banner h2 {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     color: #fff;
-    font-size: 20px;
-    font-weight: 800;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 850;
+    letter-spacing: -.7px;
 }
 
 .home-creator-banner h2 span {
@@ -589,10 +591,10 @@ Discover trending videos, follow your favourite creators, watch live streams and
 }
 
 .home-creator-banner p {
-    max-width: 540px;
+    max-width: 620px;
     margin: 0;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.7;
 }
 
@@ -603,120 +605,110 @@ Discover trending videos, follow your favourite creators, watch live streams and
     flex-shrink: 0;
 }
 
-/* TABLET */
+/* RESPONSIVE */
 
 @media (max-width: 1100px) {
-    .home-wrapper {
-        padding: 20px;
-    }
-
     .home-video-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .home-hero {
-        min-height: 460px;
-        background-size: 58% 100%;
-    }
-
-    .home-hero-content {
-        width: 70%;
+        min-height: 450px;
+        background-size: 70% 100%;
     }
 }
 
-/* MOBILE */
-
 @media (max-width: 760px) {
     .home-wrapper {
-        padding: 12px 13px 40px;
+        padding: 16px 16px 42px;
     }
 
     .home-hero {
         min-height: 0;
-        display: block;
-        padding-top: clamp(175px, 55vw, 260px);
-        background-size: 100% auto;
-        background-position: center top;
+        background-size: cover;
+        background-position: center;
     }
 
     .home-hero::before {
-        background: linear-gradient(
-            180deg,
-            rgba(13,17,23,0) 0%,
-            rgba(13,17,23,.15) 38%,
-            rgba(13,17,23,.88) 67%,
-            #0d1117 100%
-        );
+        background: linear-gradient(90deg,
+            rgba(13,17,23,.98),
+            rgba(13,17,23,.78));
     }
 
     .home-hero-content {
         width: 100%;
-        max-width: none;
-        padding: 20px 20px 25px;
-    }
-
-    .home-eyebrow {
-        margin-bottom: 15px;
-        font-size: 10px;
+        padding: 34px 24px;
     }
 
     .home-hero-title {
-        font-size: clamp(34px, 8vw, 45px);
-        letter-spacing: -1.6px;
+        font-size: clamp(36px, 10vw, 52px);
+        letter-spacing: -1.8px;
     }
 
     .home-hero-description {
-        margin: 16px 0 22px;
         font-size: 13px;
-        line-height: 1.65;
-    }
-
-    .home-hero-actions {
-        gap: 9px;
-    }
-
-    .ss-btn {
-        min-height: 43px;
-        padding: 0 15px;
-        font-size: 12px;
     }
 
     .home-hero-features {
-        gap: 17px 12px;
-        margin-top: 27px;
+        gap: 16px;
+        margin-top: 30px;
         padding-top: 20px;
     }
 
-    .home-feature {
+    .home-video-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 12px;
+    }
+
+    .home-video-info {
         gap: 8px;
     }
 
-    .home-feature-icon svg {
-        width: 18px;
-        height: 18px;
+    .home-video-avatar {
+        width: 30px;
+        height: 30px;
     }
 
-    .home-feature-text h4 {
-        font-size: 11px;
+    .home-video-title {
+        font-size: 12px;
     }
 
-    .home-feature-text p {
-        font-size: 10px;
+    .home-live-strip,
+    .home-creator-banner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 23px 20px;
     }
 
-    .home-discovery {
-        margin-bottom: 29px;
-        gap: 7px;
+    .home-live-strip .ss-btn {
+        width: 100%;
     }
 
-    .home-chip {
-        min-height: 34px;
-        padding: 0 12px;
-        font-size: 11px;
+    .home-creator-banner-actions {
+        width: 100%;
     }
 
-    .home-section {
-        margin-bottom: 34px;
+    .home-creator-banner-actions .ss-btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-wrapper {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .home-hero-content {
+        padding: 30px 18px;
+    }
+
+    .home-hero-title {
+        font-size: 35px;
+    }
+
+    .home-hero-features {
+        grid-template-columns: 1fr;
     }
 
     .home-section-title {
@@ -724,107 +716,15 @@ Discover trending videos, follow your favourite creators, watch live streams and
     }
 
     .home-section-subtitle {
-        font-size: 10px;
-    }
-
-    .home-video-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 23px 12px;
-    }
-
-    .home-video-info {
-        gap: 8px;
-        margin-top: 9px;
-    }
-
-    .home-video-avatar {
-        width: 29px;
-        height: 29px;
-    }
-
-    .home-video-title {
         font-size: 11px;
     }
 
-    .home-video-creator,
-    .home-video-meta {
-        font-size: 9px;
-    }
-
-    .home-live-strip {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 22px 19px;
-        gap: 18px;
-    }
-
-    .home-live-title {
-        font-size: 18px;
-    }
-
-    .home-live-strip .ss-btn {
-        width: 100%;
-    }
-
-    .home-creator-banner {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 22px 19px;
-    }
-
-    .home-creator-banner h2 {
-        font-size: 18px;
-    }
-
-    .home-creator-banner-actions {
-        width: 100%;
-    }
-}
-
-/* SMALL MOBILE */
-
-@media (max-width: 380px) {
-    .home-wrapper {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .home-hero-content {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .home-hero-title {
-        font-size: 31px;
-    }
-
-    .home-hero-features {
-        grid-template-columns: 1fr;
-    }
-
     .home-video-grid {
-        gap: 20px 9px;
+        gap: 22px 10px;
     }
 
     .home-video-avatar {
         display: none;
-    }
-
-    .home-creator-banner-actions {
-        flex-direction: column;
-    }
-
-    .home-creator-banner-actions .ss-btn {
-        width: 100%;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .home-wrapper *,
-    .home-wrapper *::before,
-    .home-wrapper *::after {
-        transition-duration: .01ms !important;
-        animation-duration: .01ms !important;
     }
 }
 </style>
@@ -833,35 +733,28 @@ Discover trending videos, follow your favourite creators, watch live streams and
 {% block content %}
 <div class="home-wrapper">
 
-    <!-- CINEMATIC HERO -->
+    <!-- HERO -->
     <section class="home-hero">
         <div class="home-hero-content">
 
-            <div class="home-eyebrow">Your world. Your videos.</div>
+            <div class="home-eyebrow">Welcome to Entstream</div>
 
             <h1 class="home-hero-title">
-                Discover more.<br>
-                <span>Watch without limits.</span>
+                Turn Your Screen Into a
+                <span>World of Entertainment</span>
             </h1>
 
             <p class="home-hero-description">
-                Explore videos from independent creators, discover new channels,
-                join live streams and find the content worth coming back for.
+                Anytime · Anywhere · On Any Device
             </p>
 
             <div class="home-hero-actions">
                 <a href="{% url 'videos:list' %}" class="ss-btn ss-btn-primary">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M8 5v14l11-7z"/>
-                    </svg>
-                    Explore videos
+                    Start Watching Today!
                 </a>
 
                 {% if user.is_authenticated %}
                     <a href="{% url 'videos:upload' %}" class="ss-btn ss-btn-outline">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-                        </svg>
                         Upload a video
                     </a>
                 {% else %}
@@ -875,53 +768,52 @@ Discover trending videos, follow your favourite creators, watch live streams and
 
                 <div class="home-feature">
                     <div class="home-feature-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.2 1.2L3 12l5.9 1.9a2 2 0 0 1 1.2 1.2L12 21l1.9-5.9a2 2 0 0 1 1.2-1.2L21 12l-5.9-1.9a2 2 0 0 1-1.2-1.2L12 3z"/>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2v20M2 12h20"/>
                         </svg>
                     </div>
                     <div class="home-feature-text">
-                        <h4>Independent Creators</h4>
-                        <p>Real people. Real stories.</p>
+                        <h4>Movies &amp; Shows</h4>
+                        <p>Endless Entertainment</p>
                     </div>
                 </div>
 
                 <div class="home-feature">
                     <div class="home-feature-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="9"/>
                             <path d="M12 7v5l3 2"/>
                         </svg>
                     </div>
                     <div class="home-feature-text">
-                        <h4>Live Streams</h4>
-                        <p>Be part of the moment.</p>
+                        <h4>Live TV</h4>
+                        <p>Stay Updated</p>
                     </div>
                 </div>
 
                 <div class="home-feature">
                     <div class="home-feature-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M8 5v14l11-7z"/>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 5h16v14H4z"/>
+                            <path d="M8 9h8M8 13h5"/>
                         </svg>
                     </div>
                     <div class="home-feature-text">
-                        <h4>Endless Content</h4>
-                        <p>Entertainment, education and more.</p>
+                        <h4>Sports</h4>
+                        <p>Never Miss a Match</p>
                     </div>
                 </div>
 
                 <div class="home-feature">
                     <div class="home-feature-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 4h18v16H3z"/>
+                            <path d="M7 8h10M7 12h10M7 16h6"/>
                         </svg>
                     </div>
                     <div class="home-feature-text">
-                        <h4>Join the Community</h4>
-                        <p>Like, comment and share.</p>
+                        <h4>Documentaries</h4>
+                        <p>Explore &amp; Learn More</p>
                     </div>
                 </div>
 
@@ -929,14 +821,14 @@ Discover trending videos, follow your favourite creators, watch live streams and
         </div>
     </section>
 
-    <!-- DISCOVERY CATEGORIES -->
+    <!-- DISCOVERY NAVIGATION -->
     <nav class="home-discovery" aria-label="Video categories">
-        <a href="{% url 'videos:list' %}" class="home-chip is-active">All videos</a>
-        <a href="{% url 'streaming:stream_list' %}" class="home-chip">Live streams</a>
-        <a href="{% url 'videos:list' %}?sort=popular" class="home-chip">Popular</a>
-        <a href="{% url 'videos:list' %}?sort=latest" class="home-chip">Latest</a>
-        <a href="{% url 'videos:list' %}?category=entertainment" class="home-chip">Entertainment</a>
-        <a href="{% url 'videos:list' %}?category=education" class="home-chip">Education</a>
+        <a href="{% url 'videos:list' %}" class="home-chip is-active">For you</a>
+        <a href="{% url 'videos:list' %}?category=movies" class="home-chip">Movies</a>
+        <a href="{% url 'videos:list' %}?category=shows" class="home-chip">TV Shows</a>
+        <a href="{% url 'streaming:stream_list' %}" class="home-chip">Live TV</a>
+        <a href="{% url 'videos:list' %}?category=sports" class="home-chip">Sports</a>
+        <a href="{% url 'videos:list' %}?category=documentaries" class="home-chip">Documentaries</a>
         <a href="{% url 'videos:list' %}?category=music" class="home-chip">Music</a>
         <a href="{% url 'videos:list' %}?category=gaming" class="home-chip">Gaming</a>
     </nav>
@@ -947,8 +839,8 @@ Discover trending videos, follow your favourite creators, watch live streams and
             <div class="home-section-heading">
                 <span class="home-section-marker"></span>
                 <div>
-                    <h2 class="home-section-title">Trending now</h2>
-                    <p class="home-section-subtitle">Videos people are watching</p>
+                    <h2 class="home-section-title">Documentaries</h2>
+                    <p class="home-section-subtitle">Explore &amp; Learn More</p>
                 </div>
             </div>
 
@@ -1035,7 +927,7 @@ Discover trending videos, follow your favourite creators, watch live streams and
             <div class="home-live-copy">
                 <div class="home-live-heading">
                     <span class="home-live-dot"></span>
-                    <h2 class="home-live-title">Live on Entstream</h2>
+                    <h2 class="home-live-title">Stream More. Enjoy More.</h2>
                 </div>
 
                 <p class="home-live-description">
@@ -1055,8 +947,8 @@ Discover trending videos, follow your favourite creators, watch live streams and
             <div class="home-section-heading">
                 <span class="home-section-marker"></span>
                 <div>
-                    <h2 class="home-section-title">Recently uploaded</h2>
-                    <p class="home-section-subtitle">The latest videos from creators</p>
+                    <h2 class="home-section-title">Entertainment for Everyone</h2>
+                    <p class="home-section-subtitle">Movies, shows and more, all in one place</p>
                 </div>
             </div>
 
@@ -1131,7 +1023,7 @@ Discover trending videos, follow your favourite creators, watch live streams and
     <section class="home-section">
         <div class="home-creator-banner">
             <div>
-                <h2>Build your audience on <span>Entstream</span></h2>
+                <h2>Start Watching Today on <span>Entstream</span></h2>
                 <p>
                     Share your videos, grow your community, connect with viewers
                     and explore creator tools designed to help you develop your channel.
