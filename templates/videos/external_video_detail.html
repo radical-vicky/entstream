@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -5,10 +6,6 @@
 
 {% block extra_css %}
 <style>
-/* =========================================================
-   EXTERNAL VIDEO DETAIL
-========================================================= */
-
 .vd-page {
     width: 100%;
     max-width: 1600px;
@@ -23,7 +20,8 @@
     align-items: start;
 }
 
-.vd-main {
+.vd-main,
+.vd-sidebar {
     min-width: 0;
 }
 
@@ -33,7 +31,7 @@
     aspect-ratio: 16 / 9;
     background: #000;
     overflow: hidden;
-    border: 1px solid #30363d;
+    border: 1px solid #24292f;
 }
 
 .vd-player-wrap iframe {
@@ -51,6 +49,7 @@
     font-weight: 800;
     margin: 18px 0 10px;
     overflow-wrap: anywhere;
+    color: #f0f3f6;
 }
 
 .vd-meta {
@@ -73,8 +72,8 @@
     gap: 9px;
     padding: 15px 0;
     margin-top: 14px;
-    border-top: 1px solid #30363d;
-    border-bottom: 1px solid #30363d;
+    border-top: 1px solid #24292f;
+    border-bottom: 1px solid #24292f;
 }
 
 .vd-action-btn {
@@ -82,18 +81,20 @@
     align-items: center;
     gap: 8px;
     padding: 9px 13px;
-    background: #171d25;
+    background: #14181d;
     color: #dce2e9;
     border: 1px solid #30363d;
     font-size: 12px;
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
 }
 
 .vd-action-btn:hover {
     border-color: #ff7900;
     color: #ff7900;
+    background: #191d22;
 }
 
 .vd-action-btn i {
@@ -149,7 +150,7 @@
     align-items: center;
     gap: 15px;
     padding: 18px 0;
-    border-bottom: 1px solid #30363d;
+    border-bottom: 1px solid #24292f;
 }
 
 .vd-channel-info {
@@ -184,7 +185,7 @@
     padding: 17px;
     margin-top: 16px;
     background: #111820;
-    border: 1px solid #30363d;
+    border: 1px solid #24292f;
     font-size: 13px;
     line-height: 1.7;
     color: #c5ced8;
@@ -199,14 +200,11 @@
     margin-bottom: 10px;
 }
 
-.vd-sidebar {
-    min-width: 0;
-}
-
 .vd-sidebar-heading {
     font-size: 14px;
     font-weight: 900;
     margin-bottom: 15px;
+    color: #f0f3f6;
 }
 
 .vd-recommendation {
@@ -229,7 +227,6 @@
     flex-shrink: 0;
     background: #20252d;
     overflow: hidden;
-    border-radius: 4px;
 }
 
 .vd-rec-thumb {
@@ -279,6 +276,7 @@
         grid-template-columns: minmax(0, 1fr) 300px;
         gap: 18px;
     }
+
     .vd-rec-thumb-wrap {
         width: 115px;
     }
@@ -288,12 +286,15 @@
     .vd-layout {
         grid-template-columns: 1fr;
     }
+
     .vd-sidebar {
         margin-top: 12px;
     }
+
     .vd-recommendation {
         max-width: 650px;
     }
+
     .vd-rec-thumb-wrap {
         width: 150px;
     }
@@ -304,19 +305,24 @@
         font-size: 17px;
         margin-top: 13px;
     }
+
     .vd-actions {
         gap: 7px;
     }
+
     .vd-action-btn {
         padding: 8px 10px;
         font-size: 11px;
     }
+
     .vd-channel {
         align-items: flex-start;
     }
+
     .vd-rec-thumb-wrap {
         width: 125px;
     }
+
     .vd-rec-title {
         font-size: 11px;
     }
@@ -327,13 +333,12 @@
 
 {% block content %}
 <div class="vd-page">
-
     <div class="vd-layout">
 
         <!-- MAIN VIDEO CONTENT -->
         <main class="vd-main">
 
-            <!-- VIDEO PLAYER -->
+            <!-- YOUTUBE VIDEO PLAYER -->
             <div class="vd-player-wrap" id="vdPlayerWrap">
                 <iframe
                     id="mainExternalPlayer"
@@ -344,7 +349,6 @@
                     allowfullscreen>
                 </iframe>
             </div>
-
 
             <!-- VIDEO TITLE -->
             <h1 class="vd-title">
@@ -368,50 +372,88 @@
                 {% endif %}
             </div>
 
-
             <!-- ACTION BUTTONS -->
             <div class="vd-actions">
-                <button type="button" class="vd-action-btn" id="vdLikeButton" title="Like">
+
+                <button
+                    type="button"
+                    class="vd-action-btn"
+                    id="vdLikeButton"
+                    title="Like">
                     <i class="far fa-thumbs-up"></i>
                     <span>Like</span>
                 </button>
 
                 <div class="vd-share-wrap">
-                    <button type="button" class="vd-action-btn" id="vdShareButton">
-                        <i class="fas fa-share"></i> Share
+                    <button
+                        type="button"
+                        class="vd-action-btn"
+                        id="vdShareButton">
+                        <i class="fas fa-share"></i>
+                        Share
                     </button>
 
                     <div class="vd-share-menu" id="vdShareMenu">
+
                         <button type="button" id="vdCopyLink">
-                            <i class="fas fa-link"></i> Copy link
+                            <i class="fas fa-link"></i>
+                            Copy link
                         </button>
-                        <a id="vdWhatsApp" href="#" target="_blank" rel="noopener">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
+
+                        <a
+                            id="vdWhatsApp"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp
                         </a>
-                        <a id="vdFacebook" href="#" target="_blank" rel="noopener">
-                            <i class="fab fa-facebook"></i> Facebook
+
+                        <a
+                            id="vdFacebook"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-facebook"></i>
+                            Facebook
                         </a>
-                        <a id="vdTwitter" href="#" target="_blank" rel="noopener">
-                            <i class="fab fa-x-twitter"></i> X / Twitter
+
+                        <a
+                            id="vdTwitter"
+                            href="#"
+                            target="_blank"
+                            rel="noopener">
+                            <i class="fab fa-x-twitter"></i>
+                            X / Twitter
                         </a>
+
                         <a id="vdEmail" href="#">
-                            <i class="fas fa-envelope"></i> Email
+                            <i class="fas fa-envelope"></i>
+                            Email
                         </a>
+
                         <button type="button" id="vdNativeShare">
-                            <i class="fas fa-mobile-alt"></i> More sharing options
+                            <i class="fas fa-mobile-alt"></i>
+                            More sharing options
                         </button>
+
                     </div>
                 </div>
             </div>
 
-
             <!-- CHANNEL INFORMATION -->
             <div class="vd-channel">
                 <div class="vd-channel-info">
+
                     {% if external_video.channel_thumbnail %}
-                        <img class="vd-channel-avatar" src="{{ external_video.channel_thumbnail }}" alt="{{ external_video.channel_title|default:'Channel' }}">
+                        <img
+                            class="vd-channel-avatar"
+                            src="{{ external_video.channel_thumbnail }}"
+                            alt="{{ external_video.channel_title|default:'Channel' }}">
                     {% else %}
-                        <div class="vd-channel-avatar" style="display:grid;place-items:center;color:#ff7900;">
+                        <div
+                            class="vd-channel-avatar"
+                            style="display:grid;place-items:center;color:#ff7900;">
                             <i class="fas fa-user"></i>
                         </div>
                     {% endif %}
@@ -420,60 +462,90 @@
                         <div class="vd-channel-name">
                             {{ external_video.channel_title|default:"StreamSphere Creator" }}
                         </div>
+
                         <div class="vd-channel-label">
                             Creator
                         </div>
                     </div>
+
                 </div>
             </div>
-
 
             <!-- DESCRIPTION -->
             {% if external_video.description %}
-            <div class="vd-description">
-                <div class="vd-description-title">
-                    Description
+                <div class="vd-description">
+                    <div class="vd-description-title">
+                        Description
+                    </div>
+
+                    {{ external_video.description }}
                 </div>
-                {{ external_video.description }}
-            </div>
             {% endif %}
 
         </main>
 
-
         <!-- MORE VIDEOS -->
         <aside class="vd-sidebar">
+
             <h3 class="vd-sidebar-heading">
                 More videos
             </h3>
 
             {% for related in recommended_videos %}
                 {% if related.video_id %}
-                <a href="{% url 'videos:external_detail' related.video_id %}" class="vd-recommendation">
-                    <div class="vd-rec-thumb-wrap">
-                        {% if related.thumbnail_url %}
-                            <img class="vd-rec-thumb" src="{{ related.thumbnail_url }}" alt="{{ related.title }}" loading="lazy">
-                        {% elif related.thumbnail %}
-                            <img class="vd-rec-thumb" src="{{ related.thumbnail }}" alt="{{ related.title }}" loading="lazy">
-                        {% else %}
-                            <img class="vd-rec-thumb" src="https://i.ytimg.com/vi/{{ related.video_id }}/hqdefault.jpg" alt="{{ related.title }}" loading="lazy">
-                        {% endif %}
-                    </div>
-                    <div class="vd-rec-info">
-                        <div class="vd-rec-title">
-                            {{ related.title }}
+
+                    <a
+                        href="{% url 'videos:external_detail' related.video_id %}"
+                        class="vd-recommendation">
+
+                        <div class="vd-rec-thumb-wrap">
+
+                            {% if related.thumbnail_url %}
+                                <img
+                                    class="vd-rec-thumb"
+                                    src="{{ related.thumbnail_url }}"
+                                    alt="{{ related.title }}"
+                                    loading="lazy">
+
+                            {% elif related.thumbnail %}
+                                <img
+                                    class="vd-rec-thumb"
+                                    src="{{ related.thumbnail }}"
+                                    alt="{{ related.title }}"
+                                    loading="lazy">
+
+                            {% else %}
+                                <img
+                                    class="vd-rec-thumb"
+                                    src="https://i.ytimg.com/vi/{{ related.video_id }}/hqdefault.jpg"
+                                    alt="{{ related.title }}"
+                                    loading="lazy">
+                            {% endif %}
+
                         </div>
-                        <div class="vd-rec-channel">
-                            {{ related.channel_title|default:"StreamSphere Creator" }}
+
+                        <div class="vd-rec-info">
+
+                            <div class="vd-rec-title">
+                                {{ related.title }}
+                            </div>
+
+                            <div class="vd-rec-channel">
+                                {{ related.channel_title|default:"StreamSphere Creator" }}
+                            </div>
+
                         </div>
-                    </div>
-                </a>
+                    </a>
+
                 {% endif %}
             {% empty %}
+
                 <div class="vd-empty-recommendations">
                     No more videos available.
                 </div>
+
             {% endfor %}
+
         </aside>
 
     </div>
@@ -483,80 +555,345 @@
 
 {% block extra_js %}
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-    // Pass the next video ID from Django to JavaScript safely
-    const nextVideoId = "{{ recommended_videos.0.video_id|default:'' }}";
+(function () {
+    "use strict";
+
+    /* =========================================================
+       VIDEO DATA FROM DJANGO
+    ========================================================= */
+
+    const nextVideoId = "{{ recommended_videos.0.video_id|default:''|escapejs }}";
+
+    const currentVideoTitle =
+        "{{ external_video.title|default:'StreamSphere video'|escapejs }}";
+
+    const currentChannel =
+        "{{ external_video.channel_title|default:'StreamSphere'|escapejs }}";
+
+    const currentThumbnail =
+        "{% if external_video.thumbnail_url %}{{ external_video.thumbnail_url|escapejs }}{% elif external_video.thumbnail %}{{ external_video.thumbnail|escapejs }}{% endif %}";
+
+    let youtubePlayer = null;
+    let mediaSessionReady = false;
+
+
+    /* =========================================================
+       MEDIA SESSION / LOCK SCREEN CONTROLS
+    ========================================================= */
+
+    function setupMediaSession(player) {
+        if (!("mediaSession" in navigator)) {
+            return;
+        }
+
+        if (typeof MediaMetadata === "undefined") {
+            return;
+        }
+
+        try {
+            const artwork = currentThumbnail
+                ? [
+                    {
+                        src: currentThumbnail,
+                        sizes: "512x512",
+                        type: "image/jpeg"
+                    }
+                ]
+                : [];
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: currentVideoTitle,
+                artist: currentChannel,
+                album: "StreamSphere",
+                artwork: artwork
+            });
+
+            navigator.mediaSession.setActionHandler("play", function () {
+                if (player && player.playVideo) {
+                    player.playVideo();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler("pause", function () {
+                if (player && player.pauseVideo) {
+                    player.pauseVideo();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler("seekbackward", function () {
+                if (!player || !player.getCurrentTime) return;
+
+                const currentTime = player.getCurrentTime();
+                player.seekTo(Math.max(0, currentTime - 10), true);
+            });
+
+            navigator.mediaSession.setActionHandler("seekforward", function () {
+                if (!player || !player.getCurrentTime) return;
+
+                const currentTime = player.getCurrentTime();
+                player.seekTo(currentTime + 10, true);
+            });
+
+            navigator.mediaSession.setActionHandler("seekto", function (details) {
+                if (
+                    player &&
+                    player.seekTo &&
+                    details.seekTime !== undefined
+                ) {
+                    player.seekTo(details.seekTime, true);
+                }
+            });
+
+            mediaSessionReady = true;
+
+        } catch (error) {
+            console.warn("Media Session setup failed:", error);
+        }
+    }
+
+
+    function updateMediaSessionState(state) {
+        if (!("mediaSession" in navigator)) {
+            return;
+        }
+
+        try {
+            if (state === YT.PlayerState.PLAYING) {
+                navigator.mediaSession.playbackState = "playing";
+            } else if (
+                state === YT.PlayerState.PAUSED ||
+                state === YT.PlayerState.ENDED
+            ) {
+                navigator.mediaSession.playbackState = "paused";
+            } else {
+                navigator.mediaSession.playbackState = "none";
+            }
+        } catch (error) {
+            console.warn("Could not update media playback state:", error);
+        }
+    }
+
+
+    function clearMediaSession() {
+        if (!("mediaSession" in navigator)) {
+            return;
+        }
+
+        try {
+            navigator.mediaSession.playbackState = "none";
+        } catch (error) {
+            console.warn("Could not clear media session:", error);
+        }
+    }
+
+
+    /* =========================================================
+       YOUTUBE PLAYER INITIALIZATION
+    ========================================================= */
 
     window.onYouTubeIframeAPIReady = function () {
-        let player = new YT.Player("mainExternalPlayer", {
+        const iframe = document.getElementById("mainExternalPlayer");
+
+        if (!iframe || typeof YT === "undefined") {
+            return;
+        }
+
+        youtubePlayer = new YT.Player("mainExternalPlayer", {
             events: {
-                "onStateChange": function (event) {
-                    // Check if the video has ended
+                onReady: function (event) {
+                    setupMediaSession(event.target);
+                },
+
+                onStateChange: function (event) {
+                    updateMediaSessionState(event.data);
+
+                    /*
+                     * Automatically play the next recommended video
+                     * when the current YouTube video finishes.
+                     */
                     if (event.data === YT.PlayerState.ENDED) {
-                        // If there is a next video, load it immediately inside the iframe
                         if (nextVideoId) {
-                            player.loadVideoById(nextVideoId);
-                            
-                            // Optional: Update the URL in the browser address bar without reloading the page
-                            // window.history.pushState({}, '', `/videos/external/${nextVideoId}/`);
+                            event.target.loadVideoById(nextVideoId);
+
+                            /*
+                             * The next video uses the same player.
+                             * Update lock-screen metadata.
+                             */
+                            if ("mediaSession" in navigator && mediaSessionReady) {
+                                try {
+                                    navigator.mediaSession.metadata =
+                                        new MediaMetadata({
+                                            title: "Next video",
+                                            artist: currentChannel,
+                                            album: "StreamSphere"
+                                        });
+                                } catch (error) {
+                                    console.warn(error);
+                                }
+                            }
+                        } else {
+                            clearMediaSession();
                         }
                     }
+                },
+
+                onError: function (event) {
+                    console.error("YouTube player error:", event.data);
                 }
             }
         });
     };
 
+
+    /* =========================================================
+       SHARE MENU
+    ========================================================= */
+
     document.addEventListener("DOMContentLoaded", function () {
-        /* ========================================================
-           SHARE MENU & LINK LOGIC
-        ======================================================== */
+
         const shareButton = document.getElementById("vdShareButton");
         const shareMenu = document.getElementById("vdShareMenu");
+
         const shareUrl = window.location.href;
-        const safeShareTitle = "{{ external_video.title|default:'StreamSphere video'|escapejs }}";
+        const safeShareTitle = currentVideoTitle;
 
         if (shareButton && shareMenu) {
+
             shareButton.addEventListener("click", function (event) {
                 event.stopPropagation();
                 shareMenu.classList.toggle("show");
             });
 
             document.addEventListener("click", function (event) {
-                if (!shareMenu.contains(event.target) && !shareButton.contains(event.target)) {
+                if (
+                    !shareMenu.contains(event.target) &&
+                    !shareButton.contains(event.target)
+                ) {
+                    shareMenu.classList.remove("show");
+                }
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
                     shareMenu.classList.remove("show");
                 }
             });
         }
+
+
+        /* =====================================================
+           SOCIAL SHARE LINKS
+        ===================================================== */
 
         const whatsapp = document.getElementById("vdWhatsApp");
         const facebook = document.getElementById("vdFacebook");
         const twitter = document.getElementById("vdTwitter");
         const email = document.getElementById("vdEmail");
 
-        if (whatsapp) whatsapp.href = "https://wa.me/?text=" + encodeURIComponent(safeShareTitle + " " + shareUrl);
-        if (facebook) facebook.href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl);
-        if (twitter) twitter.href = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(safeShareTitle) + "&url=" + encodeURIComponent(shareUrl);
-        if (email) email.href = "mailto:?subject=" + encodeURIComponent(safeShareTitle) + "&body=" + encodeURIComponent(shareUrl);
+        if (whatsapp) {
+            whatsapp.href =
+                "https://wa.me/?text=" +
+                encodeURIComponent(safeShareTitle + " " + shareUrl);
+        }
+
+        if (facebook) {
+            facebook.href =
+                "https://www.facebook.com/sharer/sharer.php?u=" +
+                encodeURIComponent(shareUrl);
+        }
+
+        if (twitter) {
+            twitter.href =
+                "https://twitter.com/intent/tweet?text=" +
+                encodeURIComponent(safeShareTitle) +
+                "&url=" +
+                encodeURIComponent(shareUrl);
+        }
+
+        if (email) {
+            email.href =
+                "mailto:?subject=" +
+                encodeURIComponent(safeShareTitle) +
+                "&body=" +
+                encodeURIComponent(shareUrl);
+        }
+
+
+        /* =====================================================
+           COPY VIDEO LINK
+        ===================================================== */
 
         const copyLinkBtn = document.getElementById("vdCopyLink");
+
         if (copyLinkBtn) {
             copyLinkBtn.addEventListener("click", async function () {
                 try {
                     await navigator.clipboard.writeText(shareUrl);
-                    copyLinkBtn.textContent = "Copied";
-                    setTimeout(() => { copyLinkBtn.textContent = "Copy link"; }, 1800);
-                } catch (error) {}
-            });
-        }
 
-        const nativeShareBtn = document.getElementById("vdNativeShare");
-        if (nativeShareBtn) {
-            nativeShareBtn.addEventListener("click", async function () {
-                if (navigator.share) {
-                    try { await navigator.share({ title: safeShareTitle, url: shareUrl }); } catch (error) {}
+                    copyLinkBtn.textContent = "Copied";
+
+                    setTimeout(function () {
+                        copyLinkBtn.innerHTML =
+                            '<i class="fas fa-link"></i> Copy link';
+                    }, 1800);
+
+                } catch (error) {
+                    console.error("Unable to copy video link:", error);
+                    copyLinkBtn.textContent = "Copy unavailable";
                 }
             });
         }
+
+
+        /* =====================================================
+           NATIVE SHARE
+        ===================================================== */
+
+        const nativeShareBtn = document.getElementById("vdNativeShare");
+
+        if (nativeShareBtn) {
+            nativeShareBtn.addEventListener("click", async function () {
+
+                if (!navigator.share) {
+                    if (navigator.clipboard) {
+                        try {
+                            await navigator.clipboard.writeText(shareUrl);
+                            nativeShareBtn.textContent = "Link copied";
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+
+                    return;
+                }
+
+                try {
+                    await navigator.share({
+                        title: safeShareTitle,
+                        text: "Watch this video on StreamSphere",
+                        url: shareUrl
+                    });
+                } catch (error) {
+                    if (error.name !== "AbortError") {
+                        console.error("Sharing failed:", error);
+                    }
+                }
+            });
+        }
+
     });
+
+
+    /* =========================================================
+       CLEANUP
+    ========================================================= */
+
+    window.addEventListener("pagehide", function () {
+        clearMediaSession();
+    });
+
+})();
 </script>
 {% endblock %}
